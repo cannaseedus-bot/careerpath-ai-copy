@@ -1,24 +1,24 @@
-import Career from './pages/Career';
-import SWOT from './pages/SWOT';
-import Nemesis from './pages/Nemesis';
-import ModelManager from './pages/ModelManager';
 import APIManager from './pages/APIManager';
 import CLIPlayground from './pages/CLIPlayground';
+import Career from './pages/Career';
 import Home from './pages/Home';
+import ModelManager from './pages/ModelManager';
+import Nemesis from './pages/Nemesis';
 import Pricing from './pages/Pricing';
+import SWOT from './pages/SWOT';
 import Success from './pages/Success';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Career": Career,
-    "SWOT": SWOT,
-    "Nemesis": Nemesis,
-    "ModelManager": ModelManager,
     "APIManager": APIManager,
     "CLIPlayground": CLIPlayground,
+    "Career": Career,
     "Home": Home,
+    "ModelManager": ModelManager,
+    "Nemesis": Nemesis,
     "Pricing": Pricing,
+    "SWOT": SWOT,
     "Success": Success,
 }
 

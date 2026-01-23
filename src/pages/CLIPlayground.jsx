@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Terminal, Play, Copy, Download, Settings } from "lucide-react";
+import { Terminal, Play, Copy, Download, Settings, FileArchive } from "lucide-react";
+import { exportCliConfig } from "@/functions/export-cli-config";
 
 export default function CLIPlayground() {
   const [selectedModel, setSelectedModel] = useState("");
@@ -64,15 +65,37 @@ ${input}
     a.click();
   };
 
+  const handleExportAll = async () => {
+    try {
+      const { data } = await exportCliConfig();
+      const blob = new Blob([data], { type: 'application/zip' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cli-config-${Date.now()}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export configurations');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white flex items-center gap-3">
-            <Terminal className="w-10 h-10 text-purple-400" />
-            CLI Playground
-          </h1>
-          <p className="text-slate-400 mt-2">Test your models and generate CLI configurations</p>
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-white flex items-center gap-3">
+              <Terminal className="w-10 h-10 text-purple-400" />
+              CLI Playground
+            </h1>
+            <p className="text-slate-400 mt-2">Test your models and generate CLI configurations</p>
+          </div>
+          <Button onClick={handleExportAll} className="bg-blue-600 hover:bg-blue-700">
+            <FileArchive className="w-5 h-5 mr-2" />
+            Export All CLI Files
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
