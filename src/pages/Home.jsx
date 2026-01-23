@@ -41,6 +41,14 @@ export default function Home() {
               </Button>
             </Link>
           </div>
+          
+          <div className="mt-8">
+            <Link to={createPageUrl("Pricing")}>
+              <Button variant="ghost" className="text-purple-300 hover:text-white">
+                View Pricing - Starting at $9.99/mo →
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

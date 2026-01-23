@@ -5,6 +5,7 @@ import ModelManager from './pages/ModelManager';
 import APIManager from './pages/APIManager';
 import CLIPlayground from './pages/CLIPlayground';
 import Home from './pages/Home';
+import Pricing from './pages/Pricing';
 import __Layout from './Layout.jsx';
 
 
@@ -16,6 +17,7 @@ export const PAGES = {
     "APIManager": APIManager,
     "CLIPlayground": CLIPlayground,
     "Home": Home,
+    "Pricing": Pricing,
 }
 
 export const pagesConfig = {
