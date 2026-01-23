@@ -7,6 +7,7 @@ import Nemesis from './pages/Nemesis';
 import Pricing from './pages/Pricing';
 import SWOT from './pages/SWOT';
 import Success from './pages/Success';
+import CLIEditor from './pages/CLIEditor';
 import __Layout from './Layout.jsx';
 
 
@@ -20,6 +21,7 @@ export const PAGES = {
     "Pricing": Pricing,
     "SWOT": SWOT,
     "Success": Success,
+    "CLIEditor": CLIEditor,
 }
 
 export const pagesConfig = {
