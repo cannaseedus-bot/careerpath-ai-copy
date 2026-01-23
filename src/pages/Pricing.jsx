@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, Zap, Rocket, Crown, Terminal } from "lucide-react";
+import { createCheckout } from "@/functions/create-checkout";
 
 const tiers = [
   {
     name: "Starter",
+    key: "starter",
     price: "$9.99",
     period: "/month",
     icon: Terminal,
@@ -21,11 +23,12 @@ const tiers = [
       "2GB model storage",
       "Standard endpoints"
     ],
-    cta: "Start Free Trial",
+    cta: "Subscribe Now",
     popular: false
   },
   {
     name: "Professional",
+    key: "professional",
     price: "$29.99",
     period: "/month",
     icon: Rocket,
@@ -39,11 +42,12 @@ const tiers = [
       "Custom endpoints",
       "cPanel integration"
     ],
-    cta: "Get Started",
+    cta: "Subscribe Now",
     popular: true
   },
   {
     name: "Enterprise",
+    key: "enterprise",
     price: "$99.99",
     period: "/month",
     icon: Crown,
@@ -58,7 +62,7 @@ const tiers = [
       "White-label options",
       "SLA guarantee"
     ],
-    cta: "Contact Sales",
+    cta: "Subscribe Now",
     popular: false
   }
 ];
@@ -71,6 +75,29 @@ const addOns = [
 ];
 
 export default function Pricing() {
+  const [loading, setLoading] = useState(null);
+
+  const handleCheckout = async (tierKey) => {
+    if (window.self !== window.top) {
+      alert('Checkout is only available in the published app. Please open the app in a new tab.');
+      return;
+    }
+
+    setLoading(tierKey);
+    try {
+      const { data } = await createCheckout({
+        tier: tierKey,
+        success_url: window.location.origin + '/success',
+        cancel_url: window.location.href
+      });
+      window.location.href = data.url;
+    } catch (error) {
+      console.error('Checkout failed:', error);
+      alert('Failed to start checkout. Please try again.');
+      setLoading(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white py-20 px-6">
       <div className="max-w-7xl mx-auto">
@@ -136,8 +163,12 @@ export default function Pricing() {
                     ))}
                   </ul>
                   
-                  <Button className={`w-full ${buttonColors[tier.color]}`}>
-                    {tier.cta}
+                  <Button 
+                    className={`w-full ${buttonColors[tier.color]}`}
+                    onClick={() => handleCheckout(tier.key)}
+                    disabled={loading === tier.key}
+                  >
+                    {loading === tier.key ? 'Processing...' : tier.cta}
                   </Button>
                 </CardContent>
               </Card>
