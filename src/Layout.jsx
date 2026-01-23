@@ -16,6 +16,10 @@ import {
 } from "lucide-react";
 
 const navigationItems = {
+    Home: [],
+    ModelManager: [],
+    APIManager: [],
+    CLIPlayground: [],
     Career: [
         { title: "Mission", id: "hero", icon: User },
         { title: "Studios", id: "studios", icon: Briefcase },
@@ -42,7 +46,8 @@ export default function Layout({ children, currentPageName }) {
     const [activeSection, setActiveSection] = useState(currentPageName === 'SWOT' ? 'swot-hero' : (currentPageName === 'Nemesis' ? 'nemesis-hero' : 'hero'));
     const observer = useRef(null);
 
-    const currentNavItems = navigationItems[currentPageName] || navigationItems.Career;
+    const currentNavItems = navigationItems[currentPageName] || [];
+    const showSidebar = currentNavItems.length > 0;
 
     useEffect(() => {
         observer.current = new IntersectionObserver((entries) => {
@@ -153,6 +158,7 @@ export default function Layout({ children, currentPageName }) {
             </div>
 
             {/* Sidebar - Hidden in Print */}
+            {showSidebar && (
             <aside className="fixed inset-y-0 left-0 flex flex-col gap-3 sm:gap-4 py-6 px-3 items-center bg-transparent z-50 print:hidden">
                 <a 
                     href={currentPageName === 'SWOT' ? '#swot-hero' : (currentPageName === 'Nemesis' ? '#nemesis-hero' : '#hero')}
@@ -188,11 +194,12 @@ export default function Layout({ children, currentPageName }) {
                     className="w-9 h-9 mt-auto rounded-full flex items-center justify-center transition-all duration-150 bg-white bg-opacity-10 backdrop-blur-sm border border-white border-opacity-10 hover:bg-opacity-20 hover:scale-105 text-white will-change-transform"
                 >
                     <Download className="w-4 h-4" />
-                </button>
-            </aside>
+                    </button>
+                    </aside>
+                    )}
             
             {/* Main Content */}
-            <main className="relative z-10 flex flex-col items-center w-full px-4 custom-scrollbar overflow-y-auto min-h-screen sm:pl-20 md:pl-24 lg:pl-28 print:pl-0 print:px-8">
+            <main className={`relative z-10 flex flex-col items-center w-full px-4 custom-scrollbar overflow-y-auto min-h-screen print:pl-0 print:px-8 ${showSidebar ? 'sm:pl-20 md:pl-24 lg:pl-28' : ''}`}>
                 {children}
             </main>
         </div>
