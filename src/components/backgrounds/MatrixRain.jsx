@@ -21,6 +21,8 @@ export default function MatrixRain() {
     
     // Array to track the y position of each drop
     const drops = Array(columns).fill(0);
+    let frameCount = 0;
+    const animationSpeed = 2; // Update every 2 frames (slower effect)
 
     const draw = () => {
       // Semi-transparent background for trail effect
@@ -53,8 +55,10 @@ export default function MatrixRain() {
         // Reset shadow
         ctx.shadowColor = 'transparent';
 
-        // Move to next position
-        drops[i]++;
+        // Move to next position (slower animation)
+        if (frameCount % animationSpeed === 0) {
+          drops[i]++;
+        }
 
         // Reset to top if it goes off screen
         if (y > canvas.height && Math.random() > 0.95) {
@@ -62,6 +66,7 @@ export default function MatrixRain() {
         }
       }
 
+      frameCount++;
       requestAnimationFrame(draw);
     };
 
