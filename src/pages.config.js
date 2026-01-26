@@ -4,11 +4,11 @@ import CLIPlayground from './pages/CLIPlayground';
 import Career from './pages/Career';
 import Home from './pages/Home';
 import ModelManager from './pages/ModelManager';
+import Monitoring from './pages/Monitoring';
 import Nemesis from './pages/Nemesis';
 import Pricing from './pages/Pricing';
 import SWOT from './pages/SWOT';
 import Success from './pages/Success';
-import Monitoring from './pages/Monitoring';
 import __Layout from './Layout.jsx';
 
 
@@ -19,11 +19,11 @@ export const PAGES = {
     "Career": Career,
     "Home": Home,
     "ModelManager": ModelManager,
+    "Monitoring": Monitoring,
     "Nemesis": Nemesis,
     "Pricing": Pricing,
     "SWOT": SWOT,
     "Success": Success,
-    "Monitoring": Monitoring,
 }
 
 export const pagesConfig = {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import MatrixRain from "@/components/backgrounds/MatrixRain";
 import { 
     User,
     Briefcase,
@@ -145,16 +146,8 @@ export default function Layout({ children, currentPageName }) {
              <div className="cursor-outline"></div>
 
             {/* Background - Hidden in Print */}
-            <div className="fixed inset-0 z-0 print:hidden">
-                <iframe 
-                    src="https://my.spline.design/thresholddarkambientui-v0gkZCfi6zXm69kE0wccy70f/" 
-                    frameBorder="0" 
-                    width="100%" 
-                    height="100%" 
-                    className="w-full h-full"
-                    loading="lazy"
-                    title="3D Background"
-                ></iframe>
+            <div className="fixed inset-0 z-0 print:hidden bg-black">
+                <MatrixRain />
             </div>
 
             {/* Sidebar - Hidden in Print */}
