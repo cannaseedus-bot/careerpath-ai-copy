@@ -22,7 +22,7 @@ export default function MatrixRain() {
     // Array to track the y position of each drop
     const drops = Array(columns).fill(0);
     let frameCount = 0;
-    const animationSpeed = 2; // Update every 2 frames (slower effect)
+    const animationSpeed = 6; // Update every 6 frames (slower descent)
 
     const draw = () => {
       // Semi-transparent background for trail effect
