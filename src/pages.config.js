@@ -1,4 +1,5 @@
 import APIManager from './pages/APIManager';
+import CLIEditor from './pages/CLIEditor';
 import CLIPlayground from './pages/CLIPlayground';
 import Career from './pages/Career';
 import Home from './pages/Home';
@@ -7,12 +8,13 @@ import Nemesis from './pages/Nemesis';
 import Pricing from './pages/Pricing';
 import SWOT from './pages/SWOT';
 import Success from './pages/Success';
-import CLIEditor from './pages/CLIEditor';
+import Monitoring from './pages/Monitoring';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "APIManager": APIManager,
+    "CLIEditor": CLIEditor,
     "CLIPlayground": CLIPlayground,
     "Career": Career,
     "Home": Home,
@@ -21,7 +23,7 @@ export const PAGES = {
     "Pricing": Pricing,
     "SWOT": SWOT,
     "Success": Success,
-    "CLIEditor": CLIEditor,
+    "Monitoring": Monitoring,
 }
 
 export const pagesConfig = {
