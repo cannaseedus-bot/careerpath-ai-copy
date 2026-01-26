@@ -7,50 +7,89 @@ import { Terminal, Cpu, Link as LinkIcon, Play, Zap, Code, Layers, Settings } fr
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="inline-block mb-6">
-            <div className="flex items-center gap-3 bg-purple-600/20 backdrop-blur-sm border border-purple-500/30 rounded-full px-6 py-3">
-              <Terminal className="w-6 h-6 text-purple-400" />
-              <span className="text-purple-200 font-semibold">CLI.MX2LM.COM</span>
+    <div className="min-h-screen bg-black text-green-400 font-mono p-4">
+      {/* Terminal Header */}
+      <div className="max-w-5xl mx-auto mb-8">
+        <div className="border-2 border-green-400 bg-black">
+          <div className="bg-green-400 text-black px-4 py-1 flex justify-between items-center">
+            <span className="font-bold">CLI.MX2LM.COM</span>
+            <span className="text-xs">[ root@nexus ~ ]</span>
+          </div>
+          <div className="p-6 space-y-4">
+            <div className="text-green-400">
+              <span className="text-yellow-400">$</span> ./welcome.sh
+            </div>
+            <div className="ml-4 space-y-2">
+              <div>╔════════════════════════════════════════════════════════════╗</div>
+              <div>║  Nexus Studio - Hugging Face Model Management Playground  ║</div>
+              <div>║  v2.0 | Powered by Phi-3, Gemma, DeepSeek                ║</div>
+              <div>╚════════════════════════════════════════════════════════════╝</div>
+              <div className="mt-4 text-blue-400">
+                Welcome to Nexus Studio. Configure, manage, and deploy 
+                <br />quantized AI models with a unified command-line interface.
+              </div>
             </div>
           </div>
-          
-          <h1 className="text-6xl md:text-7xl font-black mb-6 bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent">
-            Hugging Face Model
-            <br />Management Playground
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto">
-            Configure, manage, and test <span className="text-purple-400 font-semibold">Phi-3</span>, <span className="text-blue-400 font-semibold">Gemma</span>, and <span className="text-green-400 font-semibold">DeepSeek</span> models with quantization support for your CLI tools
-          </p>
-          
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link to={createPageUrl("ModelManager")}>
-              <Button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-6 text-lg">
-                <Cpu className="w-6 h-6 mr-3" />
-                Manage Models
-              </Button>
-            </Link>
-            <Link to={createPageUrl("CLIPlayground")}>
-              <Button variant="outline" className="border-purple-500 text-purple-300 hover:bg-purple-600/20 px-8 py-6 text-lg">
-                <Play className="w-6 h-6 mr-3" />
-                Test Playground
-              </Button>
-            </Link>
+        </div>
+      </div>
+
+      {/* Main Navigation */}
+      <div className="max-w-5xl mx-auto space-y-4 mb-8">
+        <div className="border-2 border-green-400 bg-black">
+          <div className="bg-green-400 text-black px-4 py-1">
+            <span className="font-bold">QUICK COMMANDS</span>
           </div>
-          
-          <div className="mt-8">
-            <Link to={createPageUrl("Pricing")}>
-              <Button variant="ghost" className="text-purple-300 hover:text-white">
-                View Pricing - Starting at $9.99/mo →
-              </Button>
+          <div className="p-6 space-y-3">
+            <Link to={createPageUrl("ModelManager")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ nexus models --list</div>
+              <div className="text-green-400 text-sm ml-4">Manage Hugging Face models and quantization settings</div>
+            </Link>
+            <Link to={createPageUrl("APIManager")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ nexus endpoints --configure</div>
+              <div className="text-green-400 text-sm ml-4">Set up API endpoints and runtime connections</div>
+            </Link>
+            <Link to={createPageUrl("CLIPlayground")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ nexus playground --test</div>
+              <div className="text-green-400 text-sm ml-4">Test models and generate CLI configurations</div>
+            </Link>
+            <Link to={createPageUrl("CLIEditor")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ nexus cli --personalize</div>
+              <div className="text-green-400 text-sm ml-4">Create custom CLI with your preferred models</div>
+            </Link>
+            <Link to={createPageUrl("Monitoring")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ nexus monitor --dashboard</div>
+              <div className="text-green-400 text-sm ml-4">Track performance metrics and system health</div>
             </Link>
           </div>
         </div>
-      </section>
+      </div>
+
+      {/* Features */}
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div className="border-2 border-cyan-400 bg-black">
+          <div className="bg-cyan-400 text-black px-4 py-1">
+            <span className="font-bold">MODEL REGISTRY</span>
+          </div>
+          <div className="p-4 space-y-2 text-sm">
+            <div>├─ Phi-3 Mini/Lite variants</div>
+            <div>├─ Gemma code models</div>
+            <div>├─ DeepSeek Coder series</div>
+            <div>└─ Quantization: INT4/INT8/GGUF</div>
+          </div>
+        </div>
+
+        <div className="border-2 border-yellow-400 bg-black">
+          <div className="bg-yellow-400 text-black px-4 py-1">
+            <span className="font-bold">API ENDPOINTS</span>
+          </div>
+          <div className="p-4 space-y-2 text-sm text-yellow-400">
+            <div>├─ Hugging Face Inference</div>
+            <div>├─ Custom runtimes</div>
+            <div>├─ cPanel storage</div>
+            <div>└─ Secure key management</div>
+          </div>
+        </div>
+      </div>
 
       {/* Features Grid */}
       <section className="py-20 px-6">
