@@ -91,169 +91,48 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Features Grid */}
-      <section className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16">
-            Everything You Need for CLI Model Management
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:border-purple-500 transition-all">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-3">
-                  <Cpu className="w-8 h-8 text-purple-400" />
-                  Model Registry
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-slate-300">
-                <p className="mb-4">Manage Hugging Face models with full quantization support:</p>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-purple-400" />
-                    Phi-3 Mini & Lite variants
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-blue-400" />
-                    Gemma code models
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-green-400" />
-                    DeepSeek Coder series
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-yellow-400" />
-                    INT4/INT8/GGUF quantization
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:border-green-500 transition-all">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-3">
-                  <LinkIcon className="w-8 h-8 text-green-400" />
-                  API Endpoints
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-slate-300">
-                <p className="mb-4">Configure connections to your model infrastructure:</p>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <Code className="w-4 h-4 text-green-400" />
-                    Hugging Face Inference API
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Code className="w-4 h-4 text-orange-400" />
-                    Custom runtime endpoints
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Code className="w-4 h-4 text-blue-400" />
-                    cPanel file storage integration
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Code className="w-4 h-4 text-purple-400" />
-                    Secure API key management
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:border-blue-500 transition-all">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-3">
-                  <Terminal className="w-8 h-8 text-blue-400" />
-                  CLI Playground
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-slate-300">
-                <p className="mb-4">Test and validate your model configurations:</p>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <Play className="w-4 h-4 text-blue-400" />
-                    Interactive testing interface
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Play className="w-4 h-4 text-purple-400" />
-                    Generate CLI configs
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Play className="w-4 h-4 text-green-400" />
-                    Export model settings
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Play className="w-4 h-4 text-yellow-400" />
-                    Real-time output preview
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
+      {/* Getting Started */}
+      <div className="max-w-5xl mx-auto border-2 border-magenta-400 bg-black mb-8">
+        <div className="bg-magenta-400 text-black px-4 py-1">
+          <span className="font-bold">INSTALLATION</span>
         </div>
-      </section>
-
-      {/* Quick Start */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-3 text-2xl">
-                <Settings className="w-8 h-8 text-purple-400" />
-                Quick Start Guide
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-slate-900 rounded-lg p-6 font-mono text-sm space-y-4">
-                <div>
-                  <div className="text-slate-400 mb-2"># Step 1: Add your Hugging Face models</div>
-                  <div className="text-purple-400">→ Navigate to Model Manager</div>
-                </div>
-                
-                <div>
-                  <div className="text-slate-400 mb-2"># Step 2: Configure API endpoints</div>
-                  <div className="text-green-400">→ Set up your HF tokens and runtime URLs</div>
-                </div>
-                
-                <div>
-                  <div className="text-slate-400 mb-2"># Step 3: Test in the playground</div>
-                  <div className="text-blue-400">→ Validate your configurations</div>
-                </div>
-                
-                <div>
-                  <div className="text-slate-400 mb-2"># Step 4: Export and integrate</div>
-                  <div className="text-yellow-400">→ Download configs for your CLI tool</div>
-                </div>
-              </div>
-              
-              <div className="mt-6 flex gap-4">
-                <Link to={createPageUrl("ModelManager")} className="flex-1">
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                    Get Started
-                  </Button>
-                </Link>
-                <Link to={createPageUrl("APIManager")} className="flex-1">
-                  <Button variant="outline" className="w-full border-slate-600 text-slate-300 hover:bg-slate-700">
-                    Configure APIs
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="p-6 space-y-3 text-magenta-400">
+          <div><span className="text-yellow-400">$</span> npm install -g nexus-cli</div>
+          <div><span className="text-yellow-400">$</span> nexus init --config</div>
+          <div><span className="text-yellow-400">$</span> nexus models --add phi-3-mini</div>
+          <div className="text-gray-500 text-sm mt-2"># Ready to deploy your first model</div>
         </div>
-      </section>
+      </div>
+
+      {/* System Status */}
+      <div className="max-w-5xl mx-auto border-2 border-green-400 bg-black mb-8">
+        <div className="bg-green-400 text-black px-4 py-1">
+          <span className="font-bold">SYSTEM STATUS</span>
+        </div>
+        <div className="p-6 space-y-2 text-green-400 text-sm">
+          <div>Status: <span className="text-green-400 font-bold">ONLINE</span></div>
+          <div>Models: <span className="text-green-400">3 available</span></div>
+          <div>Endpoints: <span className="text-green-400">5 configured</span></div>
+          <div>Storage: <span className="text-green-400">cPanel integrated</span></div>
+          <div className="mt-4 text-gray-600">Last updated: {new Date().toISOString()}</div>
+        </div>
+      </div>
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto text-center text-slate-400">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Layers className="w-5 h-5 text-purple-400" />
-            <span className="font-semibold text-purple-300">CLI.MX2LM.COM</span>
+      <div className="max-w-5xl mx-auto text-center border-t-2 border-green-400 pt-6">
+        <div className="text-green-400 font-mono text-sm space-y-1">
+          <div>Nexus Studio v2.0 | CLI.MX2LM.COM</div>
+          <div className="text-gray-600">
+            <Link to={createPageUrl("Pricing")} className="text-cyan-400 hover:underline">
+              View Pricing
+            </Link>
+            {' '} • {' '}
+            <Link to={createPageUrl("Career")} className="text-cyan-400 hover:underline">
+              About
+            </Link>
           </div>
-          <p className="text-sm">
-            Hugging Face model management playground for quantized coding models
-          </p>
         </div>
-      </footer>
+      </div>
     </div>
   );
 }
