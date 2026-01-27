@@ -228,6 +228,15 @@ export default function BotOrchestrator() {
                   <div className="text-purple-400 font-bold text-lg">OPTIMIZE BOT</div>
                   <div className="text-xs text-gray-400 mt-2">AI-driven performance optimization analysis</div>
                 </button>
+
+                <button
+                  onClick={() => setActiveView('model')}
+                  className="border-2 border-yellow-400 bg-black hover:bg-yellow-900/30 p-6 transition group"
+                >
+                  <Zap className="w-12 h-12 text-yellow-400 mx-auto mb-3 group-hover:scale-110 transition" />
+                  <div className="text-yellow-400 font-bold text-lg">BUILD MODEL</div>
+                  <div className="text-xs text-gray-400 mt-2">Configure and quantize LLM models</div>
+                </button>
               </div>
             )}
 
@@ -329,6 +338,19 @@ export default function BotOrchestrator() {
                 }}
               />
             )}
+          </div>
+        )}
+
+        {/* Model Builder View */}
+        {activeView === 'model' && (
+          <div className="mb-6">
+            <ModelBuilderWizard
+              onComplete={(modelData) => {
+                toast.success('Model configuration saved');
+                setActiveView('dashboard');
+              }}
+              onCancel={() => setActiveView('dashboard')}
+            />
           </div>
         )}
 
