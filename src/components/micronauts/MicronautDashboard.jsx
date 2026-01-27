@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import NGramDataVisualizer from "./NGramDataVisualizer";
 import AdaptiveControlPanel from "./AdaptiveControlPanel";
 import QuantumEntanglementVisualizer from "./QuantumEntanglementVisualizer";
+import GeometricTensorBrainDashboard from "../brain/GeometricTensorBrainDashboard";
 
 export default function MicronautDashboard() {
   const [command, setCommand] = useState('');
@@ -63,6 +64,9 @@ export default function MicronautDashboard() {
 
       {/* Quantum Entanglement Visualizer */}
       <QuantumEntanglementVisualizer />
+
+      {/* Geometric Tensor Brain - Layer 11 */}
+      <GeometricTensorBrainDashboard />
 
       {/* LLM Command Interface */}
       <div className="border-2 border-purple-400 bg-black">
