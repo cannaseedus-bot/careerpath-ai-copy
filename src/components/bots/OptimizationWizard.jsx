@@ -178,7 +178,7 @@ export default function OptimizationWizard({ bot, onComplete, onCancel }) {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="quick">Quick (< 1 min)</SelectItem>
+                            <SelectItem value="quick">Quick (under 1 min)</SelectItem>
                             <SelectItem value="standard">Standard (2-5 min)</SelectItem>
                             <SelectItem value="deep">Deep AI Analysis (5-10 min)</SelectItem>
                           </SelectContent>
