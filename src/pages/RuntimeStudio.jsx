@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import RuntimeChat from "@/components/runtime/RuntimeChat";
 import RuntimeEditor from "@/components/runtime/RuntimeEditor";
@@ -7,10 +9,12 @@ import EnvironmentVariablesPanel from "@/components/runtime/EnvironmentVariables
 import RemoteRuntimeConfig from "@/components/runtime/RemoteRuntimeConfig";
 import HFModelsPanel from "@/components/runtime/HFModelsPanel";
 import ClusterSelector from "@/components/shared/ClusterSelector";
-import { Zap } from "lucide-react";
+import { Zap, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export default function RuntimeStudio() {
+  const navigate = useNavigate();
   const [output, setOutput] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const [scriptCode, setScriptCode] = useState(`# Bot Script Editor
@@ -47,7 +51,9 @@ if __name__ == "__main__":
         pythonVersion,
         args,
         envVars,
-        remoteApiUrl
+        remoteApiUrl,
+        clusterId: selectedCluster?.id,
+        clusterType: selectedCluster?.cluster_type
       });
 
       if (response.data.output) {
@@ -96,9 +102,24 @@ if __name__ == "__main__":
             </h1>
             <p className="text-gray-400 text-sm mt-1">AI-Powered Development Environment</p>
           </div>
-          <div className="text-right">
-            <p className="text-cyan-400 text-sm">Connected to: AI Agent</p>
-            <p className="text-gray-400 text-xs">All tools enabled</p>
+          <div className="text-right space-y-2">
+            {selectedCluster && (
+              <p className="text-cyan-400 text-sm">
+                🎯 Cluster: <span className="font-bold">{selectedCluster.name}</span>
+              </p>
+            )}
+            <div className="flex gap-2 justify-end">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => navigate(createPageUrl("ClusterManagement"))}
+                className="border-cyan-400 text-cyan-400 h-7 text-xs"
+              >
+                <Settings className="w-3 h-3 mr-1" />
+                Manage Clusters
+              </Button>
+              <p className="text-gray-400 text-xs">Connected to: AI Agent</p>
+            </div>
           </div>
         </div>
       </div>
@@ -194,10 +215,18 @@ if __name__ == "__main__":
 
       {/* Info Bar */}
       <div className="border-t border-cyan-400 bg-slate-900 p-3 text-xs text-gray-400">
-        <div className="max-w-7xl mx-auto">
-          <span className="text-cyan-400">Agent Status:</span> Connected • 
-          <span className="text-cyan-400 ml-2">Python:</span> {pythonVersion} •
-          <span className="text-cyan-400 ml-2">Runtime:</span> {remoteApiUrl ? "Remote" : "Local"}
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div>
+            <span className="text-cyan-400">Agent Status:</span> Connected • 
+            <span className="text-cyan-400 ml-2">Python:</span> {pythonVersion} •
+            <span className="text-cyan-400 ml-2">Runtime:</span> {remoteApiUrl ? "Remote" : "Local"} •
+            {selectedCluster && (
+              <>
+                <span className="text-cyan-400 ml-2">Cluster:</span> {selectedCluster.cluster_type} •
+                <span className="text-cyan-400 ml-2">GPU:</span> {selectedCluster.gpu_support ? "✓" : "—"}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
