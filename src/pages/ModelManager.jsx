@@ -273,6 +273,13 @@ export default function ModelManager() {
           </Card>
         )}
 
+        <BatchQuantizationDialog
+          open={showBatchDialog}
+          onClose={() => setShowBatchDialog(false)}
+          models={models}
+          onQuantize={handleBatchQuantize}
+        />
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {models.map((model) => (
             <Card key={model.id} className="bg-slate-800 border-slate-700 hover:border-blue-500 transition-all">
