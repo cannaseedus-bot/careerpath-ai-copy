@@ -23,14 +23,10 @@ import OptimizationWizard from "@/components/bots/OptimizationWizard";
 import TemplateWizard from "@/components/bots/TemplateWizard";
 
 export default function BotOrchestrator() {
-  const [showForm, setShowForm] = useState(false);
+  const [activeView, setActiveView] = useState('dashboard'); // dashboard, create, deploy, optimize, template
   const [editingBot, setEditingBot] = useState(null);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [selectedBotForDeployment, setSelectedBotForDeployment] = useState(null);
-  const [selectedBotForOptimization, setSelectedBotForOptimization] = useState(null);
-  const [showTemplateWizard, setShowTemplateWizard] = useState(false);
-  const [showDeploymentWizard, setShowDeploymentWizard] = useState(false);
-  const [showOptimizationWizard, setShowOptimizationWizard] = useState(false);
+  const [selectedBot, setSelectedBot] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     bot_type: "custom",
@@ -86,7 +82,7 @@ export default function BotOrchestrator() {
       schedule: {}
     });
     setEditingBot(null);
-    setShowForm(false);
+    setActiveView('dashboard');
   };
 
   const handleSubmit = (e) => {
@@ -101,18 +97,7 @@ export default function BotOrchestrator() {
   const handleEdit = (bot) => {
     setEditingBot(bot);
     setFormData(bot);
-    setShowForm(true);
-  };
-
-  const handleTemplateSelect = (template) => {
-    setFormData({
-      ...formData,
-      name: template.name,
-      bot_type: template.bot_type,
-      config: template.config,
-      script: template.script
-    });
-    setShowForm(true);
+    setActiveView('create');
   };
 
   const deployBotMutation = useMutation({
@@ -126,8 +111,8 @@ export default function BotOrchestrator() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bots'] });
       toast.success('Bot deployed successfully');
-      setShowDeploymentWizard(false);
-      setSelectedBotForDeployment(null);
+      setActiveView('dashboard');
+      setSelectedBot(null);
     }
   });
 
@@ -142,8 +127,8 @@ export default function BotOrchestrator() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bots'] });
       toast.success('Optimization analysis complete');
-      setShowOptimizationWizard(false);
-      setSelectedBotForOptimization(null);
+      setActiveView('dashboard');
+      setSelectedBot(null);
     }
   });
 
@@ -190,112 +175,164 @@ export default function BotOrchestrator() {
             <span className="text-xs">[ Bot Orchestration System ]</span>
           </div>
           <div className="p-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="text-cyan-400 text-2xl mb-2">╔═══ BOT ORCHESTRATOR ═══╗</div>
-                <div className="text-green-400">Create and manage autonomous bots for scraping, data processing, and cluster operations</div>
-              </div>
-              <div className="flex gap-2">
+            <div className="text-cyan-400 text-2xl mb-4">╔═══ BOT ORCHESTRATOR ═══╗</div>
+            
+            {/* Main Action Buttons */}
+            {activeView === 'dashboard' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <button
-                  onClick={() => setShowAIAssistant(!showAIAssistant)}
-                  className="border-2 border-purple-400 text-purple-400 px-4 py-2 hover:bg-purple-900/30 transition font-bold"
+                  onClick={() => setActiveView('create')}
+                  className="border-2 border-green-400 bg-black hover:bg-green-900/30 p-6 transition group"
                 >
-                  <Sparkles className="w-4 h-4 inline mr-2" />
-                  AI_ASSIST
+                  <Plus className="w-12 h-12 text-green-400 mx-auto mb-3 group-hover:scale-110 transition" />
+                  <div className="text-green-400 font-bold text-lg">CREATE BOT</div>
+                  <div className="text-xs text-gray-400 mt-2">Build custom bot from scratch with AI assistance</div>
                 </button>
-                <button onClick={() => setShowForm(!showForm)} className="bg-green-400 text-black px-4 py-2 hover:bg-green-300 transition font-bold">
-                  <Plus className="w-4 h-4 inline mr-2" />
-                  CREATE_BOT
+
+                <button
+                  onClick={() => setActiveView('template')}
+                  className="border-2 border-yellow-400 bg-black hover:bg-yellow-900/30 p-6 transition group"
+                >
+                  <Layers className="w-12 h-12 text-yellow-400 mx-auto mb-3 group-hover:scale-110 transition" />
+                  <div className="text-yellow-400 font-bold text-lg">USE TEMPLATE</div>
+                  <div className="text-xs text-gray-400 mt-2">Quick-start with pre-configured bot templates</div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (bots.length === 0) {
+                      toast.error('Create a bot first');
+                      return;
+                    }
+                    setActiveView('deploy');
+                  }}
+                  className="border-2 border-cyan-400 bg-black hover:bg-cyan-900/30 p-6 transition group"
+                >
+                  <Rocket className="w-12 h-12 text-cyan-400 mx-auto mb-3 group-hover:scale-110 transition" />
+                  <div className="text-cyan-400 font-bold text-lg">DEPLOY BOT</div>
+                  <div className="text-xs text-gray-400 mt-2">Deploy to local, staging, or production cluster</div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (bots.length === 0) {
+                      toast.error('Create a bot first');
+                      return;
+                    }
+                    setActiveView('optimize');
+                  }}
+                  className="border-2 border-purple-400 bg-black hover:bg-purple-900/30 p-6 transition group"
+                >
+                  <TrendingUp className="w-12 h-12 text-purple-400 mx-auto mb-3 group-hover:scale-110 transition" />
+                  <div className="text-purple-400 font-bold text-lg">OPTIMIZE BOT</div>
+                  <div className="text-xs text-gray-400 mt-2">AI-driven performance optimization analysis</div>
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
+            )}
 
-        {/* Micronaut Dashboard */}
-        <div className="mb-6">
-          <MicronautDashboard />
-        </div>
-
-        {/* AI Assistant */}
-        {showAIAssistant && showForm && (
-          <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <AIAssistant
-              botType={formData.bot_type}
-              currentScript={formData.script}
-              currentConfig={formData.config}
-              onApplySuggestion={(code) => {
-                setFormData({ ...formData, script: code });
-                toast.success("Code applied to editor");
-              }}
-            />
-            {editingBot && (
-              <CompressionMetrics bot={editingBot} />
+            {/* Back Button */}
+            {activeView !== 'dashboard' && (
+              <button
+                onClick={() => {
+                  setActiveView('dashboard');
+                  setSelectedBot(null);
+                  setEditingBot(null);
+                }}
+                className="border-2 border-gray-400 text-gray-400 px-4 py-2 hover:bg-gray-900/30 transition mb-4"
+              >
+                ← BACK TO DASHBOARD
+              </button>
             )}
           </div>
-        )}
+        </div>
 
-        {/* Deployment Wizard */}
-        {showDeploymentWizard && selectedBotForDeployment && (
-          <div className="mb-6">
-            <DeploymentWizard
-              bot={selectedBotForDeployment}
-              onComplete={(config) => deployBotMutation.mutate(config)}
-              onCancel={() => {
-                setShowDeploymentWizard(false);
-                setSelectedBotForDeployment(null);
-              }}
-            />
-          </div>
-        )}
-
-        {/* Optimization Wizard */}
-        {showOptimizationWizard && selectedBotForOptimization && (
-          <div className="mb-6">
-            <OptimizationWizard
-              bot={selectedBotForOptimization}
-              onComplete={(config) => optimizeBotMutation.mutate(config)}
-              onCancel={() => {
-                setShowOptimizationWizard(false);
-                setSelectedBotForOptimization(null);
-              }}
-            />
-          </div>
-        )}
-
-        {/* Template Wizard */}
-        {showTemplateWizard && (
+        {/* Template Wizard View */}
+        {activeView === 'template' && (
           <div className="mb-6">
             <TemplateWizard
               onComplete={(botData) => {
                 createMutation.mutate(botData);
-                setShowTemplateWizard(false);
+                setActiveView('dashboard');
               }}
-              onCancel={() => setShowTemplateWizard(false)}
+              onCancel={() => setActiveView('dashboard')}
             />
           </div>
         )}
 
-        {/* Bot Templates */}
-        {!showForm && !selectedBotForDeployment && !selectedBotForOptimization && !showTemplateWizard && !showDeploymentWizard && !showOptimizationWizard && (
-          <div className="mb-6">
-            <BotTemplates onSelectTemplate={() => setShowTemplateWizard(true)} />
-          </div>
-        )}
-
-        {/* Bot Creation Wizard */}
-        {showForm && !editingBot && (
+        {/* Create Bot View */}
+        {activeView === 'create' && !editingBot && (
           <BotCreationWizard
             onComplete={(botData) => createMutation.mutate(botData)}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingBot(null);
-            }}
+            onCancel={() => setActiveView('dashboard')}
           />
         )}
 
+        {/* Deploy Bot View */}
+        {activeView === 'deploy' && (
+          <div className="mb-6">
+            {!selectedBot ? (
+              <div className="border-2 border-cyan-400 bg-black p-6">
+                <div className="text-cyan-400 text-xl mb-4 font-bold">SELECT BOT TO DEPLOY</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {bots.map(bot => (
+                    <button
+                      key={bot.id}
+                      onClick={() => setSelectedBot(bot)}
+                      className="border-2 border-cyan-400 p-4 hover:bg-cyan-900/30 transition text-left"
+                    >
+                      <div className="text-cyan-400 font-bold">{bot.name}</div>
+                      <div className="text-xs text-gray-400">{bot.bot_type}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <DeploymentWizard
+                bot={selectedBot}
+                onComplete={(config) => deployBotMutation.mutate(config)}
+                onCancel={() => {
+                  setActiveView('dashboard');
+                  setSelectedBot(null);
+                }}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Optimize Bot View */}
+        {activeView === 'optimize' && (
+          <div className="mb-6">
+            {!selectedBot ? (
+              <div className="border-2 border-purple-400 bg-black p-6">
+                <div className="text-purple-400 text-xl mb-4 font-bold">SELECT BOT TO OPTIMIZE</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {bots.map(bot => (
+                    <button
+                      key={bot.id}
+                      onClick={() => setSelectedBot(bot)}
+                      className="border-2 border-purple-400 p-4 hover:bg-purple-900/30 transition text-left"
+                    >
+                      <div className="text-purple-400 font-bold">{bot.name}</div>
+                      <div className="text-xs text-gray-400">{bot.bot_type}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <OptimizationWizard
+                bot={selectedBot}
+                onComplete={(config) => optimizeBotMutation.mutate(config)}
+                onCancel={() => {
+                  setActiveView('dashboard');
+                  setSelectedBot(null);
+                }}
+              />
+            )}
+          </div>
+        )}
+
         {/* Bot Edit Form */}
-        {showForm && editingBot && (
+        {activeView === 'create' && editingBot && (
           <div className="border-2 border-cyan-400 bg-black mb-6">
             <div className="bg-cyan-400 text-black px-4 py-1 font-bold">
               [ EDIT BOT ]
@@ -375,20 +412,50 @@ export default function BotOrchestrator() {
                 </div>
 
                 <div className="flex gap-3 justify-end border-t-2 border-gray-700 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAIAssistant(!showAIAssistant)}
+                    className="border-2 border-purple-400 text-purple-400 px-4 py-2 hover:bg-purple-900/30 transition font-bold"
+                  >
+                    <Sparkles className="w-4 h-4 inline mr-2" />
+                    {showAIAssistant ? 'HIDE' : 'SHOW'}_AI
+                  </button>
                   <button type="button" onClick={resetForm} className="border-2 border-red-400 text-red-400 px-4 py-2 hover:bg-red-900/30 transition">
                     CANCEL
                   </button>
                   <button type="submit" className="bg-green-400 text-black px-4 py-2 hover:bg-green-300 transition font-bold">
-                    {editingBot ? "UPDATE_BOT" : "CREATE_BOT"}
+                    UPDATE_BOT
                   </button>
                 </div>
+
+                {/* AI Assistant Panel */}
+                {showAIAssistant && (
+                  <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <AIAssistant
+                      botType={formData.bot_type}
+                      currentScript={formData.script}
+                      currentConfig={formData.config}
+                      onApplySuggestion={(code) => {
+                        setFormData({ ...formData, script: code });
+                        toast.success("Code applied to editor");
+                      }}
+                    />
+                    <CompressionMetrics bot={editingBot} />
+                  </div>
+                )}
               </form>
             </div>
           </div>
         )}
 
-        {/* Bots Display */}
-        <Tabs defaultValue="orchestrators" className="space-y-6">
+        {/* Micronaut Dashboard & Bot List */}
+        {activeView === 'dashboard' && (
+          <>
+            <div className="mb-6">
+              <MicronautDashboard />
+            </div>
+
+            <Tabs defaultValue="orchestrators" className="space-y-6">
           <TabsList className="bg-slate-900 border-2 border-green-400">
             <TabsTrigger value="orchestrators" className="data-[state=active]:bg-green-400 data-[state=active]:text-black">
               Orchestrators ({orchestratorBots.length})
@@ -442,8 +509,8 @@ export default function BotOrchestrator() {
                         </button>
                         <button
                           onClick={() => {
-                            setSelectedBotForDeployment(bot);
-                            setShowDeploymentWizard(true);
+                            setSelectedBot(bot);
+                            setActiveView('deploy');
                           }}
                           className="border-2 border-cyan-400 text-cyan-400 px-3 py-1 hover:bg-cyan-900/30 transition flex items-center gap-2"
                         >
@@ -452,8 +519,8 @@ export default function BotOrchestrator() {
                         </button>
                         <button
                           onClick={() => {
-                            setSelectedBotForOptimization(bot);
-                            setShowOptimizationWizard(true);
+                            setSelectedBot(bot);
+                            setActiveView('optimize');
                           }}
                           className="border-2 border-orange-400 text-orange-400 px-3 py-1 hover:bg-orange-900/30 transition flex items-center gap-2"
                         >
@@ -518,8 +585,8 @@ export default function BotOrchestrator() {
                         </button>
                         <button
                           onClick={() => {
-                            setSelectedBotForDeployment(bot);
-                            setShowDeploymentWizard(true);
+                            setSelectedBot(bot);
+                            setActiveView('deploy');
                           }}
                           className="border border-cyan-400 text-cyan-400 px-2 py-1 hover:bg-cyan-900/30 transition text-xs"
                           title="Deploy"
@@ -528,8 +595,8 @@ export default function BotOrchestrator() {
                         </button>
                         <button
                           onClick={() => {
-                            setSelectedBotForOptimization(bot);
-                            setShowOptimizationWizard(true);
+                            setSelectedBot(bot);
+                            setActiveView('optimize');
                           }}
                           className="border border-orange-400 text-orange-400 px-2 py-1 hover:bg-orange-900/30 transition text-xs"
                           title="Optimize"
@@ -556,6 +623,8 @@ export default function BotOrchestrator() {
             )}
           </TabsContent>
         </Tabs>
+          </>
+        )}
       </div>
     </div>
   );
