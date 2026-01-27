@@ -356,6 +356,12 @@ export default function ModelBuilderWizard({ onComplete, onCancel }) {
                       <span className="text-gray-400">Compression:</span>
                       <span className="text-cyan-400 font-semibold">{modelData.compression_enabled ? "Enabled" : "Disabled"}</span>
                     </div>
+                    {modelData.dataset_source && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Dataset:</span>
+                        <span className="text-cyan-400 font-semibold">{modelData.dataset_source}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
