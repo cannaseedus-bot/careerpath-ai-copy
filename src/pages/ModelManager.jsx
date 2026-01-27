@@ -197,25 +197,8 @@ export default function ModelManager() {
           </div>
         )}
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <TabsList className="bg-slate-800 border border-slate-700 w-full justify-start">
-            <TabsTrigger value="models" className="text-cyan-400">
-              <Code className="w-4 h-4 mr-2" /> Models
-            </TabsTrigger>
-            <TabsTrigger value="datasets" className="text-cyan-400">
-              <Database className="w-4 h-4 mr-2" /> Datasets
-            </TabsTrigger>
-            <TabsTrigger value="serving" className="text-cyan-400">
-              <Server className="w-4 h-4 mr-2" /> Serving
-            </TabsTrigger>
-            <TabsTrigger value="training" className="text-cyan-400">
-              <TrendingUp className="w-4 h-4 mr-2" /> Training
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Models Tab */}
-          <TabsContent value="models">
+        {showForm && (
+          <Card className="mb-8 bg-slate-800 border-slate-700">
             <CardHeader>
               <CardTitle className="text-white">
                 {editingModel ? "Edit Model" : "Add New Model"}
@@ -359,76 +342,95 @@ export default function ModelManager() {
           onQuantize={handleBatchQuantize}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {models.map((model) => (
-            <Card key={model.id} className="bg-slate-800 border-slate-700 hover:border-blue-500 transition-all">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-white text-lg flex items-center gap-2">
-                      <Code className="w-5 h-5 text-blue-400" />
-                      {model.name}
-                    </CardTitle>
-                    <p className="text-sm text-slate-400 mt-1">{model.model_id}</p>
-                  </div>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => toggleActiveMutation.mutate({ id: model.id, is_active: !model.is_active })}
-                    className="text-slate-400 hover:text-white"
-                  >
-                    {model.is_active ? <Power className="w-4 h-4 text-green-400" /> : <PowerOff className="w-4 h-4" />}
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary" className="bg-blue-900 text-blue-200">
-                    {model.model_type}
-                  </Badge>
-                  <Badge variant="secondary" className="bg-purple-900 text-purple-200">
-                    {model.quantization}
-                  </Badge>
-                  {model.parameters && (
-                    <Badge variant="secondary" className="bg-slate-700 text-slate-200">
-                      {model.parameters}
-                    </Badge>
-                  )}
-                </div>
-                {model.capabilities?.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {model.capabilities.map((cap, i) => (
-                      <span key={i} className="text-xs px-2 py-1 rounded bg-slate-700 text-slate-300">
-                        {cap}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <div className="text-sm text-slate-400">
-                  Context: {model.context_length?.toLocaleString()}
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleEdit(model)}
-                    className="flex-1 border-slate-600 text-slate-300 hover:text-white"
-                  >
-                    <Edit className="w-4 h-4 mr-1" />
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => deleteMutation.mutate(model.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+          <TabsList className="bg-slate-800 border border-slate-700 w-full justify-start">
+            <TabsTrigger value="models" className="text-cyan-400">
+              <Code className="w-4 h-4 mr-2" /> Models
+            </TabsTrigger>
+            <TabsTrigger value="datasets" className="text-cyan-400">
+              <Database className="w-4 h-4 mr-2" /> Datasets
+            </TabsTrigger>
+            <TabsTrigger value="serving" className="text-cyan-400">
+              <Server className="w-4 h-4 mr-2" /> Serving
+            </TabsTrigger>
+            <TabsTrigger value="training" className="text-cyan-400">
+              <TrendingUp className="w-4 h-4 mr-2" /> Training
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Models Tab */}
+          <TabsContent value="models">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {models.map((model) => (
+                <Card key={model.id} className="bg-slate-800 border-slate-700 hover:border-blue-500 transition-all">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-white text-lg flex items-center gap-2">
+                          <Code className="w-5 h-5 text-blue-400" />
+                          {model.name}
+                        </CardTitle>
+                        <p className="text-sm text-slate-400 mt-1">{model.model_id}</p>
+                      </div>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => toggleActiveMutation.mutate({ id: model.id, is_active: !model.is_active })}
+                        className="text-slate-400 hover:text-white"
+                      >
+                        {model.is_active ? <Power className="w-4 h-4 text-green-400" /> : <PowerOff className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="secondary" className="bg-blue-900 text-blue-200">
+                        {model.model_type}
+                      </Badge>
+                      <Badge variant="secondary" className="bg-purple-900 text-purple-200">
+                        {model.quantization}
+                      </Badge>
+                      {model.parameters && (
+                        <Badge variant="secondary" className="bg-slate-700 text-slate-200">
+                          {model.parameters}
+                        </Badge>
+                      )}
+                    </div>
+                    {model.capabilities?.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {model.capabilities.map((cap, i) => (
+                          <span key={i} className="text-xs px-2 py-1 rounded bg-slate-700 text-slate-300">
+                            {cap}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="text-sm text-slate-400">
+                      Context: {model.context_length?.toLocaleString()}
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEdit(model)}
+                        className="flex-1 border-slate-600 text-slate-300 hover:text-white"
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => deleteMutation.mutate(model.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
 
             {models.length === 0 && !showForm && (
               <div className="text-center py-16">
