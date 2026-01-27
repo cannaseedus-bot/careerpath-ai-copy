@@ -17,6 +17,7 @@ import TensorSchemaVisualizer from "@/components/bots/TensorSchemaVisualizer";
 import OptimizationInsights from "@/components/bots/OptimizationInsights";
 import CompressionMetrics from "@/components/bots/CompressionMetrics";
 import MicronautDashboard from "@/components/micronauts/MicronautDashboard";
+import BotCreationWizard from "@/components/bots/BotCreationWizard";
 
 export default function BotOrchestrator() {
   const [showForm, setShowForm] = useState(false);
@@ -230,11 +231,22 @@ export default function BotOrchestrator() {
           <BotTemplates onSelectTemplate={handleTemplateSelect} />
         )}
 
-        {/* Bot Form */}
-        {showForm && (
+        {/* Bot Creation Wizard */}
+        {showForm && !editingBot && (
+          <BotCreationWizard
+            onComplete={(botData) => createMutation.mutate(botData)}
+            onCancel={() => {
+              setShowForm(false);
+              setEditingBot(null);
+            }}
+          />
+        )}
+
+        {/* Bot Edit Form */}
+        {showForm && editingBot && (
           <div className="border-2 border-cyan-400 bg-black mb-6">
             <div className="bg-cyan-400 text-black px-4 py-1 font-bold">
-              {editingBot ? "[ EDIT BOT ]" : "[ CREATE NEW BOT ]"}
+              [ EDIT BOT ]
             </div>
             <div className="p-6">
               <form onSubmit={handleSubmit} className="space-y-4">
