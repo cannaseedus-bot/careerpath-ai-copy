@@ -102,25 +102,31 @@ export default function CLIEditor() {
   const currentTier = tierFeatures[config.subscription_tier];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+    <div className="min-h-screen bg-black text-green-400 font-mono p-4">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-white flex items-center gap-3">
-              <Code className="w-10 h-10 text-purple-400" />
-              CLI Editor
-            </h1>
-            <p className="text-slate-400 mt-2">Customize your personalized CLI experience</p>
+        {/* Terminal Header */}
+        <div className="border-2 border-green-400 bg-black mb-6">
+          <div className="bg-green-400 text-black px-4 py-1 flex justify-between items-center">
+            <span className="font-bold">$ mx2lm cli --editor</span>
+            <span className="text-xs">[ CLI Configuration ]</span>
           </div>
-          <div className="flex gap-3">
-            <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
-              <Save className="w-5 h-5 mr-2" />
-              Save Config
-            </Button>
-            <Button onClick={handleExport} className="bg-blue-600 hover:bg-blue-700">
-              <Download className="w-5 h-5 mr-2" />
-              Export CLI
-            </Button>
+          <div className="p-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="text-cyan-400 text-2xl mb-2">╔═══ CLI EDITOR ═══╗</div>
+                <div className="text-green-400">Customize your personalized CLI experience</div>
+              </div>
+              <div className="flex gap-3">
+                <button onClick={handleSave} className="bg-green-400 text-black px-4 py-2 hover:bg-green-300 transition font-bold">
+                  <Save className="w-4 h-4 inline mr-2" />
+                  SAVE
+                </button>
+                <button onClick={handleExport} className="bg-blue-400 text-black px-4 py-2 hover:bg-blue-300 transition font-bold">
+                  <Download className="w-4 h-4 inline mr-2" />
+                  EXPORT
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

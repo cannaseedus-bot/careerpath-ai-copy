@@ -77,30 +77,37 @@ export default function APIManager() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="min-h-screen bg-black text-green-400 font-mono p-4">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-white flex items-center gap-3">
-              <LinkIcon className="w-10 h-10 text-green-400" />
-              API Endpoints
-            </h1>
-            <p className="text-slate-400 mt-2">Configure API connections for your models</p>
+        {/* Terminal Header */}
+        <div className="border-2 border-green-400 bg-black mb-6">
+          <div className="bg-green-400 text-black px-4 py-1 flex justify-between items-center">
+            <span className="font-bold">$ mx2lm endpoints --configure</span>
+            <span className="text-xs">[ API Manager ]</span>
           </div>
-          <Button onClick={() => setShowForm(!showForm)} className="bg-green-600 hover:bg-green-700">
-            <Plus className="w-5 h-5 mr-2" />
-            Add Endpoint
-          </Button>
+          <div className="p-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="text-cyan-400 text-2xl mb-2">╔═══ API ENDPOINT MANAGER ═══╗</div>
+                <div className="text-green-400">Configure API connections for your models</div>
+              </div>
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="bg-green-400 text-black px-4 py-2 hover:bg-green-300 transition font-bold"
+              >
+                <Plus className="w-4 h-4 inline mr-2" />
+                ADD_ENDPOINT
+              </button>
+            </div>
+          </div>
         </div>
 
         {showForm && (
-          <Card className="mb-8 bg-slate-800 border-slate-700">
-            <CardHeader>
-              <CardTitle className="text-white">
-                {editingEndpoint ? "Edit Endpoint" : "Add New Endpoint"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="mb-6 border-2 border-cyan-400 bg-black">
+            <div className="bg-cyan-400 text-black px-4 py-1">
+              <span className="font-bold">{editingEndpoint ? "EDIT_ENDPOINT" : "NEW_ENDPOINT"}</span>
+            </div>
+            <div className="p-6">
               {formData.endpoint_type === "ollama" && (
                 <div className="mb-4 p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
                   <div className="text-sm text-blue-300 font-semibold mb-2">Ollama Cloud API Integration:</div>
@@ -174,19 +181,19 @@ for await (const part of response) {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm text-slate-300 mb-2 block">Name</label>
+                    <label className="text-sm text-cyan-400 mb-2 block">► Name</label>
                     <Input
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Hugging Face API"
-                      className="bg-slate-900 border-slate-600 text-white"
+                      className="bg-black border-2 border-green-400 text-green-400 font-mono"
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-sm text-slate-300 mb-2 block">Type</label>
+                    <label className="text-sm text-cyan-400 mb-2 block">► Type</label>
                     <Select value={formData.endpoint_type} onValueChange={(val) => setFormData({ ...formData, endpoint_type: val })}>
-                      <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
+                      <SelectTrigger className="bg-black border-2 border-green-400 text-green-400">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -201,93 +208,91 @@ for await (const part of response) {
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm text-slate-300 mb-2 block">URL</label>
+                  <label className="text-sm text-cyan-400 mb-2 block">► URL</label>
                   <Input
                     value={formData.url}
                     onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                     placeholder="https://api-inference.huggingface.co"
-                    className="bg-slate-900 border-slate-600 text-white"
+                    className="bg-black border-2 border-green-400 text-green-400 font-mono"
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-slate-300 mb-2 block">API Key</label>
+                  <label className="text-sm text-cyan-400 mb-2 block">► API Key</label>
                   <Input
                     type="password"
                     value={formData.api_key}
                     onChange={(e) => setFormData({ ...formData, api_key: e.target.value })}
                     placeholder="hf_..."
-                    className="bg-slate-900 border-slate-600 text-white"
+                    className="bg-black border-2 border-green-400 text-green-400 font-mono"
                   />
                 </div>
-                <div className="flex gap-3 justify-end">
-                  <Button type="button" variant="outline" onClick={resetForm}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" className="bg-green-600 hover:bg-green-700">
-                    {editingEndpoint ? "Update" : "Create"} Endpoint
-                  </Button>
+                <div className="flex gap-3 justify-end mt-4">
+                  <button type="button" onClick={resetForm} className="border-2 border-gray-600 text-gray-400 px-4 py-2 hover:bg-gray-900 transition">
+                    [CANCEL]
+                  </button>
+                  <button type="submit" className="bg-green-400 text-black px-4 py-2 hover:bg-green-300 transition font-bold">
+                    [{editingEndpoint ? "UPDATE" : "CREATE"}]
+                  </button>
                 </div>
               </form>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         <div className="space-y-4">
           {endpoints.map((endpoint) => (
-            <Card key={endpoint.id} className="bg-slate-800 border-slate-700 hover:border-green-500 transition-all">
-              <CardContent className="p-6">
+            <div key={endpoint.id} className="border-2 border-green-400 bg-black hover:border-cyan-400 transition-all">
+              <div className="p-4">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center gap-3 mb-2 flex-wrap">
                       <Key className="w-5 h-5 text-green-400" />
-                      <h3 className="text-xl font-semibold text-white">{endpoint.name}</h3>
-                      <Badge variant={endpoint.is_active ? "default" : "secondary"} className={endpoint.is_active ? "bg-green-600" : "bg-slate-600"}>
-                        {endpoint.is_active ? "Active" : "Inactive"}
-                      </Badge>
-                      <Badge variant="secondary" className="bg-blue-900 text-blue-200">
-                        {endpoint.endpoint_type}
-                      </Badge>
+                      <h3 className="text-xl font-semibold text-cyan-400">{endpoint.name}</h3>
+                      <span className={`text-xs px-2 py-1 ${endpoint.is_active ? "bg-green-400 text-black" : "bg-gray-600 text-black"}`}>
+                        [{endpoint.is_active ? "ACTIVE" : "INACTIVE"}]
+                      </span>
+                      <span className="text-xs px-2 py-1 bg-blue-400 text-black">
+                        [{endpoint.endpoint_type.toUpperCase()}]
+                      </span>
                     </div>
-                    <p className="text-slate-400 font-mono text-sm">{endpoint.url}</p>
+                    <p className="text-green-400 font-mono text-sm">→ {endpoint.url}</p>
                     {endpoint.api_key && (
-                      <p className="text-slate-500 text-sm mt-2">
-                        API Key: {endpoint.api_key.substring(0, 10)}...
+                      <p className="text-gray-500 text-sm mt-2 font-mono">
+                        🔑 {endpoint.api_key.substring(0, 10)}...
                       </p>
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
+                    <button
                       onClick={() => handleEdit(endpoint)}
-                      className="border-slate-600 text-slate-300 hover:text-white"
+                      className="border-2 border-cyan-400 text-cyan-400 px-3 py-1 hover:bg-cyan-900/30 transition"
                     >
                       <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
+                    </button>
+                    <button
                       onClick={() => deleteMutation.mutate(endpoint.id)}
+                      className="border-2 border-red-400 text-red-400 px-3 py-1 hover:bg-red-900/30 transition"
                     >
                       <Trash2 className="w-4 h-4" />
-                    </Button>
+                    </button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
 
         {endpoints.length === 0 && !showForm && (
-          <div className="text-center py-16">
-            <LinkIcon className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-400 mb-2">No endpoints configured</h3>
-            <p className="text-slate-500 mb-4">Add your first API endpoint to connect models</p>
-            <Button onClick={() => setShowForm(true)} className="bg-green-600 hover:bg-green-700">
-              <Plus className="w-5 h-5 mr-2" />
-              Add Endpoint
-            </Button>
+          <div className="border-2 border-gray-600 bg-black p-16 text-center">
+            <LinkIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+            <div className="text-gray-500 mb-2">╔════════════════════════╗</div>
+            <h3 className="text-xl font-semibold text-gray-400 mb-2">NO_ENDPOINTS_CONFIGURED</h3>
+            <div className="text-gray-500 mb-2">╚════════════════════════╝</div>
+            <p className="text-gray-600 mb-4">$ Add your first API endpoint to connect models</p>
+            <button onClick={() => setShowForm(true)} className="bg-green-400 text-black px-6 py-2 hover:bg-green-300 transition font-bold">
+              [+ ADD_ENDPOINT]
+            </button>
           </div>
         )}
       </div>
