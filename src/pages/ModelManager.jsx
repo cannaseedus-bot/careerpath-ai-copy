@@ -7,16 +7,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit, Power, PowerOff, Cpu, Code, Zap } from "lucide-react";
+import { Plus, Trash2, Edit, Power, PowerOff, Cpu, Code, Zap, Layers } from "lucide-react";
+import BatchQuantizationDialog from "@/components/models/BatchQuantizationDialog";
 
 export default function ModelManager() {
   const [showForm, setShowForm] = useState(false);
+  const [showBatchDialog, setShowBatchDialog] = useState(false);
   const [editingModel, setEditingModel] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     model_id: "",
     model_type: "phi-3",
     quantization: "none",
+    quantization_config: {},
     tokenizer: "",
     context_length: 4096,
     parameters: "",
@@ -65,6 +68,7 @@ export default function ModelManager() {
       model_id: "",
       model_type: "phi-3",
       quantization: "none",
+      quantization_config: {},
       tokenizer: "",
       context_length: 4096,
       parameters: "",
@@ -75,6 +79,18 @@ export default function ModelManager() {
     });
     setEditingModel(null);
     setShowForm(false);
+  };
+
+  const handleBatchQuantize = async (modelIds, quantization, config) => {
+    for (const id of modelIds) {
+      await updateMutation.mutateAsync({
+        id,
+        data: {
+          quantization,
+          quantization_config: config
+        }
+      });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -103,10 +119,20 @@ export default function ModelManager() {
             </h1>
             <p className="text-slate-400 mt-2">Manage quantized models for your CLI</p>
           </div>
-          <Button onClick={() => setShowForm(!showForm)} className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="w-5 h-5 mr-2" />
-            Add Model
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => setShowBatchDialog(true)}
+              variant="outline"
+              className="border-yellow-600 text-yellow-400 hover:bg-yellow-600/20"
+            >
+              <Layers className="w-5 h-5 mr-2" />
+              Batch Quantize
+            </Button>
+            <Button onClick={() => setShowForm(!showForm)} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-5 h-5 mr-2" />
+              Add Model
+            </Button>
+          </div>
         </div>
 
         {showForm && (
@@ -163,12 +189,28 @@ export default function ModelManager() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-slate-400">Float</div>
                         <SelectItem value="none">None (FP32)</SelectItem>
                         <SelectItem value="fp16">FP16</SelectItem>
+                        <SelectItem value="fp8">FP8</SelectItem>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-slate-400">Integer</div>
                         <SelectItem value="int8">INT8</SelectItem>
                         <SelectItem value="int4">INT4</SelectItem>
+                        <SelectItem value="int2">INT2</SelectItem>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-slate-400">AWQ</div>
+                        <SelectItem value="awq-4bit">AWQ 4-bit</SelectItem>
+                        <SelectItem value="awq-8bit">AWQ 8-bit</SelectItem>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-slate-400">GPTQ</div>
+                        <SelectItem value="gptq-4bit">GPTQ 4-bit</SelectItem>
+                        <SelectItem value="gptq-8bit">GPTQ 8-bit</SelectItem>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-slate-400">GGUF</div>
+                        <SelectItem value="gguf-q2">GGUF Q2</SelectItem>
                         <SelectItem value="gguf-q4">GGUF Q4</SelectItem>
+                        <SelectItem value="gguf-q5">GGUF Q5</SelectItem>
                         <SelectItem value="gguf-q8">GGUF Q8</SelectItem>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-slate-400">BitsAndBytes</div>
+                        <SelectItem value="bitsandbytes-4bit">BitsAndBytes 4-bit</SelectItem>
+                        <SelectItem value="bitsandbytes-8bit">BitsAndBytes 8-bit</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
