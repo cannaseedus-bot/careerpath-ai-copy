@@ -93,36 +93,36 @@ Generate EXECUTABLE Python code that solves this request. Return ONLY valid Pyth
     }
   };
 
-  const extractPythonCode = (text) => {
-    // Extract Python code from markdown code blocks
-    const pythonMatch = text.match(/```python\n([\s\S]*?)\n```|```\n([\s\S]*?)\n```/);
-    return pythonMatch ? (pythonMatch[1] || pythonMatch[2]) : text;
+  const extractPythonCode = async (text) => {
+    // Use code-extractor function to extract code blocks
+    try {
+      const result = await base44.functions.invoke('code-extractor', {
+        content: text,
+        conversationId: conversation?.id
+      });
+      return result.code;
+    } catch (e) {
+      // Fallback extraction
+      const pythonMatch = text.match(/```(?:python)?\n([\s\S]*?)\n```/);
+      return pythonMatch ? pythonMatch[1].trim() : null;
+    }
   };
 
   const applyCodeToEditor = async (codeText, toolCallIdx) => {
     if (!onCodeGenerated) return;
 
-    const cleanCode = extractPythonCode(codeText);
-    
     try {
-      // Process through Micronaut for validation
-      const result = await base44.functions.invoke('micronaut-controller', {
-        action: 'process_generated_code',
-        source: 'runtime-chat',
-        code: cleanCode,
-        tool_call_idx: toolCallIdx
-      });
-
-      if (result && result.success !== false) {
-        onCodeGenerated(cleanCode);
-        toast.success("Code applied to editor");
-      } else {
-        toast.error(result?.error || "Failed to process code");
+      const cleanCode = await extractPythonCode(codeText);
+      
+      if (!cleanCode) {
+        toast.error("No valid Python code found");
+        return;
       }
-    } catch (error) {
-      // Fallback: apply code directly if Micronaut fails
+
       onCodeGenerated(cleanCode);
       toast.success("Code applied to editor");
+    } catch (error) {
+      toast.error("Failed to extract code");
     }
   };
 
