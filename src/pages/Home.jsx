@@ -74,64 +74,110 @@ export default function Home() {
             </Link>
             <Link to={createPageUrl("BotOrchestrator")} className="block hover:bg-green-900/30 p-3 transition">
               <div className="text-cyan-400">$ mx2lm bots --orchestrate</div>
-              <div className="text-green-400 text-sm ml-4">Create scrapers, data builders, and cluster bots</div>
+              <div className="text-green-400 text-sm ml-4">XJSON Runtime Cluster with SVG-3D tensors & SCXQ2 compression</div>
+            </Link>
+            <Link to={createPageUrl("Monitoring")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ mx2lm monitor --cluster</div>
+              <div className="text-green-400 text-sm ml-4">Real-time cluster health and bot performance metrics</div>
             </Link>
           </div>
         </div>
       </div>
 
       {/* Features */}
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <div className="border-2 border-cyan-400 bg-black">
           <div className="bg-cyan-400 text-black px-4 py-1">
-            <span className="font-bold">MODEL REGISTRY</span>
+            <span className="font-bold">XJSON RUNTIME</span>
           </div>
-          <div className="p-4 space-y-2 text-sm">
-            <div>├─ Phi-3 Mini/Lite variants</div>
-            <div>├─ Gemma code models</div>
-            <div>├─ DeepSeek Coder series</div>
-            <div>└─ Quantization: INT4/INT8/GGUF</div>
+          <div className="p-4 space-y-2 text-sm text-cyan-400">
+            <div>├─ Phase law: @Pop → @Wo → @Sek → @Collapse</div>
+            <div>├─ SVG-3D tensor schemas</div>
+            <div>├─ SCXQ2 delta compression</div>
+            <div>└─ Distributed cluster nodes</div>
           </div>
         </div>
 
-        <div className="border-2 border-yellow-400 bg-black">
-          <div className="bg-yellow-400 text-black px-4 py-1">
-            <span className="font-bold">API ENDPOINTS</span>
+        <div className="border-2 border-purple-400 bg-black">
+          <div className="bg-purple-400 text-black px-4 py-1">
+            <span className="font-bold">BOT ORCHESTRATION</span>
           </div>
-          <div className="p-4 space-y-2 text-sm text-yellow-400">
-            <div>├─ Hugging Face Inference</div>
-            <div>├─ Custom runtimes</div>
-            <div>├─ cPanel storage</div>
-            <div>└─ Secure key management</div>
+          <div className="p-4 space-y-2 text-sm text-purple-400">
+            <div>├─ Web scrapers (HuggingFace datasets)</div>
+            <div>├─ N-gram builders</div>
+            <div>├─ Tensor processors (three.js)</div>
+            <div>└─ AI authoring assistant</div>
+          </div>
+        </div>
+
+        <div className="border-2 border-green-400 bg-black">
+          <div className="bg-green-400 text-black px-4 py-1">
+            <span className="font-bold">DEPLOYMENT</span>
+          </div>
+          <div className="p-4 space-y-2 text-sm text-green-400">
+            <div>├─ Version control & rollback</div>
+            <div>├─ Multi-environment (local/staging/prod)</div>
+            <div>├─ Cluster health monitoring</div>
+            <div>└─ Invariant enforcement</div>
           </div>
         </div>
       </div>
 
       {/* Getting Started */}
-      <div className="max-w-5xl mx-auto border-2 border-magenta-400 bg-black mb-8">
-        <div className="bg-magenta-400 text-black px-4 py-1">
-          <span className="font-bold">INSTALLATION</span>
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div className="border-2 border-magenta-400 bg-black">
+          <div className="bg-magenta-400 text-black px-4 py-1">
+            <span className="font-bold">QUICK START</span>
+          </div>
+          <div className="p-4 space-y-2 text-magenta-400 text-sm">
+            <div><span className="text-yellow-400">$</span> npm install -g @mx2lm/cli</div>
+            <div><span className="text-yellow-400">$</span> mx2lm init --config</div>
+            <div><span className="text-yellow-400">$</span> mx2lm models --add phi-3-mini</div>
+            <div><span className="text-yellow-400">$</span> mx2lm bots create --type scraper</div>
+            <div className="text-gray-500 text-xs mt-2"># Deploy to cluster in minutes</div>
+          </div>
         </div>
-        <div className="p-6 space-y-3 text-magenta-400">
-          <div><span className="text-yellow-400">$</span> npm install -g @mx2lm/cli</div>
-          <div><span className="text-yellow-400">$</span> mx2lm init --config</div>
-          <div><span className="text-yellow-400">$</span> mx2lm models --add phi-3-mini</div>
-          <div><span className="text-yellow-400">$</span> mx2lm quantize --method awq --bits 4</div>
-          <div className="text-gray-500 text-sm mt-2"># Ready to deploy your first model</div>
+
+        <div className="border-2 border-orange-400 bg-black">
+          <div className="bg-orange-400 text-black px-4 py-1">
+            <span className="font-bold">BOT EXAMPLES</span>
+          </div>
+          <div className="p-4 space-y-2 text-orange-400 text-sm">
+            <div>├─ Scrape HuggingFace code datasets</div>
+            <div>├─ Build n-gram tensors from corpora</div>
+            <div>├─ Process SVG-3D geometric weights</div>
+            <div>└─ Orchestrate cluster workers</div>
+          </div>
         </div>
       </div>
 
       {/* System Status */}
       <div className="max-w-5xl mx-auto border-2 border-green-400 bg-black mb-8">
-        <div className="bg-green-400 text-black px-4 py-1">
-          <span className="font-bold">SYSTEM STATUS</span>
+        <div className="bg-green-400 text-black px-4 py-1 flex justify-between items-center">
+          <span className="font-bold">CLUSTER STATUS</span>
+          <span className="text-xs">XJSON Runtime v2.0</span>
         </div>
-        <div className="p-6 space-y-2 text-green-400 text-sm">
-          <div>Status: <span className="text-green-400 font-bold">ONLINE</span></div>
-          <div>Models: <span className="text-green-400">3 available</span></div>
-          <div>Endpoints: <span className="text-green-400">5 configured</span></div>
-          <div>Storage: <span className="text-green-400">cPanel integrated</span></div>
-          <div className="mt-4 text-gray-600">Last updated: {new Date().toISOString()}</div>
+        <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-green-400 text-sm">
+          <div>
+            <div className="text-gray-500 text-xs">Runtime</div>
+            <div className="font-bold">ONLINE</div>
+          </div>
+          <div>
+            <div className="text-gray-500 text-xs">Active Bots</div>
+            <div className="font-bold">0</div>
+          </div>
+          <div>
+            <div className="text-gray-500 text-xs">Tensor Schemas</div>
+            <div className="font-bold">NGT-SVG-3D v1</div>
+          </div>
+          <div>
+            <div className="text-gray-500 text-xs">Compression</div>
+            <div className="font-bold">SCXQ2</div>
+          </div>
+        </div>
+        <div className="px-6 pb-6 text-xs text-gray-600">
+          <div>Phase pipeline: @Pop → @Wo → @Sek → @Collapse</div>
+          <div className="mt-1">Last sync: {new Date().toISOString()}</div>
         </div>
       </div>
 
