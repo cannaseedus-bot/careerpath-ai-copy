@@ -1,4 +1,5 @@
 import APIManager from './pages/APIManager';
+import BotOrchestrator from './pages/BotOrchestrator';
 import CIPipelines from './pages/CIPipelines';
 import CLIEditor from './pages/CLIEditor';
 import CLIPlayground from './pages/CLIPlayground';
@@ -14,12 +15,12 @@ import Pricing from './pages/Pricing';
 import SWOT from './pages/SWOT';
 import ShellAssistant from './pages/ShellAssistant';
 import Success from './pages/Success';
-import BotOrchestrator from './pages/BotOrchestrator';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "APIManager": APIManager,
+    "BotOrchestrator": BotOrchestrator,
     "CIPipelines": CIPipelines,
     "CLIEditor": CLIEditor,
     "CLIPlayground": CLIPlayground,
@@ -35,7 +36,6 @@ export const PAGES = {
     "SWOT": SWOT,
     "ShellAssistant": ShellAssistant,
     "Success": Success,
-    "BotOrchestrator": BotOrchestrator,
 }
 
 export const pagesConfig = {

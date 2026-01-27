@@ -8,13 +8,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bot, Plus, Play, Pause, Trash2, Network, Database, Globe, Cpu, Zap, AlertCircle } from "lucide-react";
+import { Bot, Plus, Play, Pause, Trash2, Network, Database, Globe, Cpu, Zap, AlertCircle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import BotTemplates from "@/components/bots/BotTemplates";
+import AIAssistant from "@/components/bots/AIAssistant";
 
 export default function BotOrchestrator() {
   const [showForm, setShowForm] = useState(false);
   const [editingBot, setEditingBot] = useState(null);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     bot_type: "custom",
@@ -147,13 +149,37 @@ export default function BotOrchestrator() {
                 <div className="text-cyan-400 text-2xl mb-2">╔═══ BOT ORCHESTRATOR ═══╗</div>
                 <div className="text-green-400">Create and manage autonomous bots for scraping, data processing, and cluster operations</div>
               </div>
-              <button onClick={() => setShowForm(!showForm)} className="bg-green-400 text-black px-4 py-2 hover:bg-green-300 transition font-bold">
-                <Plus className="w-4 h-4 inline mr-2" />
-                CREATE_BOT
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowAIAssistant(!showAIAssistant)}
+                  className="border-2 border-purple-400 text-purple-400 px-4 py-2 hover:bg-purple-900/30 transition font-bold"
+                >
+                  <Sparkles className="w-4 h-4 inline mr-2" />
+                  AI_ASSIST
+                </button>
+                <button onClick={() => setShowForm(!showForm)} className="bg-green-400 text-black px-4 py-2 hover:bg-green-300 transition font-bold">
+                  <Plus className="w-4 h-4 inline mr-2" />
+                  CREATE_BOT
+                </button>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* AI Assistant */}
+        {showAIAssistant && showForm && (
+          <div className="mb-6">
+            <AIAssistant
+              botType={formData.bot_type}
+              currentScript={formData.script}
+              currentConfig={formData.config}
+              onApplySuggestion={(code) => {
+                setFormData({ ...formData, script: code });
+                toast.success("Code applied to editor");
+              }}
+            />
+          </div>
+        )}
 
         {/* Bot Templates */}
         {!showForm && (
@@ -213,7 +239,17 @@ export default function BotOrchestrator() {
                 </div>
 
                 <div>
-                  <label className="text-green-400 text-sm mb-2 block">BOT_SCRIPT:</label>
+                  <label className="text-green-400 text-sm mb-2 flex justify-between items-center">
+                    <span>BOT_SCRIPT:</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowAIAssistant(!showAIAssistant)}
+                      className="text-xs border border-purple-400 text-purple-400 px-2 py-1 hover:bg-purple-900/30 transition flex items-center gap-1"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      {showAIAssistant ? "HIDE" : "SHOW"}_AI_ASSIST
+                    </button>
+                  </label>
                   <Textarea
                     value={formData.script}
                     onChange={(e) => setFormData({ ...formData, script: e.target.value })}
