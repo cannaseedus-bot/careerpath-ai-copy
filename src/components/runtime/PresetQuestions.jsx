@@ -60,8 +60,8 @@ export default function PresetQuestions({ onSelect, codingPatterns = {} }) {
             key={q.id}
             onClick={() => onSelect(q.label)}
             variant="outline"
-            className={`text-xs justify-start border-slate-600 hover:border-cyan-400 hover:bg-cyan-900/20 ${
-              q.custom ? "border-cyan-600 bg-cyan-900/10" : ""
+            className={`text-xs justify-start border-slate-600 text-gray-300 hover:border-cyan-400 hover:bg-cyan-900/20 hover:text-cyan-400 ${
+              q.custom ? "border-cyan-600 bg-cyan-900/20" : ""
             }`}
           >
             <span className="mr-1">{q.icon}</span>

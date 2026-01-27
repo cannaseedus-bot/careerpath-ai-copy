@@ -44,14 +44,14 @@ Return only the test code, no explanations.`,
   };
 
   return (
-    <div className="bg-black border border-slate-700 rounded p-3 space-y-3">
+    <div className="bg-slate-900 border border-slate-700 rounded p-3 space-y-3">
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-bold text-cyan-400">Unit Test Generator</h4>
         <Button
           size="sm"
           onClick={generateTests}
           disabled={isGenerating}
-          className="bg-cyan-600 hover:bg-cyan-700 text-white"
+          className="bg-cyan-600 hover:bg-cyan-700 text-black font-bold"
         >
           {isGenerating ? (
             <>
@@ -67,14 +67,14 @@ Return only the test code, no explanations.`,
       {generatedTests && (
         <div className="space-y-2">
           <div className="relative">
-            <pre className="bg-slate-900 border border-slate-600 rounded p-2 text-xs text-cyan-300 overflow-x-auto max-h-64 overflow-y-auto font-mono">
+            <pre className="bg-black border border-slate-700 rounded p-2 text-xs text-cyan-300 overflow-x-auto max-h-64 overflow-y-auto font-mono">
               {generatedTests}
             </pre>
             <Button
               size="icon"
               variant="ghost"
               onClick={copyTests}
-              className="absolute top-2 right-2 h-6 w-6 bg-slate-800 hover:bg-slate-700"
+              className="absolute top-2 right-2 h-6 w-6 bg-cyan-900/40 hover:bg-cyan-800/50 border border-slate-700"
             >
               <Copy className="w-3 h-3 text-gray-400" />
             </Button>

@@ -100,10 +100,10 @@ export default function RuntimeChat({ onCodeGenerated, code = "" }) {
   return (
     <div className="h-full flex flex-col bg-black border-l border-cyan-400">
       {/* Header */}
-      <div className="border-b border-cyan-400 p-4 flex items-center justify-between">
+      <div className="border-b border-slate-700 p-4 flex items-center justify-between bg-slate-900">
         <div>
           <h3 className="text-cyan-400 font-bold">AI Studio Assistant</h3>
-          <p className="text-xs text-gray-400">Runtime Studio v1.0</p>
+          <p className="text-xs text-gray-500">Runtime Studio v1.0</p>
         </div>
         <Button
           size="icon"
@@ -115,7 +115,7 @@ export default function RuntimeChat({ onCodeGenerated, code = "" }) {
             setConversation(newConv);
             setMessages([]);
           }}
-          className="border-cyan-400 text-cyan-400 hover:bg-cyan-900/20"
+          className="border-slate-600 text-cyan-400 hover:bg-cyan-900/20"
         >
           <Plus className="w-4 h-4" />
         </Button>
@@ -123,7 +123,7 @@ export default function RuntimeChat({ onCodeGenerated, code = "" }) {
 
       {/* Preset Questions */}
       {showPresets && messages.length === 0 && (
-        <div className="p-4 border-b border-cyan-400">
+        <div className="p-4 border-b border-slate-700 bg-slate-900">
           <PresetQuestions 
             onSelect={(question) => handleSend(question)} 
             codingPatterns={codingPatterns}
@@ -138,8 +138,8 @@ export default function RuntimeChat({ onCodeGenerated, code = "" }) {
             <div
               className={`max-w-xs lg:max-w-md xl:max-w-lg rounded-lg p-3 ${
                 msg.role === "user"
-                  ? "bg-cyan-900/40 border border-cyan-400 text-cyan-100"
-                  : "bg-slate-900 border border-slate-700 text-gray-300"
+                  ? "bg-cyan-900/30 border border-cyan-600 text-cyan-300"
+                  : "bg-slate-800 border border-slate-700 text-gray-300"
               }`}
             >
               {msg.role === "assistant" ? (
@@ -153,17 +153,17 @@ export default function RuntimeChat({ onCodeGenerated, code = "" }) {
                           </code>
                         ) : (
                           <div className="relative group">
-                            <pre className="bg-black/70 p-2 rounded text-xs overflow-x-auto">
-                              <code className="text-cyan-300">{children}</code>
-                            </pre>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 bg-slate-800 hover:bg-slate-700"
-                              onClick={() => {
-                                copyToClipboard(String(children), idx);
-                              }}
-                            >
+                           <pre className="bg-black p-2 rounded text-xs overflow-x-auto border border-slate-700">
+                             <code className="text-cyan-300">{children}</code>
+                           </pre>
+                           <Button
+                             size="icon"
+                             variant="ghost"
+                             className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 bg-cyan-900/40 hover:bg-cyan-800/50 border border-slate-700"
+                             onClick={() => {
+                               copyToClipboard(String(children), idx);
+                             }}
+                           >
                               {copiedIndex === idx ? (
                                 <Check className="w-3 h-3 text-green-400" />
                               ) : (
@@ -194,7 +194,7 @@ export default function RuntimeChat({ onCodeGenerated, code = "" }) {
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 flex items-center gap-2">
+            <div className="bg-slate-800 border border-slate-700 rounded-lg p-3 flex items-center gap-2">
               <Loader2 className="w-4 h-4 text-cyan-400 animate-spin" />
               <span className="text-gray-400 text-sm">Thinking...</span>
             </div>
@@ -205,20 +205,20 @@ export default function RuntimeChat({ onCodeGenerated, code = "" }) {
       </div>
 
       {/* Input */}
-      <div className="border-t border-cyan-400 p-4">
+      <div className="border-t border-slate-700 p-4 bg-slate-900">
         <div className="flex gap-2">
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleSend()}
             placeholder="Ask for help with scripts, models, optimization..."
-            className="bg-slate-900 border-cyan-400 text-white"
+            className="bg-black border-slate-700 text-cyan-400 placeholder:text-gray-600"
             disabled={isLoading}
           />
           <Button
             onClick={handleSend}
             disabled={isLoading || !inputValue.trim()}
-            className="bg-cyan-600 hover:bg-cyan-700 text-white"
+            className="bg-cyan-600 hover:bg-cyan-700 text-black font-bold"
           >
             <Send className="w-4 h-4" />
           </Button>

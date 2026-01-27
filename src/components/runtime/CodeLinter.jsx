@@ -81,7 +81,7 @@ Only return the JSON array, no other text.`,
   };
 
   return (
-    <div className="bg-black border border-slate-700 rounded p-3">
+    <div className="bg-slate-900 border border-slate-700 rounded p-3">
       <div className="flex items-center gap-2 mb-3">
         {isAnalyzing ? (
           <>
@@ -113,7 +113,7 @@ Only return the JSON array, no other text.`,
                   </p>
                   {issue.fix && (
                     <p className="text-gray-400 mt-1 text-xs">
-                      💡 Fix: <code className="bg-black/50 px-1">{issue.fix}</code>
+                      💡 Fix: <code className="bg-black/50 px-1 rounded">{issue.fix}</code>
                     </p>
                   )}
                 </div>

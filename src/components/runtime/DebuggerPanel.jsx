@@ -28,7 +28,7 @@ export default function DebuggerPanel({ code, onStepExecute }) {
           size="sm"
           variant={isDebugging ? "default" : "outline"}
           onClick={() => setIsDebugging(!isDebugging)}
-          className="bg-green-600 hover:bg-green-700 text-white"
+          className="bg-green-600 hover:bg-green-700 text-black font-bold"
         >
           {isDebugging ? <Pause className="w-3 h-3 mr-1" /> : <Play className="w-3 h-3 mr-1" />}
           {isDebugging ? "Pause" : "Debug"}
@@ -38,7 +38,7 @@ export default function DebuggerPanel({ code, onStepExecute }) {
           variant="outline"
           onClick={() => onStepExecute?.(currentLine)}
           disabled={!isDebugging}
-          className="border-slate-600 text-slate-300"
+          className="border-slate-600 text-gray-400 hover:text-gray-300"
         >
           <StepForward className="w-3 h-3 mr-1" />
           Step
@@ -51,7 +51,7 @@ export default function DebuggerPanel({ code, onStepExecute }) {
             setCurrentLine(null);
             setVariables({});
           }}
-          className="border-slate-600 text-slate-300"
+          className="border-slate-600 text-gray-400 hover:text-gray-300"
         >
           <RotateCcw className="w-3 h-3 mr-1" />
           Reset
