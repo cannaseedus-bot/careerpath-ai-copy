@@ -45,17 +45,35 @@ export default function ModelManager() {
 
   const { data: datasets = [] } = useQuery({
     queryKey: ["datasets"],
-    queryFn: () => base44.entities.Dataset.list()
+    queryFn: async () => {
+      try {
+        return await base44.entities.Dataset.list();
+      } catch {
+        return [];
+      }
+    }
   });
 
   const { data: servingConfigs = [] } = useQuery({
     queryKey: ["serving"],
-    queryFn: () => base44.entities.ModelServingConfig.list()
+    queryFn: async () => {
+      try {
+        return await base44.entities.ModelServingConfig.list();
+      } catch {
+        return [];
+      }
+    }
   });
 
   const { data: trainingRuns = [] } = useQuery({
     queryKey: ["training_runs"],
-    queryFn: () => base44.entities.TrainingRun.list()
+    queryFn: async () => {
+      try {
+        return await base44.entities.TrainingRun.list();
+      } catch {
+        return [];
+      }
+    }
   });
 
   const createMutation = useMutation({
