@@ -17,6 +17,7 @@ import RuntimeStudio from './pages/RuntimeStudio';
 import SWOT from './pages/SWOT';
 import ShellAssistant from './pages/ShellAssistant';
 import Success from './pages/Success';
+import ClusterManagement from './pages/ClusterManagement';
 import __Layout from './Layout.jsx';
 
 
@@ -40,6 +41,7 @@ export const PAGES = {
     "SWOT": SWOT,
     "ShellAssistant": ShellAssistant,
     "Success": Success,
+    "ClusterManagement": ClusterManagement,
 }
 
 export const pagesConfig = {
