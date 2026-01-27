@@ -93,22 +93,36 @@ Generate EXECUTABLE Python code that solves this request. Return ONLY valid Pyth
     }
   };
 
-  const applyCodeToEditor = (codeText, toolCallIdx) => {
-    if (onCodeGenerated) {
-      onCodeGenerated(codeText);
-      toast.success("Code applied to editor");
-      
-      // Log code generation event via Micronaut
-      try {
-        base44.functions.invoke('micronaut-controller', {
-          action: 'log_code_generation',
-          source: 'runtime-chat',
-          code_length: codeText.length,
-          tool_call_idx: toolCallIdx
-        }).catch(() => {});
-      } catch (e) {
-        // Silent fail for logging
+  const extractPythonCode = (text) => {
+    // Extract Python code from markdown code blocks
+    const pythonMatch = text.match(/```python\n([\s\S]*?)\n```|```\n([\s\S]*?)\n```/);
+    return pythonMatch ? (pythonMatch[1] || pythonMatch[2]) : text;
+  };
+
+  const applyCodeToEditor = async (codeText, toolCallIdx) => {
+    if (!onCodeGenerated) return;
+
+    const cleanCode = extractPythonCode(codeText);
+    
+    try {
+      // Process through Micronaut for validation
+      const result = await base44.functions.invoke('micronaut-controller', {
+        action: 'process_generated_code',
+        source: 'runtime-chat',
+        code: cleanCode,
+        tool_call_idx: toolCallIdx
+      });
+
+      if (result && result.success !== false) {
+        onCodeGenerated(cleanCode);
+        toast.success("Code applied to editor");
+      } else {
+        toast.error(result?.error || "Failed to process code");
       }
+    } catch (error) {
+      // Fallback: apply code directly if Micronaut fails
+      onCodeGenerated(cleanCode);
+      toast.success("Code applied to editor");
     }
   };
 
