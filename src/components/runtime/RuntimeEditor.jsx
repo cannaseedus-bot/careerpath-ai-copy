@@ -57,6 +57,10 @@ if __name__ == "__main__":
     document.body.removeChild(element);
   };
 
+  const handleApplyFix = (fixedCode) => {
+    handleCodeChange(fixedCode);
+  };
+
   return (
     <div className="h-full flex flex-col bg-black border border-cyan-400">
       {/* Toolbar */}
@@ -141,11 +145,11 @@ if __name__ == "__main__":
         />
 
         {/* Bottom Panels */}
-        <div className="border-t border-slate-700 flex gap-2 overflow-x-auto p-2 bg-slate-900 max-h-64 overflow-y-auto">
-          {showLinter && <div className="flex-1 min-w-max"><CodeLinter code={displayCode} /></div>}
-          {showDebugger && <div className="flex-1 min-w-max"><DebuggerPanel code={displayCode} onStepExecute={() => {}} /></div>}
-          {showTests && <div className="flex-1 min-w-max"><TestGenerator code={displayCode} /></div>}
-        </div>
+         <div className="border-t border-slate-700 flex gap-2 overflow-x-auto p-2 bg-slate-900 max-h-64 overflow-y-auto">
+           {showLinter && <div className="flex-1 min-w-max"><CodeLinter code={displayCode} onApplyFix={handleApplyFix} /></div>}
+           {showDebugger && <div className="flex-1 min-w-max"><DebuggerPanel code={displayCode} onStepExecute={() => {}} /></div>}
+           {showTests && <div className="flex-1 min-w-max"><TestGenerator code={displayCode} /></div>}
+         </div>
       </div>
     </div>
   );
