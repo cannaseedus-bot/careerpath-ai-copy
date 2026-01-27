@@ -1,5 +1,5 @@
 import React from "react";
-import { X } from "lucide-react";
+import { X, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function WidgetModal({ isOpen, title, onClose, children }) {
@@ -29,5 +29,3 @@ export default function WidgetModal({ isOpen, title, onClose, children }) {
     </div>
   );
 }
-
-import { Terminal } from "lucide-react";
