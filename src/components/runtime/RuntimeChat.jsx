@@ -5,14 +5,30 @@ import { Input } from "@/components/ui/input";
 import { Send, Loader2, Plus, Copy, Check } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
+import PresetQuestions from "@/components/runtime/PresetQuestions";
 
-export default function RuntimeChat({ onCodeGenerated }) {
+export default function RuntimeChat({ onCodeGenerated, code = "" }) {
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState(null);
+  const [showPresets, setShowPresets] = useState(true);
+  const [codingPatterns, setCodingPatterns] = useState({});
   const messagesEndRef = useRef(null);
+
+  // Analyze coding patterns
+  useEffect(() => {
+    if (!code) return;
+    
+    const patterns = {
+      usesAsync: /async|await|asyncio/.test(code),
+      usesDataProcessing: /pandas|numpy|DataFrame/.test(code),
+      complexity: code.split("\n").length > 50 ? "high" : "medium"
+    };
+    
+    setCodingPatterns(patterns);
+  }, [code]);
 
   useEffect(() => {
     const initChat = async () => {
@@ -56,12 +72,13 @@ export default function RuntimeChat({ onCodeGenerated }) {
     }
   }, [conversation?.id]);
 
-  const handleSend = async () => {
-    if (!inputValue.trim() || !conversation || isLoading) return;
+  const handleSend = async (message = inputValue) => {
+    if (!message.trim() || !conversation || isLoading) return;
 
     setIsLoading(true);
-    const userMessage = inputValue;
-    setInputValue("");
+    const userMessage = message;
+    if (message === inputValue) setInputValue("");
+    setShowPresets(false);
 
     try {
       await base44.agents.addMessage(conversation, {
@@ -103,6 +120,16 @@ export default function RuntimeChat({ onCodeGenerated }) {
           <Plus className="w-4 h-4" />
         </Button>
       </div>
+
+      {/* Preset Questions */}
+      {showPresets && messages.length === 0 && (
+        <div className="p-4 border-b border-cyan-400">
+          <PresetQuestions 
+            onSelect={(question) => handleSend(question)} 
+            codingPatterns={codingPatterns}
+          />
+        </div>
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
