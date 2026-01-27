@@ -116,7 +116,7 @@ export default function ShellAssistant() {
     };
 
     return (
-        <div className="w-full max-w-7xl mx-auto py-8 px-4">
+        <div className="w-full max-w-7xl mx-auto py-8 px-4 bg-black min-h-screen">
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">

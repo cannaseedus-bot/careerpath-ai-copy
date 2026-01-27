@@ -125,20 +125,26 @@ export default function CIPipelines() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 p-6">
+    <div className="min-h-screen bg-black text-green-400 font-mono p-4">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-white flex items-center gap-3">
-              <GitBranch className="w-10 h-10 text-green-400" />
-              CI/CD Pipelines
-            </h1>
-            <p className="text-slate-400 mt-2">Automate model quantization and deployment</p>
+        {/* Terminal Header */}
+        <div className="border-2 border-green-400 bg-black mb-6">
+          <div className="bg-green-400 text-black px-4 py-1 flex justify-between items-center">
+            <span className="font-bold">$ mx2lm ci --deploy</span>
+            <span className="text-xs">[ CI/CD Manager ]</span>
           </div>
-          <Button onClick={() => setShowForm(!showForm)} className="bg-green-600 hover:bg-green-700">
-            <Plus className="w-5 h-5 mr-2" />
-            New Pipeline
-          </Button>
+          <div className="p-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="text-cyan-400 text-2xl mb-2">╔═══ CI/CD PIPELINES ═══╗</div>
+                <div className="text-green-400">Automate model quantization and deployment</div>
+              </div>
+              <button onClick={() => setShowForm(!showForm)} className="bg-green-400 text-black px-4 py-2 hover:bg-green-300 transition font-bold">
+                <Plus className="w-4 h-4 inline mr-2" />
+                NEW_PIPELINE
+              </button>
+            </div>
+          </div>
         </div>
 
         {showForm && (

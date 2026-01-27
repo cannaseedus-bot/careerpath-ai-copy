@@ -99,19 +99,22 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white py-20 px-6">
+    <div className="min-h-screen bg-black text-green-400 font-mono p-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-purple-600/20 text-purple-300 border-purple-500/30">
-            Flexible Pricing
-          </Badge>
-          <h1 className="text-5xl md:text-6xl font-black mb-6">
-            Choose Your Plan
-          </h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Model hosting and metered API access for your CLI tools. Start at $9.99/month.
-          </p>
+        {/* Terminal Header */}
+        <div className="border-2 border-green-400 bg-black mb-8">
+          <div className="bg-green-400 text-black px-4 py-1 flex justify-between items-center">
+            <span className="font-bold">$ mx2lm pricing --plans</span>
+            <span className="text-xs">[ Subscription Plans ]</span>
+          </div>
+          <div className="p-6 text-center">
+            <div className="text-cyan-400 text-3xl mb-3">╔═══════════════════════════╗</div>
+            <div className="text-cyan-400 text-2xl mb-2">CHOOSE YOUR PLAN</div>
+            <div className="text-cyan-400 text-3xl mb-4">╚═══════════════════════════╝</div>
+            <div className="text-green-400 max-w-2xl mx-auto">
+              Model hosting and metered API access for your CLI tools. Start at $9.99/month.
+            </div>
+          </div>
         </div>
 
         {/* Pricing Tiers */}
