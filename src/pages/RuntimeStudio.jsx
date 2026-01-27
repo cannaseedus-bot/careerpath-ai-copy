@@ -8,6 +8,20 @@ import { Zap } from "lucide-react";
 export default function RuntimeStudio() {
   const [output, setOutput] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
+  const [scriptCode, setScriptCode] = useState(`# Bot Script Editor
+# Write your bot script here
+
+import json
+from datetime import datetime
+
+def main():
+    print("Hello from Runtime Studio!")
+    return {"status": "success", "timestamp": str(datetime.now())}
+
+if __name__ == "__main__":
+    result = main()
+    print(json.dumps(result, indent=2))
+`);
 
   const handleRunScript = async (code) => {
     setIsRunning(true);
@@ -66,12 +80,17 @@ export default function RuntimeStudio() {
           <RuntimeEditor
             onRun={handleRunScript}
             onSave={handleSaveScript}
+            code={scriptCode}
+            onChange={setScriptCode}
           />
         </div>
 
         {/* Chat (middle-right) */}
         <div className="col-span-5 lg:col-span-3.5 border-r border-cyan-400">
-          <RuntimeChat onCodeGenerated={(code) => setOutput([{ type: "info", text: code }])} />
+          <RuntimeChat 
+            onCodeGenerated={(code) => setOutput([{ type: "info", text: code }])} 
+            code={scriptCode}
+          />
         </div>
 
         {/* Output (right) */}
