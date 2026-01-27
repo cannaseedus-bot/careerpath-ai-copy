@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, ChevronLeft, Zap } from "lucide-react";
 import { toast } from "sonner";
+import ClusterSelector from "@/components/shared/ClusterSelector";
 
 const steps = [
   {
@@ -27,6 +28,12 @@ const steps = [
     title: "Compression Settings",
     subtitle: "Optimize for performance",
     info: "Configure SCXQ2 compression and tensor sharding"
+  },
+  {
+    id: "select-cluster",
+    title: "Select Cluster",
+    subtitle: "Choose deployment cluster",
+    info: "Select which bot cluster system to deploy this model to"
   },
   {
     id: "review",
@@ -50,7 +57,8 @@ export default function ModelBuilderWizard({ onComplete, onCancel }) {
     capabilities: [],
     compression_enabled: false,
     tensor_sharding: false,
-    dataset_source: ""
+    dataset_source: "",
+    cluster_id: ""
   });
 
   const handleNext = () => {
@@ -327,6 +335,19 @@ export default function ModelBuilderWizard({ onComplete, onCancel }) {
                   <div className="bg-cyan-900/20 border border-cyan-400 rounded p-4 text-sm text-cyan-200">
                     {steps[currentStep].info}
                   </div>
+                  <ClusterSelector 
+                    value={modelData.cluster_id} 
+                    onChange={(id) => setModelData({ ...modelData, cluster_id: id })}
+                    label="Select a cluster"
+                  />
+                </div>
+              )}
+
+              {currentStep === 4 && (
+                <div className="space-y-4">
+                  <div className="bg-cyan-900/20 border border-cyan-400 rounded p-4 text-sm text-cyan-200">
+                    {steps[currentStep].info}
+                  </div>
                   <div className="bg-slate-900 rounded p-4 space-y-3">
                     <div className="flex justify-between">
                       <span className="text-gray-400">Name:</span>
@@ -362,9 +383,13 @@ export default function ModelBuilderWizard({ onComplete, onCancel }) {
                         <span className="text-cyan-400 font-semibold">{modelData.dataset_source}</span>
                       </div>
                     )}
-                  </div>
-                </div>
-              )}
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Cluster:</span>
+                      <span className="text-cyan-400 font-semibold">{modelData.cluster_id ? "Selected" : "Not selected"}</span>
+                    </div>
+                    </div>
+                    </div>
+                    )}
             </motion.div>
           </AnimatePresence>
         </div>
