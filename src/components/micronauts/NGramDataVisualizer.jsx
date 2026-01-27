@@ -24,21 +24,21 @@ export default function NGramDataVisualizer() {
   const [ngramData, setNgramData] = useState(null);
   const [executedData, setExecutedData] = useState(null);
 
-  const executeBranMutation = useMutation({
+  const executeBrainMutation = useMutation({
     mutationFn: async () => {
       // Step 1: Map query to n-gram data
       const { data: mapped } = await base44.functions.invoke('ngram-data-map', {
         query,
         variables: {},
-        operation_name: 'BranQuery'
+        operation_name: 'BrainQuery'
       });
       setNgramData(mapped);
 
-      // Step 2: Execute bran query
-      const { data: executed } = await base44.functions.invoke('bran-data-executor', {
-        bran_query: query,
+      // Step 2: Execute brain query
+      const { data: executed } = await base44.functions.invoke('brain-data-executor', {
+        brain_query: query,
         execution_context: {
-          operation_name: 'BranQuery',
+          operation_name: 'BrainQuery',
           persistent: false
         },
         session_data: {
@@ -50,7 +50,7 @@ export default function NGramDataVisualizer() {
       return executed;
     },
     onSuccess: () => {
-      toast.success("Bran query executed with compressed n-gram data");
+      toast.success("Brain query executed with compressed n-gram data");
     }
   });
 
@@ -59,7 +59,7 @@ export default function NGramDataVisualizer() {
       <div className="border-2 border-cyan-400 bg-black">
         <div className="bg-cyan-400 text-black px-4 py-1 font-bold flex items-center gap-2">
           <Database className="w-4 h-4" />
-          BRAN DATA EXECUTOR (N-Gram GraphQL)
+          BRAIN DATA EXECUTOR (N-Gram GraphQL)
         </div>
         <div className="p-4 space-y-3">
           <div className="text-xs text-gray-400 mb-2">
@@ -71,12 +71,12 @@ export default function NGramDataVisualizer() {
             className="bg-slate-900 text-green-400 font-mono text-xs h-40"
           />
           <Button
-            onClick={() => executeBranMutation.mutate()}
-            disabled={executeBranMutation.isPending}
+            onClick={() => executeBrainMutation.mutate()}
+            disabled={executeBrainMutation.isPending}
             className="w-full bg-cyan-400 text-black hover:bg-cyan-300"
           >
             <Zap className="w-4 h-4 mr-2" />
-            {executeBranMutation.isPending ? 'EXECUTING...' : 'EXECUTE BRAN QUERY'}
+            {executeBrainMutation.isPending ? 'EXECUTING...' : 'EXECUTE BRAIN QUERY'}
           </Button>
         </div>
       </div>
@@ -174,7 +174,7 @@ export default function NGramDataVisualizer() {
       )}
 
       <div className="text-xs text-gray-600 space-y-1">
-        <div>✓ Brans replace traditional database queries</div>
+        <div>✓ Brains replace traditional database queries</div>
         <div>✓ Data compressed to n-grams for AI recall</div>
         <div>✓ Execution-ready without separate DB system</div>
         <div>✓ Session-based or persistent compression modes</div>

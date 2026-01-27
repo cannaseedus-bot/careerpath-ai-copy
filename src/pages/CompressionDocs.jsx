@@ -28,7 +28,7 @@ export default function CompressionDocs() {
             <TabsTrigger value="folds">Folds</TabsTrigger>
             <TabsTrigger value="micronauts">Micronauts</TabsTrigger>
             <TabsTrigger value="patterns">Patterns</TabsTrigger>
-            <TabsTrigger value="brans">Brans</TabsTrigger>
+            <TabsTrigger value="brains">Brains</TabsTrigger>
             <TabsTrigger value="examples">Examples</TabsTrigger>
           </TabsList>
 
@@ -202,19 +202,19 @@ export default function CompressionDocs() {
             </Card>
           </TabsContent>
 
-          {/* Brans */}
-          <TabsContent value="brans" className="space-y-4">
+          {/* Brains */}
+          <TabsContent value="brains" className="space-y-4">
             <Card className="bg-slate-900 border-2 border-orange-400 p-6">
               <h2 className="text-2xl text-orange-400 mb-4 flex items-center gap-2">
                 <Zap className="w-6 h-6" />
-                Brans: N-Gram Data Execution
+                Brains: N-Gram Data Execution
               </h2>
 
               <div className="space-y-4">
                 <div className="bg-black p-4 rounded border border-orange-400">
                   <div className="text-yellow-400 mb-2">Paradigm Shift:</div>
                   <div className="text-gray-300 space-y-2">
-                    <p>Brans (Brain Constellation Access Nodes) replace traditional databases with compressed n-gram execution.</p>
+                    <p>Brains (Brain Constellation Access Nodes) replace traditional databases with compressed n-gram execution.</p>
                     <ul className="list-disc list-inside text-sm space-y-1">
                       <li>Data compressed to n-grams for AI recall</li>
                       <li>GraphQL-style mapping delivers compressed data</li>
@@ -226,7 +226,7 @@ export default function CompressionDocs() {
                 </div>
 
                 <div className="bg-black p-4 rounded border border-orange-400">
-                  <div className="text-yellow-400 mb-2">Bran Query Example:</div>
+                  <div className="text-yellow-400 mb-2">Brain Query Example:</div>
                   <pre className="text-xs text-green-400 overflow-auto">
 {`{
   Bot {
@@ -266,7 +266,7 @@ export default function CompressionDocs() {
                   <div className="text-yellow-400 mb-2">Compression Folds:</div>
                   <pre className="text-xs text-green-400 overflow-auto">
 {`⟁NGRAM_DATA_FOLD⟁ - N-gram compressed data
-⟁BRAN_EXECUTION_FOLD⟁ - Execution context
+⟁BRAIN_EXECUTION_FOLD⟁ - Execution context
 ⟁DATA_FOLD⟁ - Entity compression
 ⟁TENSOR_FOLD⟁ - Tensor n-grams`}</pre>
                 </div>

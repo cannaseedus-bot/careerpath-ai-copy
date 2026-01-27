@@ -3,20 +3,20 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
-        const { bran_query, execution_context, session_data } = await req.json();
+        const { brain_query, execution_context, session_data } = await req.json();
 
         // Execute compressed n-gram data directly
-        const result = await executeBran(base44, bran_query, execution_context, session_data);
+        const result = await executeBrain(base44, brain_query, execution_context, session_data);
 
         return Response.json(result);
     } catch (error) {
-        console.error('Bran executor error:', error);
+        console.error('Brain executor error:', error);
         return Response.json({ error: error.message }, { status: 500 });
     }
 });
 
-async function executeBran(base44, query, context, sessionData) {
-    // BRAN = Brain Constellation Data Access Node
+async function executeBrain(base44, query, context, sessionData) {
+    // BRAIN = Brain Constellation Data Access Node
     // Replaces traditional DB queries with compressed n-gram execution
 
     // Step 1: Fetch compressed n-gram data via map
@@ -38,7 +38,7 @@ async function executeBran(base44, query, context, sessionData) {
         data: executed,
         mode: executionMode,
         compressed: true,
-        fold: '⟁BRAN_EXECUTION_FOLD⟁',
+        fold: '⟁BRAIN_EXECUTION_FOLD⟁',
         timestamp: new Date().toISOString()
     };
 }
@@ -86,7 +86,7 @@ async function executeCompressedData(base44, ngramData, mode, sessionData) {
             // Keep compressed, return execution handle
             results[entity] = {
                 compressed: compressedData.compressed,
-                execution_handle: `bran:${entity}:${Date.now()}`,
+                execution_handle: `brain:${entity}:${Date.now()}`,
                 recall_method: 'ngram-decompression'
             };
         } else {
