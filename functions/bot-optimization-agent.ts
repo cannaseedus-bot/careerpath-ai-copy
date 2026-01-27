@@ -30,6 +30,11 @@ Deno.serve(async (req) => {
         // Generate optimization suggestions using AI
         const optimizations = await generateOptimizations(base44, botData, deploymentData, analysis);
 
+        // Spawn micronauts for optimization if needed
+        if (optimizations.length > 0) {
+            await spawnOptimizationMicronauts(base44, botData, optimizations);
+        }
+
         // Save optimization suggestions
         const savedOptimizations = [];
         for (const opt of optimizations) {
@@ -221,4 +226,46 @@ async function applyOptimization(base44, bot, deployment, optimization) {
     }
 
     return true;
+}
+
+async function spawnOptimizationMicronauts(base44, bot, optimizations) {
+    // Spawn micronauts to handle specific optimization types
+    const micronautSpecs = {
+        'tensor_sharding': { type: 'db-master', folds: ['⟁TENSOR_FOLD⟁', '⟁STORAGE_FOLD⟁'] },
+        'weight_pruning': { type: 'pattern-match', folds: ['⟁TENSOR_FOLD⟁'] },
+        'compression_tuning': { type: 'vector-ctrl', folds: ['⟁COMPRESSION_FOLD⟁'] }
+    };
+
+    for (const opt of optimizations) {
+        const spec = micronautSpecs[opt.type];
+        if (spec) {
+            try {
+                await base44.functions.invoke('micronaut-controller', {
+                    action: 'spawn',
+                    micronaut_name: `µ-opt-${opt.type}-${Date.now()}`,
+                    config: {
+                        type: spec.type,
+                        folds: spec.folds,
+                        control_vectors: {
+                            flow: 0.8,
+                            intensity: 0.9,
+                            entropy: 0.1,
+                            stability: 0.95
+                        }
+                    },
+                    parent_agent_id: `optimization-agent-${bot.id}`,
+                    ngram_data: {
+                        policies: [
+                            { name: 'optimization-policy', rule: opt.type, action: 'apply', priority: opt.priority }
+                        ],
+                        tools: [
+                            { name: 'compression-engine', type: 'compression', endpoint: 'compression-engine' }
+                        ]
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to spawn micronaut:', error);
+            }
+        }
+    }
 }

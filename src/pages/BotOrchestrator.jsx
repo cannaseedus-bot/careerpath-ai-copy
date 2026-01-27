@@ -16,6 +16,7 @@ import DeploymentManager from "@/components/bots/DeploymentManager";
 import TensorSchemaVisualizer from "@/components/bots/TensorSchemaVisualizer";
 import OptimizationInsights from "@/components/bots/OptimizationInsights";
 import CompressionMetrics from "@/components/bots/CompressionMetrics";
+import MicronautDashboard from "@/components/micronauts/MicronautDashboard";
 
 export default function BotOrchestrator() {
   const [showForm, setShowForm] = useState(false);
@@ -170,6 +171,11 @@ export default function BotOrchestrator() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Micronaut Dashboard */}
+        <div className="mb-6">
+          <MicronautDashboard />
         </div>
 
         {/* AI Assistant */}
