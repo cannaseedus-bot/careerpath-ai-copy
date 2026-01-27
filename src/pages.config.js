@@ -16,6 +16,7 @@ import Pricing from './pages/Pricing';
 import SWOT from './pages/SWOT';
 import ShellAssistant from './pages/ShellAssistant';
 import Success from './pages/Success';
+import RuntimeStudio from './pages/RuntimeStudio';
 import __Layout from './Layout.jsx';
 
 
@@ -38,6 +39,7 @@ export const PAGES = {
     "SWOT": SWOT,
     "ShellAssistant": ShellAssistant,
     "Success": Success,
+    "RuntimeStudio": RuntimeStudio,
 }
 
 export const pagesConfig = {
