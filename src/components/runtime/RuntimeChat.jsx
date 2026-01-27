@@ -119,10 +119,22 @@ Generate EXECUTABLE Python code that solves this request. Return ONLY valid Pyth
         return;
       }
 
-      onCodeGenerated(cleanCode);
-      toast.success("Code applied to editor");
+      // Merge with existing code to avoid duplicates
+      const mergeResult = await base44.functions.invoke('code-merger', {
+        currentCode: code,
+        newCode: cleanCode
+      });
+
+      if (mergeResult.success) {
+        onCodeGenerated(mergeResult.code);
+        toast.success(`Code applied (${mergeResult.stats.functions} functions, ${mergeResult.stats.classes} classes)`);
+      } else {
+        // Fallback to direct application
+        onCodeGenerated(cleanCode);
+        toast.success("Code applied to editor");
+      }
     } catch (error) {
-      toast.error("Failed to extract code");
+      toast.error("Failed to merge code");
     }
   };
 
