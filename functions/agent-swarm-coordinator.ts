@@ -23,6 +23,12 @@ Deno.serve(async (req) => {
             case 'specialize_agents':
                 result = await specializeAgents(base44, parameters);
                 break;
+            case 'adjust_learning':
+                result = await adjustLearningPriorities(base44, parameters.swarm_id, parameters.performance_data);
+                break;
+            case 'predict_learning_path':
+                result = await predictOptimalLearningPath(base44, parameters.agent_id, parameters.task_complexity);
+                break;
             default:
                 return Response.json({ error: 'Unknown operation' }, { status: 400 });
         }
@@ -491,4 +497,214 @@ function calculateEfficiencyScore(metrics) {
     const opsScore = Math.min(1, operations / 100);
     
     return (timeScore * 0.4 + opsScore * 0.3 + successRate * 0.3);
+}
+
+// DYNAMIC LEARNING PRIORITY ADJUSTMENT
+async function adjustLearningPriorities(base44, swarmId, performanceData) {
+    const micronauts = await base44.entities.Micronaut.list();
+    const swarmAgents = micronauts.filter(m => m.parent_agent_id === swarmId || m.parent_agent_id === 'brain-layer-11');
+    
+    if (swarmAgents.length === 0) {
+        return { success: false, message: 'No swarm agents found' };
+    }
+    
+    // Analyze performance across all agents
+    const performanceAnalysis = {
+        high_performers: [],
+        low_performers: [],
+        critical_folds: [],
+        emerging_patterns: performanceData.recent_patterns || []
+    };
+    
+    swarmAgents.forEach(agent => {
+        const efficiency = calculateEfficiencyScore(agent.metrics);
+        if (efficiency > 0.75) {
+            performanceAnalysis.high_performers.push({ name: agent.name, efficiency });
+        } else if (efficiency < 0.4) {
+            performanceAnalysis.low_performers.push({ name: agent.name, efficiency });
+        }
+    });
+    
+    // Identify critical folds that need more resources
+    const foldPerformance = {};
+    swarmAgents.forEach(agent => {
+        agent.assigned_folds?.forEach(fold => {
+            if (!foldPerformance[fold]) {
+                foldPerformance[fold] = { total: 0, success: 0, agents: 0 };
+            }
+            foldPerformance[fold].total += agent.metrics?.operations || 0;
+            foldPerformance[fold].success += (agent.metrics?.success_rate || 0) * (agent.metrics?.operations || 0);
+            foldPerformance[fold].agents += 1;
+        });
+    });
+    
+    for (const fold in foldPerformance) {
+        const avgSuccess = foldPerformance[fold].success / (foldPerformance[fold].total || 1);
+        if (avgSuccess < 0.5 || foldPerformance[fold].agents < 2) {
+            performanceAnalysis.critical_folds.push(fold);
+        }
+    }
+    
+    // Use LLM to analyze patterns and suggest learning priorities
+    const llmAnalysis = await base44.integrations.Core.InvokeLLM({
+        prompt: `Analyze agent swarm performance and suggest dynamic learning priority adjustments:
+
+Performance Data:
+- High Performers: ${performanceAnalysis.high_performers.length}
+- Low Performers: ${performanceAnalysis.low_performers.length}
+- Critical Folds: ${performanceAnalysis.critical_folds.join(', ')}
+- Task Complexity: ${performanceData.task_complexity || 'medium'}
+- Recent Patterns: ${JSON.stringify(performanceData.recent_patterns || [])}
+
+Suggest:
+1. Which folds need more learning resources
+2. Which agents should shift focus
+3. New patterns that are emerging and need attention
+4. Learning priority scores (0-1) for each fold
+5. Recommended resource reallocation percentages`,
+        response_json_schema: {
+            type: 'object',
+            properties: {
+                priority_folds: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            fold: { type: 'string' },
+                            priority_score: { type: 'number' },
+                            reason: { type: 'string' },
+                            resource_allocation: { type: 'number' }
+                        }
+                    }
+                },
+                agent_adjustments: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            agent_name: { type: 'string' },
+                            new_focus_folds: { type: 'array', items: { type: 'string' } },
+                            learning_intensity: { type: 'number' },
+                            reason: { type: 'string' }
+                        }
+                    }
+                },
+                emerging_patterns: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            pattern_type: { type: 'string' },
+                            complexity: { type: 'number' },
+                            required_folds: { type: 'array', items: { type: 'string' } }
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Apply learning priority adjustments
+    const updates = [];
+    for (const adjustment of llmAnalysis.agent_adjustments) {
+        const agent = swarmAgents.find(a => a.name === adjustment.agent_name);
+        if (agent) {
+            await base44.entities.Micronaut.update(agent.id, {
+                assigned_folds: adjustment.new_focus_folds,
+                control_vectors: {
+                    ...agent.control_vectors,
+                    learning_intensity: adjustment.learning_intensity,
+                    learning_priorities: llmAnalysis.priority_folds.reduce((acc, fold) => {
+                        acc[fold.fold] = fold.priority_score;
+                        return acc;
+                    }, {})
+                },
+                metrics: {
+                    ...agent.metrics,
+                    learning_adjusted_at: new Date().toISOString()
+                }
+            });
+            updates.push({
+                agent: agent.name,
+                adjustment: adjustment.reason
+            });
+        }
+    }
+    
+    return {
+        success: true,
+        adjustments_applied: updates.length,
+        priority_folds: llmAnalysis.priority_folds,
+        emerging_patterns: llmAnalysis.emerging_patterns,
+        updates
+    };
+}
+
+// PREDICT OPTIMAL LEARNING PATH WITH SCXQ2 INTEGRATION
+async function predictOptimalLearningPath(base44, agentId, taskComplexity) {
+    const micronauts = await base44.entities.Micronaut.list();
+    const agent = micronauts.find(m => m.id === agentId);
+    
+    if (!agent) {
+        return { success: false, error: 'Agent not found' };
+    }
+    
+    // Use SCXQ2 compression metrics to predict learning efficiency
+    const compressionData = await base44.functions.invoke('compression-inference-engine', {
+        operation: 'inference',
+        data: {
+            agent_history: agent.metrics,
+            task_patterns: agent.ngram_data,
+            current_folds: agent.assigned_folds
+        },
+        parameters: {}
+    }).catch(() => ({ data: { result: { metrics: { efficiency: 0 } } } }));
+    
+    // Use LLM to predict optimal learning path
+    const learningPath = await base44.integrations.Core.InvokeLLM({
+        prompt: `Predict optimal learning path for specialized Micronaut agent:
+
+Agent Type: ${agent.type}
+Current Folds: ${JSON.stringify(agent.assigned_folds)}
+Performance Metrics: ${JSON.stringify(agent.metrics)}
+Task Complexity: ${taskComplexity}
+Compression Efficiency: ${compressionData.data?.result?.metrics?.efficiency || 'unknown'}
+
+Based on SCXQ2 compression patterns and current performance, suggest:
+1. Optimal sequence of folds to learn (priority order)
+2. Estimated learning time for each fold
+3. Prerequisites and dependencies
+4. Expected efficiency improvements
+5. Risk factors and mitigation strategies`,
+        response_json_schema: {
+            type: 'object',
+            properties: {
+                learning_sequence: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            fold: { type: 'string' },
+                            priority: { type: 'number' },
+                            estimated_time_hours: { type: 'number' },
+                            prerequisites: { type: 'array', items: { type: 'string' } },
+                            expected_efficiency_gain: { type: 'number' }
+                        }
+                    }
+                },
+                total_learning_time: { type: 'number' },
+                confidence_score: { type: 'number' },
+                risk_factors: { type: 'array', items: { type: 'string' } }
+            }
+        }
+    });
+    
+    return {
+        success: true,
+        agent_id: agentId,
+        agent_name: agent.name,
+        current_efficiency: calculateEfficiencyScore(agent.metrics),
+        predicted_path: learningPath,
+        scxq2_insights: compressionData.data?.result?.metrics
+    };
 }

@@ -88,6 +88,23 @@ export default function GeometricTensorBrainDashboard() {
     }
   });
 
+  const adjustLearningMutation = useMutation({
+    mutationFn: async () => {
+      const { data: result } = await base44.functions.invoke('agent-swarm-coordinator', {
+        operation: 'adjust_learning',
+        swarm_id: 'primary-swarm',
+        performance_data: {
+          task_complexity: 'high',
+          recent_patterns: processingResult?.ngram_patterns?.patterns || []
+        }
+      });
+      return result;
+    },
+    onSuccess: (data) => {
+      toast.success(`Learning priorities adjusted: ${data.adjustments_applied} agents`);
+    }
+  });
+
   const analyzeMutation = useMutation({
     mutationFn: async (data) => {
       const { data: result } = await base44.functions.invoke('geometric-tensor-brain', {
@@ -220,6 +237,16 @@ export default function GeometricTensorBrainDashboard() {
               >
                 <Brain className="w-4 h-4 mr-2" />
                 Specialize
+              </Button>
+
+              <Button
+                onClick={() => adjustLearningMutation.mutate()}
+                disabled={adjustLearningMutation.isPending}
+                variant="outline"
+                className="border-cyan-400 text-cyan-400"
+              >
+                <Activity className="w-4 h-4 mr-2" />
+                Adjust Learning
               </Button>
             </div>
           </div>
