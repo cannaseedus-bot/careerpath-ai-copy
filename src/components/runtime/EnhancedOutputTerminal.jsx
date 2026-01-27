@@ -8,8 +8,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import DebugAssistant from "./DebugAssistant";
 
-export default function EnhancedOutputTerminal({ output = [], isRunning, onClear }) {
+export default function EnhancedOutputTerminal({ output = [], isRunning, onClear, code, onApplyFix }) {
   const [filterLevel, setFilterLevel] = useState("all");
   const [searchText, setSearchText] = useState("");
   const scrollRef = useRef(null);
