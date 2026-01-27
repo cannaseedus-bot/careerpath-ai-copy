@@ -13,6 +13,7 @@ import IDEIntegrations from './pages/IDEIntegrations';
 import CIPipelines from './pages/CIPipelines';
 import Extensions from './pages/Extensions';
 import Commands from './pages/Commands';
+import ShellAssistant from './pages/ShellAssistant';
 import __Layout from './Layout.jsx';
 
 
@@ -32,6 +33,7 @@ export const PAGES = {
     "CIPipelines": CIPipelines,
     "Extensions": Extensions,
     "Commands": Commands,
+    "ShellAssistant": ShellAssistant,
 }
 
 export const pagesConfig = {
