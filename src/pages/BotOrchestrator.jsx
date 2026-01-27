@@ -8,11 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bot, Plus, Play, Pause, Trash2, Network, Database, Globe, Cpu, Zap, AlertCircle, Sparkles, Rocket } from "lucide-react";
+import { Bot, Plus, Play, Pause, Trash2, Network, Database, Globe, Cpu, Zap, AlertCircle, Sparkles, Rocket, Layers } from "lucide-react";
 import { toast } from "sonner";
 import BotTemplates from "@/components/bots/BotTemplates";
 import AIAssistant from "@/components/bots/AIAssistant";
 import DeploymentManager from "@/components/bots/DeploymentManager";
+import TensorSchemaVisualizer from "@/components/bots/TensorSchemaVisualizer";
 
 export default function BotOrchestrator() {
   const [showForm, setShowForm] = useState(false);
