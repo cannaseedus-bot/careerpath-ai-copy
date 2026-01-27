@@ -16,12 +16,21 @@ export default function RuntimeChat({ onCodeGenerated }) {
 
   useEffect(() => {
     const initChat = async () => {
-      const newConv = await base44.agents.createConversation({
-        agent_name: "runtime-studio",
-        metadata: { name: "Runtime Session", type: "development" }
-      });
-      setConversation(newConv);
-      setMessages(newConv.messages || []);
+      try {
+        const newConv = await base44.agents.createConversation({
+          agent_name: "runtime-studio",
+          metadata: { name: "Runtime Session", type: "development" }
+        });
+        if (newConv?.id) {
+          setConversation(newConv);
+          setMessages(newConv.messages || []);
+        } else {
+          toast.error("Failed to initialize chat agent");
+        }
+      } catch (error) {
+        toast.error("Chat initialization failed");
+        console.error(error);
+      }
     };
     initChat();
   }, []);
@@ -31,15 +40,20 @@ export default function RuntimeChat({ onCodeGenerated }) {
   }, [messages]);
 
   useEffect(() => {
-    if (!conversation) return;
-    const unsubscribe = base44.agents.subscribeToConversation(
-      conversation.id,
-      (data) => {
-        setMessages(data.messages);
-        setIsLoading(false);
-      }
-    );
-    return unsubscribe;
+    if (!conversation?.id) return;
+    try {
+      const unsubscribe = base44.agents.subscribeToConversation(
+        conversation.id,
+        (data) => {
+          setMessages(data.messages || []);
+          setIsLoading(false);
+        }
+      );
+      return unsubscribe;
+    } catch (error) {
+      console.error("Subscription error:", error);
+      return () => {};
+    }
   }, [conversation?.id]);
 
   const handleSend = async () => {
