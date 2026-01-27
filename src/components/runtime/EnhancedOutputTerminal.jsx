@@ -25,6 +25,10 @@ export default function EnhancedOutputTerminal({ output = [], isRunning, onClear
     return levelMatch && searchMatch;
   });
 
+  const lastError = output
+    .reverse()
+    .find((line) => line.type === "error")?.text;
+
   const handleDownload = () => {
     const text = output.map((line) => line.text).join("\n");
     const element = document.createElement("a");
