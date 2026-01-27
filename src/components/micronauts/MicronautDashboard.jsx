@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import NGramDataVisualizer from "./NGramDataVisualizer";
 import AdaptiveControlPanel from "./AdaptiveControlPanel";
 import QuantumEntanglementVisualizer from "./QuantumEntanglementVisualizer";
+import MicronautFactory from "./MicronautFactory";
 import GeometricTensorBrainDashboard from "../brain/GeometricTensorBrainDashboard";
 
 export default function MicronautDashboard() {

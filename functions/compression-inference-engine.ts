@@ -29,6 +29,9 @@ Deno.serve(async (req) => {
             case 'generate_css':
                 result = await generateCSSControls(data);
                 break;
+            case 'xcfe_tensor_create':
+                result = await createXCFETensor(data, parameters);
+                break;
             case 'save_model':
                 result = await saveTrainedModel(base44, data);
                 break;
