@@ -8,13 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bot, Plus, Play, Pause, Trash2, Network, Database, Globe, Cpu, Zap, AlertCircle, Sparkles, Rocket, Layers, TrendingUp } from "lucide-react";
+import { Bot, Plus, Play, Pause, Trash2, Network, Database, Globe, Cpu, Zap, AlertCircle, Sparkles, Rocket, Layers, TrendingUp, Activity } from "lucide-react";
 import { toast } from "sonner";
 import BotTemplates from "@/components/bots/BotTemplates";
 import AIAssistant from "@/components/bots/AIAssistant";
 import DeploymentManager from "@/components/bots/DeploymentManager";
 import TensorSchemaVisualizer from "@/components/bots/TensorSchemaVisualizer";
 import OptimizationInsights from "@/components/bots/OptimizationInsights";
+import CompressionMetrics from "@/components/bots/CompressionMetrics";
 
 export default function BotOrchestrator() {
   const [showForm, setShowForm] = useState(false);
@@ -173,7 +174,7 @@ export default function BotOrchestrator() {
 
         {/* AI Assistant */}
         {showAIAssistant && showForm && (
-          <div className="mb-6">
+          <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <AIAssistant
               botType={formData.bot_type}
               currentScript={formData.script}
@@ -183,6 +184,9 @@ export default function BotOrchestrator() {
                 toast.success("Code applied to editor");
               }}
             />
+            {editingBot && (
+              <CompressionMetrics bot={editingBot} />
+            )}
           </div>
         )}
 

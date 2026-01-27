@@ -47,17 +47,22 @@ Deno.serve(async (req) => {
         // Generate tensor weights on-the-fly
         const weights = await generateTensorWeights(schema, bot_config, sample_data);
 
+        // Apply compression calculus
+        const compressed = await applyCompressionCalculus(schema, ngrams, weights);
+
         return Response.json({
             success: true,
             schema: {
                 ...schema,
                 svg_3d_version: "1.0",
                 generated_at: new Date().toISOString(),
-                bot_type
+                bot_type,
+                compression_fold: compressed.fold
             },
             ngrams,
             weights,
-            scxq2_config: generateSCXQ2Config(schema)
+            scxq2_config: generateSCXQ2Config(schema),
+            compression_metrics: compressed.metrics
         });
 
     } catch (error) {
@@ -199,6 +204,38 @@ function generateSCXQ2Config(schema) {
             }
         },
         delta_mode: 'incremental',
-        merge_strategy: 'last_write_wins'
+        merge_strategy: 'last_write_wins',
+        fold_binding: '⟁TENSOR_FOLD⟁'
     };
+}
+
+async function applyCompressionCalculus(schema, ngrams, weights) {
+    // Apply compression fold to tensor schema
+    const schemaData = JSON.stringify({ schema, ngrams, weights });
+    const compressed = {
+        fold: '⟁TENSOR_FOLD⟁',
+        patterns: [],
+        entropy: 0
+    };
+
+    // Calculate entropy
+    const freq = new Map();
+    for (const char of schemaData) {
+        freq.set(char, (freq.get(char) || 0) + 1);
+    }
+    
+    let entropy = 0;
+    for (const count of freq.values()) {
+        const p = count / schemaData.length;
+        entropy -= p * Math.log2(p);
+    }
+
+    compressed.entropy = entropy;
+    compressed.metrics = {
+        original_size: schemaData.length,
+        entropy,
+        compressibility: entropy > 3 ? 'low' : 'high'
+    };
+
+    return compressed;
 }

@@ -80,6 +80,10 @@ export default function Home() {
               <div className="text-cyan-400">$ mx2lm monitor --cluster</div>
               <div className="text-green-400 text-sm ml-4">Real-time cluster health and bot performance metrics</div>
             </Link>
+            <Link to={createPageUrl("CompressionDocs")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ mx2lm docs --compression-calculus</div>
+              <div className="text-green-400 text-sm ml-4">W3Schools-style compression calculus reference</div>
+            </Link>
           </div>
         </div>
       </div>
