@@ -101,6 +101,31 @@ export default function APIManager() {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {formData.endpoint_type === "ollama" && (
+                <div className="mb-4 p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
+                  <div className="text-sm text-blue-300 font-semibold mb-2">Ollama Integration Example:</div>
+                  <pre className="text-xs text-slate-300 font-mono bg-slate-900 p-3 rounded overflow-x-auto">
+{`import { Ollama } from "ollama";
+
+const ollama = new Ollama({
+  host: "https://ollama.com",
+  headers: {
+    Authorization: "Bearer " + process.env.OLLAMA_API_KEY,
+  },
+});
+
+const response = await ollama.chat({
+  model: "gpt-oss:120b",
+  messages: [{ role: "user", content: "Explain quantum computing" }],
+  stream: true,
+});
+
+for await (const part of response) {
+  process.stdout.write(part.message.content);
+}`}
+                  </pre>
+                </div>
+              )}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -123,6 +148,7 @@ export default function APIManager() {
                         <SelectItem value="huggingface">Hugging Face</SelectItem>
                         <SelectItem value="openai">OpenAI</SelectItem>
                         <SelectItem value="anthropic">Anthropic</SelectItem>
+                        <SelectItem value="ollama">Ollama</SelectItem>
                         <SelectItem value="cpanel">cPanel</SelectItem>
                         <SelectItem value="custom">Custom</SelectItem>
                       </SelectContent>
