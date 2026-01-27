@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { AlertCircle, AlertTriangle, Lightbulb, CheckCircle } from "lucide-react";
+import { AlertCircle, AlertTriangle, Lightbulb, CheckCircle, Zap } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
-export default function CodeLinter({ code }) {
+export default function CodeLinter({ code, onApplyFix }) {
   const [issues, setIssues] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -80,6 +81,20 @@ Only return the JSON array, no other text.`,
     }
   };
 
+  const handleAutoFix = (issue) => {
+    if (!onApplyFix || !issue.fix_code) {
+      toast.error("Fix not available for this issue");
+      return;
+    }
+
+    try {
+      onApplyFix(issue.fix_code);
+      toast.success("Fix applied automatically!");
+    } catch (error) {
+      toast.error("Failed to apply fix");
+    }
+  };
+
   return (
     <div className="bg-slate-900 border border-slate-700 rounded p-3">
       <div className="flex items-center gap-2 mb-3">
@@ -112,9 +127,22 @@ Only return the JSON array, no other text.`,
                     Line {issue.line}: {issue.message}
                   </p>
                   {issue.fix && (
-                    <p className="text-gray-400 mt-1 text-xs">
-                      💡 Fix: <code className="bg-black/50 px-1 rounded">{issue.fix}</code>
-                    </p>
+                    <div className="mt-1 space-y-1">
+                      <p className="text-gray-400 text-xs">
+                        💡 Fix: <code className="bg-black/50 px-1 rounded">{issue.fix}</code>
+                      </p>
+                      {issue.fix_code && onApplyFix && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleAutoFix(issue)}
+                          className="h-6 text-xs border-cyan-400/50 text-cyan-400 hover:bg-cyan-900/20"
+                        >
+                          <Zap className="w-3 h-3 mr-1" />
+                          Auto Fix
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

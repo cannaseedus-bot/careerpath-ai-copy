@@ -17,19 +17,38 @@ export default function RuntimeStudio() {
   const navigate = useNavigate();
   const [output, setOutput] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
-  const [scriptCode, setScriptCode] = useState(`# Bot Script Editor
-# Write your bot script here
+  const [scriptCode, setScriptCode] = useState(`"""
+Bot Script for Runtime Studio
+Demonstrates data processing and model integration capabilities.
+"""
 
 import json
 from datetime import datetime
 
-def main():
-    print("Hello from Runtime Studio!")
-    return {"status": "success", "timestamp": str(datetime.now())}
+
+def main() -> dict:
+    """
+    Main execution function that processes bot tasks.
+    
+    Returns:
+        dict: Status and timestamp information in ISO format.
+    """
+    try:
+        result = {
+            "status": "success",
+            "timestamp": datetime.now().isoformat()
+        }
+        return result
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 
 if __name__ == "__main__":
     result = main()
-    print(json.dumps(result, indent=2))
+    try:
+        print(json.dumps(result, indent=2))
+    except json.JSONDecodeError as e:
+        print(f"JSON serialization error: {e}")
 `);
   const [pythonVersion, setPythonVersion] = useState("3.12");
   const [scriptArgs, setScriptArgs] = useState("");
