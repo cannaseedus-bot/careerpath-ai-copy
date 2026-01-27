@@ -68,6 +68,10 @@ export default function Home() {
               <div className="text-cyan-400">$ mx2lm commands --custom</div>
               <div className="text-green-400 text-sm ml-4">Create and manage custom CLI commands</div>
             </Link>
+            <Link to={createPageUrl("ShellAssistant")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ mx2lm assistant --ai</div>
+              <div className="text-green-400 text-sm ml-4">AI-powered shell assistant for natural language commands</div>
+            </Link>
           </div>
         </div>
       </div>
