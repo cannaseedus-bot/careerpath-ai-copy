@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, Zap, Activity, Cpu, Database, Code } from "lucide-react";
 import { toast } from "sonner";
 import NGramDataVisualizer from "./NGramDataVisualizer";
+import AdaptiveControlPanel from "./AdaptiveControlPanel";
 
 export default function MicronautDashboard() {
   const [command, setCommand] = useState('');
@@ -55,6 +56,9 @@ export default function MicronautDashboard() {
     <div className="space-y-6">
       {/* N-Gram Data Visualizer */}
       <NGramDataVisualizer />
+
+      {/* Adaptive Control Panel */}
+      <AdaptiveControlPanel />
 
       {/* LLM Command Interface */}
       <div className="border-2 border-purple-400 bg-black">

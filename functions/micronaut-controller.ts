@@ -224,7 +224,6 @@ async function terminateMicronaut(base44, name) {
 async function coordinateMicronauts(base44, config) {
     const { micronaut_names, task, parameters } = config;
     
-    // Get all specified micronauts
     const micronauts = await base44.entities.Micronaut.list();
     const targets = micronauts.filter(m => micronaut_names.includes(m.name));
 
@@ -232,34 +231,110 @@ async function coordinateMicronauts(base44, config) {
         return { success: false, error: 'No micronauts found' };
     }
 
-    // Coordinate task execution
     const results = [];
+    const adaptiveMode = parameters?.adaptive_mode || false;
+    
     for (const micronaut of targets) {
-        // Update status to processing
+        const startTime = Date.now();
+        
         await base44.entities.Micronaut.update(micronaut.id, {
             status: 'processing',
             last_activity: new Date().toISOString()
         });
 
-        // Execute task based on micronaut type
+        // Execute with performance tracking
         const result = await executeMicronautTask(base44, micronaut, task, parameters);
-        results.push(result);
-
-        // Update metrics
-        await base44.entities.Micronaut.update(micronaut.id, {
-            status: 'active',
-            metrics: {
-                ...micronaut.metrics,
-                operations: (micronaut.metrics?.operations || 0) + 1
-            }
+        const executionTime = Date.now() - startTime;
+        
+        results.push({
+            ...result,
+            execution_time: executionTime
         });
+
+        // Adaptive control: adjust vectors based on performance
+        if (adaptiveMode) {
+            const optimizedVectors = await adaptControlVectors(base44, micronaut, result, executionTime);
+            
+            await base44.entities.Micronaut.update(micronaut.id, {
+                status: 'active',
+                control_vectors: optimizedVectors,
+                metrics: {
+                    ...micronaut.metrics,
+                    operations: (micronaut.metrics?.operations || 0) + 1,
+                    avg_execution_time: calculateAvgExecution(micronaut.metrics, executionTime),
+                    last_optimization: new Date().toISOString()
+                },
+                last_activity: new Date().toISOString()
+            });
+        } else {
+            await base44.entities.Micronaut.update(micronaut.id, {
+                status: 'active',
+                metrics: {
+                    ...micronaut.metrics,
+                    operations: (micronaut.metrics?.operations || 0) + 1
+                }
+            });
+        }
     }
 
     return {
         success: true,
         coordinated: targets.length,
-        results
+        results,
+        adaptive_applied: adaptiveMode
     };
+}
+
+async function adaptControlVectors(base44, micronaut, result, executionTime) {
+    const currentVectors = micronaut.control_vectors;
+    
+    // Adaptive adjustments based on execution performance
+    let adjustments = { ...currentVectors };
+    
+    // If execution was slow, increase intensity
+    if (executionTime > 1000) {
+        adjustments.intensity = Math.min(1.0, adjustments.intensity + 0.05);
+        adjustments.flow = Math.max(0.1, adjustments.flow - 0.03);
+    }
+    
+    // If execution was fast, optimize for stability
+    if (executionTime < 200) {
+        adjustments.stability = Math.min(1.0, adjustments.stability + 0.02);
+        adjustments.entropy = Math.max(0.05, adjustments.entropy - 0.01);
+    }
+    
+    // Use AI for complex optimizations
+    if ((micronaut.metrics?.operations || 0) % 10 === 0) {
+        const aiOptimized = await base44.integrations.Core.InvokeLLM({
+            prompt: `Optimize control vectors for micronaut based on performance:
+            
+Current vectors: ${JSON.stringify(currentVectors, null, 2)}
+Execution time: ${executionTime}ms
+Operations: ${micronaut.metrics?.operations || 0}
+Type: ${micronaut.type}
+
+Suggest optimal control vector values (0-1 range).`,
+            response_json_schema: {
+                type: "object",
+                properties: {
+                    flow: { type: "number" },
+                    intensity: { type: "number" },
+                    entropy: { type: "number" },
+                    stability: { type: "number" }
+                }
+            }
+        });
+        
+        adjustments = aiOptimized;
+    }
+    
+    return adjustments;
+}
+
+function calculateAvgExecution(metrics, newTime) {
+    const ops = metrics?.operations || 0;
+    const current = metrics?.avg_execution_time || 0;
+    return (current * ops + newTime) / (ops + 1);
 }
 
 async function executeMicronautTask(base44, micronaut, task, parameters) {
