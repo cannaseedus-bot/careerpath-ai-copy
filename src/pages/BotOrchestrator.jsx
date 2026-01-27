@@ -8,18 +8,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bot, Plus, Play, Pause, Trash2, Network, Database, Globe, Cpu, Zap, AlertCircle, Sparkles, Rocket, Layers } from "lucide-react";
+import { Bot, Plus, Play, Pause, Trash2, Network, Database, Globe, Cpu, Zap, AlertCircle, Sparkles, Rocket, Layers, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import BotTemplates from "@/components/bots/BotTemplates";
 import AIAssistant from "@/components/bots/AIAssistant";
 import DeploymentManager from "@/components/bots/DeploymentManager";
 import TensorSchemaVisualizer from "@/components/bots/TensorSchemaVisualizer";
+import OptimizationInsights from "@/components/bots/OptimizationInsights";
 
 export default function BotOrchestrator() {
   const [showForm, setShowForm] = useState(false);
   const [editingBot, setEditingBot] = useState(null);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [selectedBotForDeployment, setSelectedBotForDeployment] = useState(null);
+  const [selectedBotForOptimization, setSelectedBotForOptimization] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     bot_type: "custom",
@@ -197,8 +199,24 @@ export default function BotOrchestrator() {
           </div>
         )}
 
+        {/* Optimization Insights */}
+        {selectedBotForOptimization && (
+          <div className="mb-6">
+            <OptimizationInsights 
+              bot={selectedBotForOptimization}
+              deployment={null}
+            />
+            <button
+              onClick={() => setSelectedBotForOptimization(null)}
+              className="mt-3 border-2 border-red-400 text-red-400 px-4 py-2 hover:bg-red-900/30 transition w-full"
+            >
+              CLOSE_OPTIMIZATION_AGENT
+            </button>
+          </div>
+        )}
+
         {/* Bot Templates */}
-        {!showForm && !selectedBotForDeployment && (
+        {!showForm && !selectedBotForDeployment && !selectedBotForOptimization && (
           <BotTemplates onSelectTemplate={handleTemplateSelect} />
         )}
 
@@ -356,6 +374,13 @@ export default function BotOrchestrator() {
                           DEPLOY
                         </button>
                         <button
+                          onClick={() => setSelectedBotForOptimization(bot)}
+                          className="border-2 border-orange-400 text-orange-400 px-3 py-1 hover:bg-orange-900/30 transition flex items-center gap-2"
+                        >
+                          <TrendingUp className="w-4 h-4" />
+                          OPTIMIZE
+                        </button>
+                        <button
                           onClick={() => handleEdit(bot)}
                           className="border-2 border-yellow-400 text-yellow-400 px-3 py-1 hover:bg-yellow-900/30 transition"
                         >
@@ -417,6 +442,13 @@ export default function BotOrchestrator() {
                           title="Deploy"
                         >
                           <Rocket className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={() => setSelectedBotForOptimization(bot)}
+                          className="border border-orange-400 text-orange-400 px-2 py-1 hover:bg-orange-900/30 transition text-xs"
+                          title="Optimize"
+                        >
+                          <TrendingUp className="w-3 h-3" />
                         </button>
                         <button
                           onClick={() => handleEdit(bot)}
