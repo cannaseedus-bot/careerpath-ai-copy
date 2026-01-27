@@ -1,10 +1,16 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Play, Save, Copy, Download } from "lucide-react";
+import { Play, Save, Copy, Download, Bug, Zap } from "lucide-react";
 import { toast } from "sonner";
+import CodeLinter from "@/components/runtime/CodeLinter";
+import DebuggerPanel from "@/components/runtime/DebuggerPanel";
+import TestGenerator from "@/components/runtime/TestGenerator";
 
 export default function RuntimeEditor({ onRun, onSave }) {
+  const [showDebugger, setShowDebugger] = useState(false);
+  const [showLinter, setShowLinter] = useState(true);
+  const [showTests, setShowTests] = useState(false);
   const [code, setCode] = useState(`# Bot Script Editor
 # Write your bot script here
 
@@ -47,14 +53,42 @@ if __name__ == "__main__":
   return (
     <div className="h-full flex flex-col bg-black border border-cyan-400">
       {/* Toolbar */}
-      <div className="border-b border-cyan-400 p-3 flex items-center justify-between bg-slate-900">
+      <div className="border-b border-cyan-400 p-3 flex items-center justify-between bg-slate-900 flex-wrap gap-2">
         <h3 className="text-cyan-400 font-bold text-sm">Script Editor</h3>
-        <div className="flex gap-2">
+        <div className="flex gap-1 flex-wrap">
+          <Button
+            size="sm"
+            variant={showLinter ? "default" : "outline"}
+            onClick={() => setShowLinter(!showLinter)}
+            className={showLinter ? "bg-yellow-600 text-white" : "border-slate-600 text-slate-300"}
+            title="Toggle linter"
+          >
+            <Zap className="w-3 h-3" />
+          </Button>
+          <Button
+            size="sm"
+            variant={showDebugger ? "default" : "outline"}
+            onClick={() => setShowDebugger(!showDebugger)}
+            className={showDebugger ? "bg-red-600 text-white" : "border-slate-600 text-slate-300"}
+            title="Toggle debugger"
+          >
+            <Bug className="w-3 h-3" />
+          </Button>
+          <Button
+            size="sm"
+            variant={showTests ? "default" : "outline"}
+            onClick={() => setShowTests(!showTests)}
+            className={showTests ? "bg-green-600 text-white" : "border-slate-600 text-slate-300"}
+            title="Toggle test generator"
+          >
+            ✓
+          </Button>
+          <div className="border-l border-slate-600 mx-1" />
           <Button
             size="sm"
             variant="outline"
             onClick={handleCopy}
-            className="border-cyan-400 text-cyan-400 hover:bg-cyan-900/20"
+            className="border-slate-600 text-slate-300"
             title="Copy code"
           >
             <Copy className="w-3 h-3" />
@@ -63,7 +97,7 @@ if __name__ == "__main__":
             size="sm"
             variant="outline"
             onClick={handleDownload}
-            className="border-cyan-400 text-cyan-400 hover:bg-cyan-900/20"
+            className="border-slate-600 text-slate-300"
             title="Download script"
           >
             <Download className="w-3 h-3" />
@@ -72,7 +106,7 @@ if __name__ == "__main__":
             size="sm"
             variant="outline"
             onClick={handleSave}
-            className="border-cyan-400 text-cyan-400 hover:bg-cyan-900/20"
+            className="border-slate-600 text-slate-300"
             title="Save script"
           >
             <Save className="w-3 h-3" />
@@ -89,13 +123,23 @@ if __name__ == "__main__":
         </div>
       </div>
 
-      {/* Editor */}
-      <Textarea
-        value={code}
-        onChange={(e) => setCode(e.target.value)}
-        className="flex-1 bg-black border-0 text-cyan-400 font-mono text-sm resize-none focus:ring-0"
-        placeholder="Write your Python script here..."
-      />
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Editor */}
+        <Textarea
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          className="flex-1 bg-black border-0 text-cyan-400 font-mono text-sm resize-none focus:ring-0"
+          placeholder="Write your Python script here..."
+        />
+
+        {/* Bottom Panels */}
+        <div className="border-t border-slate-700 flex gap-2 overflow-x-auto p-2 bg-slate-900 max-h-64 overflow-y-auto">
+          {showLinter && <div className="flex-1 min-w-max"><CodeLinter code={code} /></div>}
+          {showDebugger && <div className="flex-1 min-w-max"><DebuggerPanel code={code} onStepExecute={() => {}} /></div>}
+          {showTests && <div className="flex-1 min-w-max"><TestGenerator code={code} /></div>}
+        </div>
+      </div>
     </div>
   );
 }
