@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Loader2, Plus, Copy, Check } from "lucide-react";
+import { Send, Loader2, Plus, Copy, Check, Zap } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import PresetQuestions from "@/components/runtime/PresetQuestions";
@@ -83,11 +83,32 @@ export default function RuntimeChat({ onCodeGenerated, code = "" }) {
     try {
       await base44.agents.addMessage(conversation, {
         role: "user",
-        content: userMessage
+        content: `${userMessage}
+
+Generate EXECUTABLE Python code that solves this request. Return ONLY valid Python code in a code block - no explanations. The code will be executed directly.`
       });
     } catch (error) {
       toast.error("Failed to send message");
       setIsLoading(false);
+    }
+  };
+
+  const applyCodeToEditor = (codeText, toolCallIdx) => {
+    if (onCodeGenerated) {
+      onCodeGenerated(codeText);
+      toast.success("Code applied to editor");
+      
+      // Log code generation event via Micronaut
+      try {
+        base44.functions.invoke('micronaut-controller', {
+          action: 'log_code_generation',
+          source: 'runtime-chat',
+          code_length: codeText.length,
+          tool_call_idx: toolCallIdx
+        }).catch(() => {});
+      } catch (e) {
+        // Silent fail for logging
+      }
     }
   };
 
@@ -156,22 +177,35 @@ export default function RuntimeChat({ onCodeGenerated, code = "" }) {
                            <pre className="bg-black p-2 rounded text-xs overflow-x-auto border border-slate-700">
                              <code className="text-cyan-300">{children}</code>
                            </pre>
-                           <Button
-                             size="icon"
-                             variant="ghost"
-                             className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 bg-cyan-900/40 hover:bg-cyan-800/50 border border-slate-700"
-                             onClick={() => {
-                               copyToClipboard(String(children), idx);
-                             }}
-                           >
-                              {copiedIndex === idx ? (
-                                <Check className="w-3 h-3 text-green-400" />
-                              ) : (
-                                <Copy className="w-3 h-3 text-gray-400" />
-                              )}
-                            </Button>
+                           <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100">
+                             <Button
+                               size="icon"
+                               variant="ghost"
+                               className="h-6 w-6 bg-cyan-900/40 hover:bg-cyan-800/50 border border-slate-700"
+                               onClick={() => {
+                                 copyToClipboard(String(children), idx);
+                               }}
+                             >
+                                {copiedIndex === idx ? (
+                                  <Check className="w-3 h-3 text-green-400" />
+                                ) : (
+                                  <Copy className="w-3 h-3 text-gray-400" />
+                                )}
+                              </Button>
+                             <Button
+                               size="icon"
+                               variant="ghost"
+                               className="h-6 w-6 bg-green-900/40 hover:bg-green-800/50 border border-green-700"
+                               onClick={() => {
+                                 applyCodeToEditor(String(children), idx);
+                               }}
+                               title="Apply to editor"
+                             >
+                               <Zap className="w-3 h-3 text-green-400" />
+                             </Button>
+                           </div>
                           </div>
-                        ),
+                          ),
                       a: ({ children, ...props }) => (
                         <a {...props} className="text-cyan-400 hover:underline" target="_blank" rel="noopener noreferrer">
                           {children}
