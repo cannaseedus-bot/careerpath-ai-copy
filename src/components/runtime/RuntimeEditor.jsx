@@ -7,11 +7,11 @@ import CodeLinter from "@/components/runtime/CodeLinter";
 import DebuggerPanel from "@/components/runtime/DebuggerPanel";
 import TestGenerator from "@/components/runtime/TestGenerator";
 
-export default function RuntimeEditor({ onRun, onSave }) {
+export default function RuntimeEditor({ onRun, onSave, code: externalCode, onChange }) {
   const [showDebugger, setShowDebugger] = useState(false);
   const [showLinter, setShowLinter] = useState(true);
   const [showTests, setShowTests] = useState(false);
-  const [code, setCode] = useState(`# Bot Script Editor
+  const [code, setCode] = useState(externalCode || `# Bot Script Editor
 # Write your bot script here
 
 import json
@@ -26,12 +26,19 @@ if __name__ == "__main__":
     print(json.dumps(result, indent=2))
 `);
 
+  const displayCode = externalCode || code;
+
+  const handleCodeChange = (newCode) => {
+    setCode(newCode);
+    onChange?.(newCode);
+  };
+
   const handleRun = () => {
-    onRun(code);
+    onRun(displayCode);
   };
 
   const handleSave = () => {
-    onSave(code);
+    onSave(displayCode);
     toast.success("Script saved");
   };
 
