@@ -82,6 +82,17 @@ export default function EnhancedOutputTerminal({ output = [], isRunning, onClear
         </div>
       </div>
 
+      {/* Debug Assistant */}
+      {lastError && (
+        <div className="border-b border-slate-700 px-3 py-2">
+          <DebugAssistant 
+            lastError={lastError} 
+            code={code}
+            onApplyFix={onApplyFix}
+          />
+        </div>
+      )}
+
       {/* Search */}
       <div className="border-b border-slate-700 px-3 py-2">
         <input
