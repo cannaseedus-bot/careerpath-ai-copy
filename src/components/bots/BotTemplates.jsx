@@ -9,11 +9,19 @@ const templates = [
     icon: Globe,
     description: "Scrape websites, extract data, handle pagination",
     config: {
-      urls: ["https://example.com"],
+      urls: [
+        "https://huggingface.co/datasets/bigcode/the-stack",
+        "https://huggingface.co/datasets/codeparrot/github-code",
+        "https://huggingface.co/datasets/HuggingFaceH4/CodeAlpaca-20k",
+        "https://huggingface.co/datasets/iamtarun/python_code_instructions_18k_alpaca",
+        "https://huggingface.co/datasets/m-a-p/Code-Feedback"
+      ],
       selectors: {
         title: "h1.title",
         content: "div.content",
-        links: "a.link"
+        code: "pre code",
+        language: "span.language",
+        metadata: "div.dataset-info"
       },
       interval: 3600,
       follow_links: true,
