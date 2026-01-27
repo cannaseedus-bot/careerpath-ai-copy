@@ -20,6 +20,9 @@ Deno.serve(async (req) => {
             case 'analyze_performance':
                 result = await analyzeSwarmPerformance(base44);
                 break;
+            case 'specialize_agents':
+                result = await specializeAgents(base44, parameters);
+                break;
             default:
                 return Response.json({ error: 'Unknown operation' }, { status: 400 });
         }
@@ -304,6 +307,175 @@ Recommend:
         swarm_size: brainAgents.length,
         performance: performancePatterns,
         recommendations
+    };
+}
+
+async function specializeAgents(base44, parameters) {
+    const micronauts = await base44.entities.Micronaut.list();
+    const brainAgents = micronauts.filter(m => m.parent_agent_id === 'brain-layer-11');
+    
+    if (brainAgents.length === 0) {
+        return { success: false, message: 'No brain agents to specialize' };
+    }
+
+    // Analyze task patterns and agent performance
+    const taskAnalysis = {
+        text_compression: { count: 0, avg_efficiency: 0, agents: [] },
+        code_optimization: { count: 0, avg_efficiency: 0, agents: [] },
+        geometric_data: { count: 0, avg_efficiency: 0, agents: [] },
+        network_streaming: { count: 0, avg_efficiency: 0, agents: [] },
+        storage_patterns: { count: 0, avg_efficiency: 0, agents: [] },
+        ui_rendering: { count: 0, avg_efficiency: 0, agents: [] }
+    };
+
+    // Gather performance data per agent
+    brainAgents.forEach(agent => {
+        const efficiency = calculateEfficiencyScore(agent.metrics);
+        
+        // Determine current specialization from folds
+        if (agent.assigned_folds?.includes('DATA') || agent.assigned_folds?.includes('PATTERN')) {
+            taskAnalysis.text_compression.agents.push({ id: agent.id, name: agent.name, efficiency });
+        }
+        if (agent.assigned_folds?.includes('CODE') || agent.assigned_folds?.includes('COMPUTE')) {
+            taskAnalysis.code_optimization.agents.push({ id: agent.id, name: agent.name, efficiency });
+        }
+        if (agent.assigned_folds?.includes('SPACE') || agent.type === 'geometry') {
+            taskAnalysis.geometric_data.agents.push({ id: agent.id, name: agent.name, efficiency });
+        }
+    });
+
+    // AI-driven specialization recommendations
+    const specializations = await base44.integrations.Core.InvokeLLM({
+        prompt: `Analyze agent performance and recommend specializations:
+
+Current Agents:
+${JSON.stringify(brainAgents.map(a => ({
+    id: a.id,
+    name: a.name,
+    type: a.type,
+    folds: a.assigned_folds,
+    operations: a.metrics?.operations || 0,
+    efficiency: calculateEfficiencyScore(a.metrics)
+})), null, 2)}
+
+Task Analysis:
+${JSON.stringify(taskAnalysis, null, 2)}
+
+Recommend for each agent:
+1. Optimal specialization (text_compression, code_optimization, geometric_data, network_streaming, storage_patterns, ui_rendering)
+2. Specific compression folds to assign (DATA, CODE, STORAGE, NETWORK, UI, AUTH, DB, COMPUTE, PATTERN, META, SPACE, TIME, CONTROL, EVENTS)
+3. Control vector adjustments for specialization
+4. Learning priorities specific to their domain
+5. New specialized agent types if needed
+
+Maximize collective swarm efficiency through complementary specializations.`,
+        response_json_schema: {
+            type: "object",
+            properties: {
+                agent_specializations: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            agent_id: { type: "string" },
+                            specialization: { type: "string" },
+                            new_type: { type: "string" },
+                            assigned_folds: { type: "array", items: { type: "string" } },
+                            control_vectors: {
+                                type: "object",
+                                properties: {
+                                    flow: { type: "number" },
+                                    intensity: { type: "number" },
+                                    entropy: { type: "number" },
+                                    stability: { type: "number" }
+                                }
+                            },
+                            learning_priorities: { type: "array", items: { type: "string" } },
+                            reason: { type: "string" }
+                        }
+                    }
+                },
+                new_specialized_agents: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            name: { type: "string" },
+                            type: { type: "string" },
+                            specialization: { type: "string" },
+                            folds: { type: "array", items: { type: "string" } }
+                        }
+                    }
+                },
+                expected_improvements: { type: "object" }
+            }
+        }
+    });
+
+    // Apply specializations
+    const specialized = [];
+    for (const spec of specializations.agent_specializations || []) {
+        await base44.entities.Micronaut.update(spec.agent_id, {
+            type: spec.new_type,
+            assigned_folds: spec.assigned_folds,
+            control_vectors: spec.control_vectors,
+            ngram_data: {
+                ...brainAgents.find(a => a.id === spec.agent_id)?.ngram_data,
+                specialization: spec.specialization,
+                learning_priorities: spec.learning_priorities,
+                specialized_at: new Date().toISOString()
+            },
+            metrics: {
+                ...brainAgents.find(a => a.id === spec.agent_id)?.metrics,
+                specialization: spec.specialization,
+                specialization_reason: spec.reason
+            }
+        });
+        
+        specialized.push({
+            agent: brainAgents.find(a => a.id === spec.agent_id)?.name,
+            specialization: spec.specialization,
+            folds: spec.assigned_folds
+        });
+    }
+
+    // Create new specialized agents if recommended
+    for (const newAgent of specializations.new_specialized_agents || []) {
+        const { data: created } = await base44.functions.invoke('micronaut-controller', {
+            action: 'spawn',
+            micronaut_name: newAgent.name,
+            config: {
+                type: newAgent.type,
+                folds: newAgent.folds,
+                control_vectors: {
+                    flow: 0.9,
+                    intensity: 0.95,
+                    entropy: 0.08,
+                    stability: 0.92
+                }
+            },
+            parent_agent_id: 'brain-layer-11',
+            ngram_data: {
+                specialization: newAgent.specialization,
+                policies: [{ rule: `optimize.${newAgent.specialization}`, priority: 'critical' }],
+                tools: [{ name: `${newAgent.specialization}.toolkit`, type: 'specialized' }],
+                learning_priorities: [newAgent.specialization, 'efficiency', 'pattern_recognition']
+            }
+        });
+        
+        specialized.push({
+            agent: newAgent.name,
+            specialization: newAgent.specialization,
+            folds: newAgent.folds,
+            new: true
+        });
+    }
+
+    return {
+        success: true,
+        specialized_agents: specialized,
+        total_specialized: specialized.length,
+        expected_improvements: specializations.expected_improvements
     };
 }
 

@@ -72,6 +72,20 @@ export default function GeometricTensorBrainDashboard() {
     }
   });
 
+  const specializeSwarmMutation = useMutation({
+    mutationFn: async () => {
+      const { data: result } = await base44.functions.invoke('agent-swarm-coordinator', {
+        operation: 'specialize_agents',
+        parameters: {}
+      });
+      return result;
+    },
+    onSuccess: (data) => {
+      toast.success(`${data.total_specialized} agents specialized`);
+      deploySwarmMutation.mutate(); // Refresh swarm status
+    }
+  });
+
   const analyzeMutation = useMutation({
     mutationFn: async (data) => {
       const { data: result } = await base44.functions.invoke('geometric-tensor-brain', {
@@ -194,6 +208,16 @@ export default function GeometricTensorBrainDashboard() {
               >
                 <Activity className="w-4 h-4 mr-2" />
                 Analyze
+              </Button>
+
+              <Button
+                onClick={() => specializeSwarmMutation.mutate()}
+                disabled={specializeSwarmMutation.isPending}
+                variant="outline"
+                className="border-pink-400 text-pink-400"
+              >
+                <Brain className="w-4 h-4 mr-2" />
+                Specialize
               </Button>
             </div>
           </div>
@@ -401,6 +425,11 @@ export default function GeometricTensorBrainDashboard() {
                     <span className="text-sm font-bold text-green-400">{agent.name}</span>
                   </div>
                   <div className="text-xs text-gray-400">{agent.type}</div>
+                  {agent.specialization && (
+                    <Badge className="bg-pink-600 text-xs mt-1">
+                      {agent.specialization}
+                    </Badge>
+                  )}
                 </div>
               ))}
             </div>
