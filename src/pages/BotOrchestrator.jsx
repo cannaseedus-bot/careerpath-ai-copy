@@ -18,6 +18,9 @@ import OptimizationInsights from "@/components/bots/OptimizationInsights";
 import CompressionMetrics from "@/components/bots/CompressionMetrics";
 import MicronautDashboard from "@/components/micronauts/MicronautDashboard";
 import BotCreationWizard from "@/components/bots/BotCreationWizard";
+import DeploymentWizard from "@/components/bots/DeploymentWizard";
+import OptimizationWizard from "@/components/bots/OptimizationWizard";
+import TemplateWizard from "@/components/bots/TemplateWizard";
 
 export default function BotOrchestrator() {
   const [showForm, setShowForm] = useState(false);
@@ -25,6 +28,9 @@ export default function BotOrchestrator() {
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [selectedBotForDeployment, setSelectedBotForDeployment] = useState(null);
   const [selectedBotForOptimization, setSelectedBotForOptimization] = useState(null);
+  const [showTemplateWizard, setShowTemplateWizard] = useState(false);
+  const [showDeploymentWizard, setShowDeploymentWizard] = useState(false);
+  const [showOptimizationWizard, setShowOptimizationWizard] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     bot_type: "custom",
@@ -108,6 +114,38 @@ export default function BotOrchestrator() {
     });
     setShowForm(true);
   };
+
+  const deployBotMutation = useMutation({
+    mutationFn: async (deploymentConfig) => {
+      const { data } = await base44.functions.invoke('bot-deployment', {
+        action: 'deploy',
+        ...deploymentConfig
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bots'] });
+      toast.success('Bot deployed successfully');
+      setShowDeploymentWizard(false);
+      setSelectedBotForDeployment(null);
+    }
+  });
+
+  const optimizeBotMutation = useMutation({
+    mutationFn: async (optimizationConfig) => {
+      const { data } = await base44.functions.invoke('bot-optimization-agent', {
+        action: 'analyze',
+        ...optimizationConfig
+      });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bots'] });
+      toast.success('Optimization analysis complete');
+      setShowOptimizationWizard(false);
+      setSelectedBotForOptimization(null);
+    }
+  });
 
   const toggleBotStatus = async (bot) => {
     const newStatus = bot.status === "running" ? "paused" : "running";
@@ -197,38 +235,52 @@ export default function BotOrchestrator() {
           </div>
         )}
 
-        {/* Deployment Manager */}
-        {selectedBotForDeployment && (
+        {/* Deployment Wizard */}
+        {showDeploymentWizard && selectedBotForDeployment && (
           <div className="mb-6">
-            <DeploymentManager bot={selectedBotForDeployment} />
-            <button
-              onClick={() => setSelectedBotForDeployment(null)}
-              className="mt-3 border-2 border-red-400 text-red-400 px-4 py-2 hover:bg-red-900/30 transition w-full"
-            >
-              CLOSE_DEPLOYMENT_MANAGER
-            </button>
+            <DeploymentWizard
+              bot={selectedBotForDeployment}
+              onComplete={(config) => deployBotMutation.mutate(config)}
+              onCancel={() => {
+                setShowDeploymentWizard(false);
+                setSelectedBotForDeployment(null);
+              }}
+            />
           </div>
         )}
 
-        {/* Optimization Insights */}
-        {selectedBotForOptimization && (
+        {/* Optimization Wizard */}
+        {showOptimizationWizard && selectedBotForOptimization && (
           <div className="mb-6">
-            <OptimizationInsights 
+            <OptimizationWizard
               bot={selectedBotForOptimization}
-              deployment={null}
+              onComplete={(config) => optimizeBotMutation.mutate(config)}
+              onCancel={() => {
+                setShowOptimizationWizard(false);
+                setSelectedBotForOptimization(null);
+              }}
             />
-            <button
-              onClick={() => setSelectedBotForOptimization(null)}
-              className="mt-3 border-2 border-red-400 text-red-400 px-4 py-2 hover:bg-red-900/30 transition w-full"
-            >
-              CLOSE_OPTIMIZATION_AGENT
-            </button>
+          </div>
+        )}
+
+        {/* Template Wizard */}
+        {showTemplateWizard && (
+          <div className="mb-6">
+            <TemplateWizard
+              onComplete={(botData) => {
+                createMutation.mutate(botData);
+                setShowTemplateWizard(false);
+              }}
+              onCancel={() => setShowTemplateWizard(false)}
+            />
           </div>
         )}
 
         {/* Bot Templates */}
-        {!showForm && !selectedBotForDeployment && !selectedBotForOptimization && (
-          <BotTemplates onSelectTemplate={handleTemplateSelect} />
+        {!showForm && !selectedBotForDeployment && !selectedBotForOptimization && !showTemplateWizard && !showDeploymentWizard && !showOptimizationWizard && (
+          <div className="mb-6">
+            <BotTemplates onSelectTemplate={() => setShowTemplateWizard(true)} />
+          </div>
         )}
 
         {/* Bot Creation Wizard */}
@@ -389,14 +441,20 @@ export default function BotOrchestrator() {
                           {bot.status === "running" ? "PAUSE" : "START"}
                         </button>
                         <button
-                          onClick={() => setSelectedBotForDeployment(bot)}
+                          onClick={() => {
+                            setSelectedBotForDeployment(bot);
+                            setShowDeploymentWizard(true);
+                          }}
                           className="border-2 border-cyan-400 text-cyan-400 px-3 py-1 hover:bg-cyan-900/30 transition flex items-center gap-2"
                         >
                           <Rocket className="w-4 h-4" />
                           DEPLOY
                         </button>
                         <button
-                          onClick={() => setSelectedBotForOptimization(bot)}
+                          onClick={() => {
+                            setSelectedBotForOptimization(bot);
+                            setShowOptimizationWizard(true);
+                          }}
                           className="border-2 border-orange-400 text-orange-400 px-3 py-1 hover:bg-orange-900/30 transition flex items-center gap-2"
                         >
                           <TrendingUp className="w-4 h-4" />
@@ -459,14 +517,20 @@ export default function BotOrchestrator() {
                           {bot.status === "running" ? "PAUSE" : "START"}
                         </button>
                         <button
-                          onClick={() => setSelectedBotForDeployment(bot)}
+                          onClick={() => {
+                            setSelectedBotForDeployment(bot);
+                            setShowDeploymentWizard(true);
+                          }}
                           className="border border-cyan-400 text-cyan-400 px-2 py-1 hover:bg-cyan-900/30 transition text-xs"
                           title="Deploy"
                         >
                           <Rocket className="w-3 h-3" />
                         </button>
                         <button
-                          onClick={() => setSelectedBotForOptimization(bot)}
+                          onClick={() => {
+                            setSelectedBotForOptimization(bot);
+                            setShowOptimizationWizard(true);
+                          }}
                           className="border border-orange-400 text-orange-400 px-2 py-1 hover:bg-orange-900/30 transition text-xs"
                           title="Optimize"
                         >
