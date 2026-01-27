@@ -11,15 +11,23 @@ import {
     Loader2,
     Code,
     HelpCircle,
-    Zap
+    Zap,
+    Lightbulb,
+    Rocket
 } from "lucide-react";
 import { toast } from "sonner";
+import ProjectScaffold from "@/components/shell/ProjectScaffold";
+import ScaffoldResult from "@/components/shell/ScaffoldResult";
 
 export default function ShellAssistant() {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [history, setHistory] = useState([]);
     const [copied, setCopied] = useState(null);
+    const [suggestions, setSuggestions] = useState([]);
+    const [showScaffold, setShowScaffold] = useState(false);
+    const [scaffoldResult, setScaffoldResult] = useState(null);
+    const [activeTab, setActiveTab] = useState("terminal");
     const terminalRef = useRef(null);
     const inputRef = useRef(null);
 
@@ -28,6 +36,25 @@ export default function ShellAssistant() {
             terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
         }
     }, [history]);
+
+    useEffect(() => {
+        // Auto-generate suggestions when history changes
+        if (history.length > 0 && history.length % 3 === 0) {
+            getSuggestions();
+        }
+    }, [history]);
+
+    const getSuggestions = async () => {
+        try {
+            const response = await base44.functions.invoke('shell-assistant', {
+                action: 'suggest',
+                history: history.slice(-10)
+            });
+            setSuggestions(response.data.result || []);
+        } catch (error) {
+            console.error("Failed to get suggestions:", error);
+        }
+    };
 
     const processCommand = async (action) => {
         if (!input.trim()) return;
@@ -39,7 +66,8 @@ export default function ShellAssistant() {
         try {
             const response = await base44.functions.invoke('shell-assistant', {
                 prompt: input,
-                action: action
+                action: action,
+                history: history.slice(-10) // Send last 10 messages for context
             });
 
             const assistantMessage = {
@@ -60,6 +88,21 @@ export default function ShellAssistant() {
         }
     };
 
+    const handleScaffold = async (config) => {
+        try {
+            const response = await base44.functions.invoke('shell-assistant', {
+                prompt: JSON.stringify(config),
+                action: 'scaffold'
+            });
+            setScaffoldResult(response.data.result);
+            setActiveTab("scaffold");
+            toast.success("Project scaffold generated!");
+        } catch (error) {
+            toast.error("Failed to generate scaffold");
+            console.error(error);
+        }
+    };
+
     const copyToClipboard = (text, id) => {
         navigator.clipboard.writeText(text);
         setCopied(id);
@@ -75,21 +118,71 @@ export default function ShellAssistant() {
     return (
         <div className="w-full max-w-7xl mx-auto py-8 px-4">
             <div className="mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                    <Terminal className="w-8 h-8 text-green-400" />
-                    <h1 className="text-3xl font-bold text-white">MX2LM Shell Assistant</h1>
-                    <Sparkles className="w-5 h-5 text-yellow-400" />
+                <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                        <Terminal className="w-8 h-8 text-green-400" />
+                        <h1 className="text-3xl font-bold text-white">MX2LM Shell Assistant</h1>
+                        <Sparkles className="w-5 h-5 text-yellow-400" />
+                    </div>
+                    <Button
+                        onClick={() => setShowScaffold(!showScaffold)}
+                        variant="outline"
+                        className="border-purple-500 text-purple-400 hover:bg-purple-900/20"
+                    >
+                        <Rocket className="w-4 h-4 mr-2" />
+                        New Project
+                    </Button>
                 </div>
                 <p className="text-slate-400">
-                    AI-powered terminal assistant for Ollama model management and coding tasks
+                    Context-aware assistant for Ollama models, coding, and project scaffolding
                 </p>
             </div>
 
-            {/* Terminal Display */}
-            <div 
-                ref={terminalRef}
-                className="bg-slate-950 border border-slate-800 rounded-lg p-6 mb-4 h-[500px] overflow-y-auto font-mono text-sm"
-            >
+            {showScaffold && (
+                <div className="mb-6">
+                    <ProjectScaffold onGenerate={handleScaffold} />
+                </div>
+            )}
+
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="bg-slate-900 mb-4">
+                    <TabsTrigger value="terminal">
+                        <Terminal className="w-4 h-4 mr-2" />
+                        Terminal
+                    </TabsTrigger>
+                    <TabsTrigger value="scaffold">
+                        <Rocket className="w-4 h-4 mr-2" />
+                        Scaffold Result
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="terminal" className="space-y-4">
+                    {suggestions.length > 0 && (
+                        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <Lightbulb className="w-4 h-4 text-yellow-400" />
+                                <span className="text-sm font-semibold text-slate-300">Suggested Commands</span>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {suggestions.map((suggestion, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setInput(suggestion.command)}
+                                        className="text-left p-2 rounded bg-slate-950 hover:bg-slate-800 transition-colors border border-slate-700"
+                                    >
+                                        <div className="text-xs font-mono text-green-400">{suggestion.command}</div>
+                                        <div className="text-xs text-slate-500">{suggestion.description}</div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Terminal Display */}
+                    <div 
+                        ref={terminalRef}
+                        className="bg-slate-950 border border-slate-800 rounded-lg p-6 mb-4 h-[500px] overflow-y-auto font-mono text-sm"
+                    >
                 {history.length === 0 ? (
                     <div className="text-slate-500 space-y-2">
                         <p>$ Welcome to MX2LM Shell Assistant</p>
@@ -134,16 +227,16 @@ export default function ShellAssistant() {
                         </div>
                     ))
                 )}
-                {loading && (
-                    <div className="flex items-center gap-2 text-yellow-400">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Processing...</span>
+                        {loading && (
+                            <div className="flex items-center gap-2 text-yellow-400">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Processing with context...</span>
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
 
-            {/* Input Area */}
-            <div className="space-y-3">
+                    {/* Input Area */}
+                    <div className="space-y-3">
                 <div className="flex gap-2">
                     <div className="flex-1 relative">
                         <Terminal className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
@@ -162,17 +255,17 @@ export default function ShellAssistant() {
                             disabled={loading}
                         />
                     </div>
-                    <Button
-                        onClick={clearHistory}
-                        variant="outline"
-                        className="border-slate-700"
-                    >
-                        Clear
-                    </Button>
-                </div>
+                        <Button
+                            onClick={clearHistory}
+                            variant="outline"
+                            className="border-slate-700"
+                        >
+                            Clear
+                        </Button>
+                    </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-2 flex-wrap">
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 flex-wrap">
                     <Button
                         onClick={() => processCommand('command')}
                         disabled={loading || !input.trim()}
@@ -189,19 +282,28 @@ export default function ShellAssistant() {
                         <Code className="w-4 h-4 mr-2" />
                         Generate Code
                     </Button>
-                    <Button
-                        onClick={() => processCommand('explain')}
-                        disabled={loading || !input.trim()}
-                        className="bg-purple-600 hover:bg-purple-700"
-                    >
-                        <HelpCircle className="w-4 h-4 mr-2" />
-                        Explain
-                    </Button>
-                </div>
-            </div>
+                        <Button
+                            onClick={() => processCommand('explain')}
+                            disabled={loading || !input.trim()}
+                            className="bg-purple-600 hover:bg-purple-700"
+                        >
+                            <HelpCircle className="w-4 h-4 mr-2" />
+                            Explain
+                        </Button>
+                        <Button
+                            onClick={getSuggestions}
+                            disabled={loading || history.length === 0}
+                            variant="outline"
+                            className="border-yellow-500 text-yellow-400 hover:bg-yellow-900/20"
+                        >
+                            <Lightbulb className="w-4 h-4 mr-2" />
+                            Get Suggestions
+                        </Button>
+                    </div>
+                    </div>
 
-            {/* Quick Actions */}
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Quick Actions */}
+                    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-3">
                         <Zap className="w-5 h-5 text-yellow-400" />
@@ -264,10 +366,26 @@ export default function ShellAssistant() {
                             className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
                         >
                             → Create API endpoint
-                        </button>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+                </TabsContent>
+
+                <TabsContent value="scaffold">
+                    {scaffoldResult ? (
+                        <ScaffoldResult scaffold={scaffoldResult} />
+                    ) : (
+                        <div className="bg-slate-900 border border-slate-800 rounded-lg p-8 text-center">
+                            <Rocket className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                            <p className="text-slate-400">No project scaffold generated yet</p>
+                            <p className="text-sm text-slate-500 mt-2">
+                                Click "New Project" to generate a complete project structure
+                            </p>
+                        </div>
+                    )}
+                </TabsContent>
+            </Tabs>
         </div>
     );
 }
