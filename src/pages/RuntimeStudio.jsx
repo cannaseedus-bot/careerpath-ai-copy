@@ -9,6 +9,8 @@ import EnvironmentVariablesPanel from "@/components/runtime/EnvironmentVariables
 import RemoteRuntimeConfig from "@/components/runtime/RemoteRuntimeConfig";
 import HFModelsPanel from "@/components/runtime/HFModelsPanel";
 import ClusterSelector from "@/components/shared/ClusterSelector";
+import WidgetTray from "@/components/runtime/WidgetTray";
+import WidgetModal from "@/components/runtime/WidgetModal";
 import { Zap, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -55,6 +57,7 @@ if __name__ == "__main__":
   const [envVars, setEnvVars] = useState({});
   const [remoteApiUrl, setRemoteApiUrl] = useState(null);
   const [selectedCluster, setSelectedCluster] = useState(null);
+  const [activeWidget, setActiveWidget] = useState(null);
 
   const handleRunScript = async (code) => {
     setIsRunning(true);
@@ -188,8 +191,8 @@ if __name__ == "__main__":
       </div>
 
       {/* Main Layout */}
-      <div className="grid grid-cols-12 gap-0 h-[calc(100vh-220px)] overflow-y-auto">
-        {/* Editor + Env Vars */}
+      <div className="grid grid-cols-12 gap-0 h-[calc(100vh-220px)] overflow-y-auto pb-20">
+        {/* Editor */}
         <div className="col-span-4 border-r border-cyan-400 flex flex-col">
           <div className="flex-1 overflow-hidden">
             <RuntimeEditor
@@ -199,12 +202,9 @@ if __name__ == "__main__":
               onChange={setScriptCode}
             />
           </div>
-          <div className="border-t border-slate-700 p-3 h-32 overflow-y-auto">
-            <EnvironmentVariablesPanel envVars={envVars} onChange={setEnvVars} />
-          </div>
         </div>
 
-        {/* Chat + HF Models */}
+        {/* Chat */}
         <div className="col-span-4 border-r border-cyan-400 flex flex-col">
           <div className="flex-1 overflow-hidden">
             <RuntimeChat 
@@ -212,12 +212,9 @@ if __name__ == "__main__":
               code={scriptCode}
             />
           </div>
-          <div className="border-t border-slate-700 p-3 h-32 overflow-y-auto">
-            <HFModelsPanel onSelect={handleSelectHFModel} />
-          </div>
         </div>
 
-        {/* Output + Remote Config */}
+        {/* Output */}
         <div className="col-span-4 flex flex-col">
           <div className="flex-1 overflow-hidden">
             <EnhancedOutputTerminal
@@ -226,11 +223,36 @@ if __name__ == "__main__":
               onClear={() => setOutput([])}
             />
           </div>
-          <div className="border-t border-slate-700 p-3 h-32 overflow-y-auto">
-            <RemoteRuntimeConfig onConnect={setRemoteApiUrl} />
-          </div>
         </div>
       </div>
+
+      {/* Widget Modals */}
+      <WidgetModal
+        isOpen={activeWidget === "env-vars"}
+        title="Environment Variables"
+        onClose={() => setActiveWidget(null)}
+      >
+        <EnvironmentVariablesPanel envVars={envVars} onChange={setEnvVars} />
+      </WidgetModal>
+
+      <WidgetModal
+        isOpen={activeWidget === "hf-models"}
+        title="HuggingFace Models"
+        onClose={() => setActiveWidget(null)}
+      >
+        <HFModelsPanel onSelect={handleSelectHFModel} />
+      </WidgetModal>
+
+      <WidgetModal
+        isOpen={activeWidget === "remote-config"}
+        title="Runtime Configuration"
+        onClose={() => setActiveWidget(null)}
+      >
+        <RemoteRuntimeConfig onConnect={setRemoteApiUrl} />
+      </WidgetModal>
+
+      {/* Widget Tray */}
+      <WidgetTray activeWidget={activeWidget} onWidgetClick={setActiveWidget} />
 
       {/* Info Bar */}
       <div className="border-t border-cyan-400 bg-slate-900 p-3 text-xs text-gray-400">
