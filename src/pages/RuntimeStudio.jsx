@@ -6,6 +6,7 @@ import EnhancedOutputTerminal from "@/components/runtime/EnhancedOutputTerminal"
 import EnvironmentVariablesPanel from "@/components/runtime/EnvironmentVariablesPanel";
 import RemoteRuntimeConfig from "@/components/runtime/RemoteRuntimeConfig";
 import HFModelsPanel from "@/components/runtime/HFModelsPanel";
+import ClusterSelector from "@/components/shared/ClusterSelector";
 import { Zap } from "lucide-react";
 import { toast } from "sonner";
 
@@ -30,6 +31,7 @@ if __name__ == "__main__":
   const [scriptArgs, setScriptArgs] = useState("");
   const [envVars, setEnvVars] = useState({});
   const [remoteApiUrl, setRemoteApiUrl] = useState(null);
+  const [selectedCluster, setSelectedCluster] = useState(null);
 
   const handleRunScript = async (code) => {
     setIsRunning(true);
@@ -102,7 +104,7 @@ if __name__ == "__main__":
       </div>
 
       {/* Configuration Bar */}
-      <div className="border-b border-slate-700 bg-slate-900 px-4 py-3">
+      <div className="border-b border-slate-700 bg-slate-900 px-4 py-3 space-y-3">
         <div className="max-w-7xl mx-auto grid grid-cols-4 gap-3">
           <div>
             <label className="text-xs text-gray-400 mb-1 block">Python Version</label>
@@ -131,6 +133,16 @@ if __name__ == "__main__":
             <span className="text-xs text-gray-400">
               {remoteApiUrl ? `✓ Remote: ${remoteApiUrl}` : "Local execution"}
             </span>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto">
+          <label className="text-xs text-gray-400 mb-2 block">Execution Cluster</label>
+          <div className="max-w-xs">
+            <ClusterSelector 
+              value={selectedCluster}
+              onChange={setSelectedCluster}
+              label="Select cluster (optional)"
+            />
           </div>
         </div>
       </div>
