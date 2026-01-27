@@ -72,6 +72,10 @@ export default function Home() {
               <div className="text-cyan-400">$ mx2lm assistant --ai</div>
               <div className="text-green-400 text-sm ml-4">AI-powered shell assistant for natural language commands</div>
             </Link>
+            <Link to={createPageUrl("BotOrchestrator")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ mx2lm bots --orchestrate</div>
+              <div className="text-green-400 text-sm ml-4">Create scrapers, data builders, and cluster bots</div>
+            </Link>
           </div>
         </div>
       </div>
