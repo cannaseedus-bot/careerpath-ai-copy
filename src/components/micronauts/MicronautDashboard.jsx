@@ -8,6 +8,7 @@ import { Sparkles, Zap, Activity, Cpu, Database, Code } from "lucide-react";
 import { toast } from "sonner";
 import NGramDataVisualizer from "./NGramDataVisualizer";
 import AdaptiveControlPanel from "./AdaptiveControlPanel";
+import QuantumEntanglementVisualizer from "./QuantumEntanglementVisualizer";
 
 export default function MicronautDashboard() {
   const [command, setCommand] = useState('');
@@ -59,6 +60,9 @@ export default function MicronautDashboard() {
 
       {/* Adaptive Control Panel */}
       <AdaptiveControlPanel />
+
+      {/* Quantum Entanglement Visualizer */}
+      <QuantumEntanglementVisualizer />
 
       {/* LLM Command Interface */}
       <div className="border-2 border-purple-400 bg-black">

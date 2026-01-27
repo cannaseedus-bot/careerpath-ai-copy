@@ -231,8 +231,39 @@ async function coordinateMicronauts(base44, config) {
         return { success: false, error: 'No micronauts found' };
     }
 
-    const results = [];
     const adaptiveMode = parameters?.adaptive_mode || false;
+    const quantumMode = parameters?.quantum_acceleration || (targets.length >= 3);
+    
+    // Quantum acceleration for 3+ micronauts
+    if (quantumMode) {
+        const micronautIds = targets.map(m => m.id);
+        
+        // Entangle micronauts
+        const { data: entangled } = await base44.functions.invoke('quantum-acceleration-layer', {
+            operation: 'entangle',
+            micronauts: micronautIds
+        });
+        
+        // Execute with quantum parallel coordination
+        const { data: executed } = await base44.functions.invoke('quantum-acceleration-layer', {
+            operation: 'parallel_execute',
+            micronauts: micronautIds,
+            data: {
+                tasks: [{ id: 'main', operation: task }]
+            }
+        });
+        
+        return {
+            success: true,
+            coordinated: targets.length,
+            quantum_accelerated: true,
+            quantum_speedup: entangled.quantum_speedup,
+            results: executed.results
+        };
+    }
+
+    // Standard coordination
+    const results = [];
     
     for (const micronaut of targets) {
         const startTime = Date.now();
@@ -242,7 +273,6 @@ async function coordinateMicronauts(base44, config) {
             last_activity: new Date().toISOString()
         });
 
-        // Execute with performance tracking
         const result = await executeMicronautTask(base44, micronaut, task, parameters);
         const executionTime = Date.now() - startTime;
         
@@ -251,7 +281,6 @@ async function coordinateMicronauts(base44, config) {
             execution_time: executionTime
         });
 
-        // Adaptive control: adjust vectors based on performance
         if (adaptiveMode) {
             const optimizedVectors = await adaptControlVectors(base44, micronaut, result, executionTime);
             
@@ -281,7 +310,8 @@ async function coordinateMicronauts(base44, config) {
         success: true,
         coordinated: targets.length,
         results,
-        adaptive_applied: adaptiveMode
+        adaptive_applied: adaptiveMode,
+        quantum_accelerated: false
     };
 }
 
