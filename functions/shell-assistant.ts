@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { prompt, context, action, history, projectFiles } = await req.json();
+        const { prompt, context, action, history, projectFiles, url, filePath, shellCommand } = await req.json();
 
         let systemPrompt = '';
         let userPrompt = '';
@@ -168,6 +168,110 @@ Return a JSON structure with:
             return Response.json({
                 result: scaffoldResponse,
                 action: 'scaffold'
+            });
+        } else if (action === 'search') {
+            // Google Search with grounding
+            systemPrompt = `You are a research assistant. Search the web and provide accurate, well-sourced information.
+Synthesize search results into a clear, concise answer with citations.`;
+
+            const searchResponse = await base44.integrations.Core.InvokeLLM({
+                prompt: `${systemPrompt}\n\nQuery: ${prompt}`,
+                add_context_from_internet: true
+            });
+
+            return Response.json({
+                result: searchResponse,
+                action: 'search'
+            });
+        } else if (action === 'fetch') {
+            // Web fetching
+            if (!url) {
+                return Response.json({ error: 'URL required for fetch action' }, { status: 400 });
+            }
+
+            try {
+                const fetchResponse = await fetch(url);
+                const contentType = fetchResponse.headers.get('content-type');
+                
+                let content;
+                if (contentType?.includes('application/json')) {
+                    content = await fetchResponse.json();
+                } else {
+                    content = await fetchResponse.text();
+                }
+
+                return Response.json({
+                    result: {
+                        url,
+                        status: fetchResponse.status,
+                        contentType,
+                        content: typeof content === 'string' ? content.slice(0, 10000) : content
+                    },
+                    action: 'fetch'
+                });
+            } catch (error) {
+                return Response.json({
+                    result: { error: error.message, url },
+                    action: 'fetch'
+                });
+            }
+        } else if (action === 'file-read') {
+            // File operations - read
+            systemPrompt = `You are a file analysis assistant. Analyze the file content and provide insights.`;
+
+            const analysisResponse = await base44.integrations.Core.InvokeLLM({
+                prompt: `${systemPrompt}\n\nFile path: ${filePath}\nAnalyze this file and ${prompt}`,
+                add_context_from_internet: false
+            });
+
+            return Response.json({
+                result: analysisResponse,
+                action: 'file-read'
+            });
+        } else if (action === 'file-write') {
+            // File operations - write/create
+            systemPrompt = `You are a file generation assistant. Generate appropriate file content based on requirements.
+Return only the file content, no explanations.`;
+
+            const fileContent = await base44.integrations.Core.InvokeLLM({
+                prompt: `${systemPrompt}\n\nFile path: ${filePath}\nRequirements: ${prompt}`,
+                add_context_from_internet: false
+            });
+
+            return Response.json({
+                result: {
+                    path: filePath,
+                    content: fileContent
+                },
+                action: 'file-write'
+            });
+        } else if (action === 'shell-exec') {
+            // Shell command execution guidance
+            systemPrompt = `You are a shell command expert. Generate safe, production-ready shell commands.
+Include explanations of what the command does and any precautions.`;
+
+            const commandResponse = await base44.integrations.Core.InvokeLLM({
+                prompt: `${systemPrompt}\n\nTask: ${prompt}${shellCommand ? `\n\nVerify/explain this command: ${shellCommand}` : ''}`,
+                add_context_from_internet: false
+            });
+
+            return Response.json({
+                result: commandResponse,
+                action: 'shell-exec'
+            });
+        } else if (action === 'cluster') {
+            // Cluster/batch operations
+            systemPrompt = `You are a batch operations assistant. Help with cluster management, parallel processing, and distributed tasks.
+Provide efficient solutions for scaling and parallel execution.`;
+
+            const clusterResponse = await base44.integrations.Core.InvokeLLM({
+                prompt: `${systemPrompt}\n\n${prompt}${projectContext}`,
+                add_context_from_internet: false
+            });
+
+            return Response.json({
+                result: clusterResponse,
+                action: 'cluster'
             });
         }
 

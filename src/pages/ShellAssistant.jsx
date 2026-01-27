@@ -13,7 +13,12 @@ import {
     HelpCircle,
     Zap,
     Lightbulb,
-    Rocket
+    Rocket,
+    Search,
+    Globe,
+    FileText,
+    Play,
+    Network
 } from "lucide-react";
 import { toast } from "sonner";
 import ProjectScaffold from "@/components/shell/ProjectScaffold";
@@ -299,11 +304,53 @@ export default function ShellAssistant() {
                             <Lightbulb className="w-4 h-4 mr-2" />
                             Get Suggestions
                         </Button>
+                        <Button
+                            onClick={() => processCommand('search')}
+                            disabled={loading || !input.trim()}
+                            className="bg-orange-600 hover:bg-orange-700"
+                        >
+                            <Search className="w-4 h-4 mr-2" />
+                            Web Search
+                        </Button>
+                        <Button
+                            onClick={() => processCommand('fetch')}
+                            disabled={loading || !input.trim()}
+                            className="bg-cyan-600 hover:bg-cyan-700"
+                        >
+                            <Globe className="w-4 h-4 mr-2" />
+                            Fetch URL
+                        </Button>
+                        <Button
+                            onClick={() => processCommand('file-read')}
+                            disabled={loading || !input.trim()}
+                            variant="outline"
+                            className="border-pink-500 text-pink-400 hover:bg-pink-900/20"
+                        >
+                            <FileText className="w-4 h-4 mr-2" />
+                            File Ops
+                        </Button>
+                        <Button
+                            onClick={() => processCommand('shell-exec')}
+                            disabled={loading || !input.trim()}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            <Play className="w-4 h-4 mr-2" />
+                            Shell
+                        </Button>
+                        <Button
+                            onClick={() => processCommand('cluster')}
+                            disabled={loading || !input.trim()}
+                            variant="outline"
+                            className="border-indigo-500 text-indigo-400 hover:bg-indigo-900/20"
+                        >
+                            <Network className="w-4 h-4 mr-2" />
+                            Cluster
+                        </Button>
                     </div>
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-3">
                         <Zap className="w-5 h-5 text-yellow-400" />
@@ -366,6 +413,39 @@ export default function ShellAssistant() {
                             className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
                         >
                             → Create API endpoint
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Globe className="w-5 h-5 text-cyan-400" />
+                            <h3 className="font-semibold text-white">Advanced Tools</h3>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                            <button
+                                onClick={() => setInput("search for latest AI model benchmarks")}
+                                className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
+                            >
+                                → Web search with grounding
+                            </button>
+                            <button
+                                onClick={() => setInput("fetch https://api.github.com/repos/ollama/ollama")}
+                                className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
+                            >
+                                → Fetch web content
+                            </button>
+                            <button
+                                onClick={() => setInput("analyze package.json dependencies")}
+                                className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
+                            >
+                                → Read and analyze file
+                            </button>
+                            <button
+                                onClick={() => setInput("setup parallel model quantization across 4 GPUs")}
+                                className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
+                            >
+                                → Cluster operations
                             </button>
                         </div>
                     </div>
