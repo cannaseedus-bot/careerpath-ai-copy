@@ -14,6 +14,7 @@ import Pricing from './pages/Pricing';
 import SWOT from './pages/SWOT';
 import ShellAssistant from './pages/ShellAssistant';
 import Success from './pages/Success';
+import BotOrchestrator from './pages/BotOrchestrator';
 import __Layout from './Layout.jsx';
 
 
@@ -34,6 +35,7 @@ export const PAGES = {
     "SWOT": SWOT,
     "ShellAssistant": ShellAssistant,
     "Success": Success,
+    "BotOrchestrator": BotOrchestrator,
 }
 
 export const pagesConfig = {
