@@ -93,45 +93,22 @@ Generate EXECUTABLE Python code that solves this request. Return ONLY valid Pyth
     }
   };
 
-  const extractCodeBlock = (text) => {
-    const pythonMatch = text.match(/```python\n([\s\S]*?)```/);
-    if (pythonMatch) return pythonMatch[1].trim();
-    
-    const genericMatch = text.match(/```\n([\s\S]*?)```/);
-    if (genericMatch) return genericMatch[1].trim();
-    
-    return null;
-  };
-
-  const applyCodeToEditor = async (messageText, messageIdx) => {
-    const code = extractCodeBlock(messageText);
-    
-    if (!code) {
-      toast.error("No valid code block found in response");
-      return;
-    }
-
-    try {
-      // Validate code via Micronaut before applying
-      const validation = await base44.functions.invoke('micronaut-controller', {
-        action: 'validate_code_generation',
-        code: code,
-        language: 'python',
-        source: 'runtime-studio-chat',
-        message_idx: messageIdx
-      });
-
-      if (validation?.valid) {
-        onCodeGenerated(code);
-        toast.success("Code applied to editor!");
-      } else {
-        toast.error(validation?.error || "Code validation failed");
-      }
-    } catch (error) {
-      console.error("Micronaut validation error:", error);
-      // Apply anyway if Micronaut is unavailable
-      onCodeGenerated(code);
+  const applyCodeToEditor = (codeText, toolCallIdx) => {
+    if (onCodeGenerated) {
+      onCodeGenerated(codeText);
       toast.success("Code applied to editor");
+      
+      // Log code generation event via Micronaut
+      try {
+        base44.functions.invoke('micronaut-controller', {
+          action: 'log_code_generation',
+          source: 'runtime-chat',
+          code_length: codeText.length,
+          tool_call_idx: toolCallIdx
+        }).catch(() => {});
+      } catch (e) {
+        // Silent fail for logging
+      }
     }
   };
 
@@ -220,7 +197,7 @@ Generate EXECUTABLE Python code that solves this request. Return ONLY valid Pyth
                                variant="ghost"
                                className="h-6 w-6 bg-green-900/40 hover:bg-green-800/50 border border-green-700"
                                onClick={() => {
-                                 applyCodeToEditor(msg.content, idx);
+                                 applyCodeToEditor(String(children), idx);
                                }}
                                title="Apply to editor"
                              >
