@@ -36,13 +36,13 @@ if __name__ == "__main__":
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(code);
+    navigator.clipboard.writeText(displayCode);
     toast.success("Copied to clipboard");
   };
 
   const handleDownload = () => {
     const element = document.createElement("a");
-    element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(code));
+    element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(displayCode));
     element.setAttribute("download", "bot_script.py");
     element.style.display = "none";
     document.body.appendChild(element);
@@ -127,17 +127,17 @@ if __name__ == "__main__":
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Editor */}
         <Textarea
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
+          value={displayCode}
+          onChange={(e) => handleCodeChange(e.target.value)}
           className="flex-1 bg-black border-0 text-cyan-400 font-mono text-sm resize-none focus:ring-0"
           placeholder="Write your Python script here..."
         />
 
         {/* Bottom Panels */}
         <div className="border-t border-slate-700 flex gap-2 overflow-x-auto p-2 bg-slate-900 max-h-64 overflow-y-auto">
-          {showLinter && <div className="flex-1 min-w-max"><CodeLinter code={code} /></div>}
-          {showDebugger && <div className="flex-1 min-w-max"><DebuggerPanel code={code} onStepExecute={() => {}} /></div>}
-          {showTests && <div className="flex-1 min-w-max"><TestGenerator code={code} /></div>}
+          {showLinter && <div className="flex-1 min-w-max"><CodeLinter code={displayCode} /></div>}
+          {showDebugger && <div className="flex-1 min-w-max"><DebuggerPanel code={displayCode} onStepExecute={() => {}} /></div>}
+          {showTests && <div className="flex-1 min-w-max"><TestGenerator code={displayCode} /></div>}
         </div>
       </div>
     </div>
