@@ -96,8 +96,21 @@ Only return valid JSON, no other text.`,
     }
 
     try {
-      onApplyFix(issue.fix_code);
-      toast.success("Fix applied automatically!");
+      const lines = code.split("\n");
+      const lineNum = issue.line - 1;
+      
+      // Count lines in the fix_code to replace
+      const fixLines = issue.fix_code.split("\n");
+      
+      // Replace the problematic line(s) with the fixed code
+      if (lineNum >= 0 && lineNum < lines.length) {
+        lines.splice(lineNum, fixLines.length, ...fixLines);
+        const updatedCode = lines.join("\n");
+        onApplyFix(updatedCode);
+        toast.success("Fix applied automatically!");
+      } else {
+        toast.error("Could not locate line to fix");
+      }
     } catch (error) {
       toast.error("Failed to apply fix");
     }
