@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Brain, Sparkles, Activity, Zap, Database, Code } from "lucide-react";
 import { toast } from "sonner";
+import CompressionInferenceEngine from "../inference/CompressionInferenceEngine";
 
 export default function GeometricTensorBrainDashboard() {
   const [inputData, setInputData] = useState('{"example": "data"}');
@@ -436,6 +437,9 @@ export default function GeometricTensorBrainDashboard() {
           </div>
         </div>
       )}
+
+      {/* Compression Inference Engine */}
+      <CompressionInferenceEngine />
 
       {/* Swarm Performance Analysis */}
       {swarmPerformance && (
