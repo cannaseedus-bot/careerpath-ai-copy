@@ -144,8 +144,8 @@ if __name__ == "__main__":
       </div>
 
       {/* Configuration Bar */}
-      <div className="border-b border-slate-700 bg-slate-900 px-4 py-3 space-y-3">
-        <div className="max-w-7xl mx-auto grid grid-cols-4 gap-3">
+       <div className="border-b border-slate-700 bg-slate-900 px-4 py-3 space-y-3 overflow-y-auto max-h-40">
+         <div className="max-w-7xl mx-auto grid grid-cols-4 gap-3">
           <div>
             <label className="text-xs text-gray-400 mb-1 block">Python Version</label>
             <select
@@ -188,7 +188,7 @@ if __name__ == "__main__":
       </div>
 
       {/* Main Layout */}
-      <div className="grid grid-cols-12 gap-0 h-[calc(100vh-220px)]">
+      <div className="grid grid-cols-12 gap-0 h-[calc(100vh-220px)] overflow-y-auto">
         {/* Editor + Env Vars */}
         <div className="col-span-4 border-r border-cyan-400 flex flex-col">
           <div className="flex-1 overflow-hidden">
@@ -199,7 +199,7 @@ if __name__ == "__main__":
               onChange={setScriptCode}
             />
           </div>
-          <div className="border-t border-slate-700 p-3 h-32 overflow-hidden">
+          <div className="border-t border-slate-700 p-3 h-32 overflow-y-auto">
             <EnvironmentVariablesPanel envVars={envVars} onChange={setEnvVars} />
           </div>
         </div>
@@ -212,7 +212,7 @@ if __name__ == "__main__":
               code={scriptCode}
             />
           </div>
-          <div className="border-t border-slate-700 p-3 h-32 overflow-hidden">
+          <div className="border-t border-slate-700 p-3 h-32 overflow-y-auto">
             <HFModelsPanel onSelect={handleSelectHFModel} />
           </div>
         </div>
@@ -226,7 +226,7 @@ if __name__ == "__main__":
               onClear={() => setOutput([])}
             />
           </div>
-          <div className="border-t border-slate-700 p-3 h-32 overflow-hidden">
+          <div className="border-t border-slate-700 p-3 h-32 overflow-y-auto">
             <RemoteRuntimeConfig onConnect={setRemoteApiUrl} />
           </div>
         </div>
