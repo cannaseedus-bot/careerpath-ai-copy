@@ -7,16 +7,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit, Power, PowerOff, Cpu, Code, Zap, Layers } from "lucide-react";
+import { Plus, Trash2, Edit, Power, PowerOff, Cpu, Code, Zap, Layers, Database, Server, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import BatchQuantizationDialog from "@/components/models/BatchQuantizationDialog";
 import ModelBuilderWizard from "@/components/bots/ModelBuilderWizard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ModelManager() {
   const [showForm, setShowForm] = useState(false);
   const [showBatchDialog, setShowBatchDialog] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const [editingModel, setEditingModel] = useState(null);
+  const [activeTab, setActiveTab] = useState("models");
+  const [showDatasetForm, setShowDatasetForm] = useState(false);
+  const [showServingForm, setShowServingForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     model_id: "",
@@ -37,6 +41,21 @@ export default function ModelManager() {
   const { data: models = [] } = useQuery({
     queryKey: ["hfmodels"],
     queryFn: () => base44.entities.HFModel.list()
+  });
+
+  const { data: datasets = [] } = useQuery({
+    queryKey: ["datasets"],
+    queryFn: () => base44.entities.Dataset.list()
+  });
+
+  const { data: servingConfigs = [] } = useQuery({
+    queryKey: ["serving"],
+    queryFn: () => base44.entities.ModelServingConfig.list()
+  });
+
+  const { data: trainingRuns = [] } = useQuery({
+    queryKey: ["training_runs"],
+    queryFn: () => base44.entities.TrainingRun.list()
   });
 
   const createMutation = useMutation({
@@ -63,6 +82,24 @@ export default function ModelManager() {
   const toggleActiveMutation = useMutation({
     mutationFn: ({ id, is_active }) => base44.entities.HFModel.update(id, { is_active }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["hfmodels"] })
+  });
+
+  const createDatasetMutation = useMutation({
+    mutationFn: (data) => base44.entities.Dataset.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["datasets"] });
+      setShowDatasetForm(false);
+      toast.success("Dataset created");
+    }
+  });
+
+  const createServingMutation = useMutation({
+    mutationFn: (data) => base44.entities.ModelServingConfig.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["serving"] });
+      setShowServingForm(false);
+      toast.success("Serving config created");
+    }
   });
 
   const resetForm = () => {
@@ -117,14 +154,14 @@ export default function ModelManager() {
         {/* Terminal Header */}
         <div className="border-2 border-green-400 bg-black mb-6">
           <div className="bg-green-400 text-black px-4 py-1 flex justify-between items-center">
-            <span className="font-bold">$ mx2lm models --list</span>
-            <span className="text-xs">[ Model Registry ]</span>
+            <span className="font-bold">$ mx2lm models --manage</span>
+            <span className="text-xs">[ Model Manager Hub ]</span>
           </div>
           <div className="p-6">
             <div className="flex justify-between items-center">
               <div>
-                <div className="text-cyan-400 text-2xl mb-2">╔═══ HUGGING FACE MODELS ═══╗</div>
-                <div className="text-green-400">Manage quantized models for your CLI</div>
+                <div className="text-cyan-400 text-2xl mb-2">╔═══ MODEL MANAGEMENT HUB ═══╗</div>
+                <div className="text-green-400">Models • Datasets • Training • Serving</div>
               </div>
               <div className="flex gap-3">
                 <button
@@ -160,8 +197,25 @@ export default function ModelManager() {
           </div>
         )}
 
-        {showForm && (
-          <Card className="mb-8 bg-slate-800 border-slate-700">
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+          <TabsList className="bg-slate-800 border border-slate-700 w-full justify-start">
+            <TabsTrigger value="models" className="text-cyan-400">
+              <Code className="w-4 h-4 mr-2" /> Models
+            </TabsTrigger>
+            <TabsTrigger value="datasets" className="text-cyan-400">
+              <Database className="w-4 h-4 mr-2" /> Datasets
+            </TabsTrigger>
+            <TabsTrigger value="serving" className="text-cyan-400">
+              <Server className="w-4 h-4 mr-2" /> Serving
+            </TabsTrigger>
+            <TabsTrigger value="training" className="text-cyan-400">
+              <TrendingUp className="w-4 h-4 mr-2" /> Training
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Models Tab */}
+          <TabsContent value="models">
             <CardHeader>
               <CardTitle className="text-white">
                 {editingModel ? "Edit Model" : "Add New Model"}
@@ -376,17 +430,262 @@ export default function ModelManager() {
           ))}
         </div>
 
-        {models.length === 0 && !showForm && (
-          <div className="text-center py-16">
-            <Zap className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-400 mb-2">No models yet</h3>
-            <p className="text-slate-500 mb-4">Add your first Hugging Face model to get started</p>
-            <Button onClick={() => setShowForm(true)} className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-5 h-5 mr-2" />
-              Add Model
-            </Button>
-          </div>
-        )}
+            {models.length === 0 && !showForm && (
+              <div className="text-center py-16">
+                <Zap className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-slate-400 mb-2">No models yet</h3>
+                <p className="text-slate-500 mb-4">Add your first Hugging Face model to get started</p>
+                <Button onClick={() => setShowForm(true)} className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Add Model
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Datasets Tab */}
+          <TabsContent value="datasets">
+            {showDatasetForm ? (
+              <Card className="mb-8 bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white">Add Dataset</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      createDatasetMutation.mutate({
+                        name: e.target.name.value,
+                        source: e.target.source.value,
+                        format: e.target.format.value,
+                        source_id: e.target.source_id.value
+                      });
+                    }}
+                    className="space-y-4"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm text-slate-300 mb-2 block">Dataset Name</label>
+                        <Input
+                          name="name"
+                          placeholder="My Training Dataset"
+                          className="bg-slate-900 border-slate-600 text-white"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm text-slate-300 mb-2 block">Source</label>
+                        <Select defaultValue="huggingface">
+                          <SelectTrigger name="source" className="bg-slate-900 border-slate-600 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="huggingface">Hugging Face</SelectItem>
+                            <SelectItem value="local_upload">Local Upload</SelectItem>
+                            <SelectItem value="custom_url">Custom URL</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-slate-300 mb-2 block">Source ID / URL</label>
+                        <Input
+                          name="source_id"
+                          placeholder="dataset_id or https://..."
+                          className="bg-slate-900 border-slate-600 text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm text-slate-300 mb-2 block">Format</label>
+                        <Select defaultValue="jsonl">
+                          <SelectTrigger name="format" className="bg-slate-900 border-slate-600 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="jsonl">JSONL</SelectItem>
+                            <SelectItem value="csv">CSV</SelectItem>
+                            <SelectItem value="parquet">Parquet</SelectItem>
+                            <SelectItem value="huggingface">HuggingFace</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 justify-end">
+                      <Button type="button" variant="outline" onClick={() => setShowDatasetForm(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                        Add Dataset
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            ) : null}
+
+            <div className="mb-4">
+              <Button onClick={() => setShowDatasetForm(true)} className="bg-green-400 text-black hover:bg-green-300">
+                <Plus className="w-4 h-4 mr-2" />
+                ADD_DATASET
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {datasets.map((dataset) => (
+                <Card key={dataset.id} className="bg-slate-800 border-slate-700">
+                  <CardHeader>
+                    <CardTitle className="text-white text-lg flex items-center gap-2">
+                      <Database className="w-5 h-5 text-blue-400" />
+                      {dataset.name}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <Badge className="bg-blue-900 text-blue-200">{dataset.format}</Badge>
+                    <Badge className="bg-slate-700">{dataset.source}</Badge>
+                    {dataset.num_samples && <p className="text-sm text-slate-400">Samples: {dataset.num_samples}</p>}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Serving Tab */}
+          <TabsContent value="serving">
+            {showServingForm ? (
+              <Card className="mb-8 bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white">Add Serving Config</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      createServingMutation.mutate({
+                        name: e.target.name.value,
+                        model_id: e.target.model_id.value,
+                        framework: e.target.framework.value
+                      });
+                    }}
+                    className="space-y-4"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm text-slate-300 mb-2 block">Config Name</label>
+                        <Input
+                          name="name"
+                          placeholder="Production Serving"
+                          className="bg-slate-900 border-slate-600 text-white"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm text-slate-300 mb-2 block">Model</label>
+                        <Select name="model_id">
+                          <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {models.map((m) => (
+                              <SelectItem key={m.id} value={m.id}>
+                                {m.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-slate-300 mb-2 block">Framework</label>
+                        <Select defaultValue="vllm" name="framework">
+                          <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="vllm">vLLM</SelectItem>
+                            <SelectItem value="tgi">TGI (Text Generation Inference)</SelectItem>
+                            <SelectItem value="ollama">Ollama</SelectItem>
+                            <SelectItem value="transformers">Transformers</SelectItem>
+                            <SelectItem value="ctransformers">CTransformers</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 justify-end">
+                      <Button type="button" variant="outline" onClick={() => setShowServingForm(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                        Create Config
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            ) : null}
+
+            <div className="mb-4">
+              <Button onClick={() => setShowServingForm(true)} className="bg-green-400 text-black hover:bg-green-300">
+                <Plus className="w-4 h-4 mr-2" />
+                ADD_SERVING_CONFIG
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {servingConfigs.map((config) => (
+                <Card key={config.id} className="bg-slate-800 border-slate-700">
+                  <CardHeader>
+                    <CardTitle className="text-white text-lg flex items-center gap-2">
+                      <Server className="w-5 h-5 text-green-400" />
+                      {config.name}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <Badge className="bg-green-900 text-green-200">{config.framework}</Badge>
+                    <Badge className={`${config.status === "running" ? "bg-green-900" : "bg-slate-700"}`}>
+                      {config.status}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Training Tab */}
+          <TabsContent value="training">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {trainingRuns.map((run) => (
+                <Card key={run.id} className="bg-slate-800 border-slate-700">
+                  <CardHeader>
+                    <CardTitle className="text-white text-lg flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-purple-400" />
+                      {run.name}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <Badge className={`${
+                      run.status === "completed" ? "bg-green-900" : 
+                      run.status === "running" ? "bg-blue-900" :
+                      run.status === "failed" ? "bg-red-900" : "bg-slate-700"
+                    }`}>
+                      {run.status}
+                    </Badge>
+                    <Badge className="bg-purple-900 text-purple-200">{run.framework}</Badge>
+                    {run.started_at && (
+                      <p className="text-xs text-slate-400 mt-2">
+                        Started: {new Date(run.started_at).toLocaleDateString()}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            {trainingRuns.length === 0 && (
+              <div className="text-center py-16">
+                <TrendingUp className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-slate-400 mb-2">No training runs yet</h3>
+                <p className="text-slate-500">Start a training run from RuntimeStudio</p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
