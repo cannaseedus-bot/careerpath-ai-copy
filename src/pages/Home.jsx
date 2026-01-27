@@ -52,13 +52,21 @@ export default function Home() {
               <div className="text-cyan-400">$ mx2lm playground --test</div>
               <div className="text-green-400 text-sm ml-4">Test models and generate CLI configurations</div>
             </Link>
-            <Link to={createPageUrl("CLIEditor")} className="block hover:bg-green-900/30 p-3 transition">
-              <div className="text-cyan-400">$ mx2lm cli --personalize</div>
-              <div className="text-green-400 text-sm ml-4">Create custom CLI with your preferred models</div>
+            <Link to={createPageUrl("IDEIntegrations")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ mx2lm ide --setup vscode</div>
+              <div className="text-green-400 text-sm ml-4">Integrate with VS Code, Visual Studio, and more</div>
             </Link>
-            <Link to={createPageUrl("Monitoring")} className="block hover:bg-green-900/30 p-3 transition">
-              <div className="text-cyan-400">$ mx2lm monitor --dashboard</div>
-              <div className="text-green-400 text-sm ml-4">Track performance metrics and system health</div>
+            <Link to={createPageUrl("CIPipelines")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ mx2lm ci --deploy</div>
+              <div className="text-green-400 text-sm ml-4">Automate with GitHub Actions, GitLab CI, CircleCI</div>
+            </Link>
+            <Link to={createPageUrl("Extensions")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ mx2lm extensions --browse</div>
+              <div className="text-green-400 text-sm ml-4">Discover and install community extensions</div>
+            </Link>
+            <Link to={createPageUrl("Commands")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ mx2lm commands --custom</div>
+              <div className="text-green-400 text-sm ml-4">Create and manage custom CLI commands</div>
             </Link>
           </div>
         </div>
