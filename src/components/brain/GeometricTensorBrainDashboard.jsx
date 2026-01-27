@@ -13,6 +13,7 @@ export default function GeometricTensorBrainDashboard() {
   const [inputData, setInputData] = useState('{"example": "data"}');
   const [processingResult, setProcessingResult] = useState(null);
   const [swarmStatus, setSwarmStatus] = useState(null);
+  const [swarmPerformance, setSwarmPerformance] = useState(null);
 
   const processMutation = useMutation({
     mutationFn: async (data) => {
@@ -41,6 +42,33 @@ export default function GeometricTensorBrainDashboard() {
     onSuccess: (data) => {
       setSwarmStatus(data);
       toast.success(`Agent swarm deployed: ${data.swarm_size} agents`);
+    }
+  });
+
+  const optimizeSwarmMutation = useMutation({
+    mutationFn: async () => {
+      const { data: result } = await base44.functions.invoke('agent-swarm-coordinator', {
+        operation: 'optimize_swarm',
+        parameters: {}
+      });
+      return result;
+    },
+    onSuccess: (data) => {
+      toast.success(`Swarm optimized: ${data.agents_optimized} agents`);
+    }
+  });
+
+  const analyzeSwarmMutation = useMutation({
+    mutationFn: async () => {
+      const { data: result } = await base44.functions.invoke('agent-swarm-coordinator', {
+        operation: 'analyze_performance',
+        parameters: {}
+      });
+      return result;
+    },
+    onSuccess: (data) => {
+      setSwarmPerformance(data);
+      toast.success('Swarm performance analyzed');
     }
   });
 
@@ -145,7 +173,27 @@ export default function GeometricTensorBrainDashboard() {
                 className="border-green-400 text-green-400"
               >
                 <Database className="w-4 h-4 mr-2" />
-                Deploy Agent Swarm
+                Deploy Swarm
+              </Button>
+
+              <Button
+                onClick={() => optimizeSwarmMutation.mutate()}
+                disabled={optimizeSwarmMutation.isPending}
+                variant="outline"
+                className="border-yellow-400 text-yellow-400"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Optimize Swarm
+              </Button>
+
+              <Button
+                onClick={() => analyzeSwarmMutation.mutate()}
+                disabled={analyzeSwarmMutation.isPending}
+                variant="outline"
+                className="border-purple-400 text-purple-400"
+              >
+                <Activity className="w-4 h-4 mr-2" />
+                Analyze
               </Button>
             </div>
           </div>
@@ -183,12 +231,38 @@ export default function GeometricTensorBrainDashboard() {
                 </div>
               </div>
 
+              {processingResult.dynamic_folds?.length > 0 && (
+                <div className="bg-black p-4 rounded border border-yellow-400">
+                  <div className="text-sm font-bold text-yellow-400 mb-2">
+                    🔥 Dynamic Folds Generated
+                  </div>
+                  <div className="space-y-2">
+                    {processingResult.dynamic_folds.map((fold, i) => (
+                      <div key={i} className="flex justify-between text-xs">
+                        <span className="text-yellow-400">{fold.name}</span>
+                        <span className="text-gray-400">{fold.symbol}</span>
+                        <Badge className="bg-green-600 text-xs">
+                          {fold.efficiency_prediction}% eff
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="bg-black p-4 rounded border border-cyan-400">
                 <div className="text-sm text-gray-400 mb-2">Structure Analysis</div>
                 <pre className="text-xs text-cyan-400 overflow-auto">
                   {JSON.stringify(processingResult.structure, null, 2)}
                 </pre>
               </div>
+
+              {processingResult.metrics.learning_shared && (
+                <Badge className="bg-purple-600">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Learning Shared Across Swarm
+                </Badge>
+              )}
             </div>
           </TabsContent>
 
@@ -304,9 +378,19 @@ export default function GeometricTensorBrainDashboard() {
       {/* Agent Swarm Status */}
       {swarmStatus && (
         <div className="border-2 border-green-400 bg-black">
-          <div className="bg-green-400 text-black px-4 py-1 font-bold flex items-center gap-2">
-            <Database className="w-4 h-4" />
-            CSS MICRONAUT AGENT SWARM
+          <div className="bg-green-400 text-black px-4 py-1 font-bold flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Database className="w-4 h-4" />
+              CSS MICRONAUT AGENT SWARM
+            </div>
+            <div className="flex gap-2 text-xs">
+              {swarmStatus.learning_enabled && (
+                <Badge className="bg-purple-600">LEARNING</Badge>
+              )}
+              {swarmStatus.dynamic_fold_generation && (
+                <Badge className="bg-yellow-600">DYNAMIC FOLDS</Badge>
+              )}
+            </div>
           </div>
           <div className="p-4">
             <div className="grid grid-cols-3 gap-3">
@@ -322,6 +406,58 @@ export default function GeometricTensorBrainDashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Swarm Performance Analysis */}
+      {swarmPerformance && (
+        <Card className="bg-slate-900 border-2 border-purple-400">
+          <div className="p-4 space-y-4">
+            <div className="flex items-center gap-2">
+              <Activity className="w-5 h-5 text-purple-400" />
+              <h3 className="text-lg font-bold text-purple-400">SWARM PERFORMANCE</h3>
+            </div>
+
+            <div className="grid grid-cols-4 gap-3">
+              <div className="bg-black p-3 rounded border border-purple-400 text-center">
+                <div className="text-xs text-gray-400">Swarm Size</div>
+                <div className="text-purple-400 font-bold text-xl">
+                  {swarmPerformance.swarm_size}
+                </div>
+              </div>
+              <div className="bg-black p-3 rounded border border-green-400 text-center">
+                <div className="text-xs text-gray-400">Total Ops</div>
+                <div className="text-green-400 font-bold text-xl">
+                  {swarmPerformance.performance.total_operations}
+                </div>
+              </div>
+              <div className="bg-black p-3 rounded border border-yellow-400 text-center">
+                <div className="text-xs text-gray-400">Avg Efficiency</div>
+                <div className="text-yellow-400 font-bold text-xl">
+                  {(swarmPerformance.performance.avg_efficiency * 100).toFixed(0)}%
+                </div>
+              </div>
+              <div className="bg-black p-3 rounded border border-cyan-400 text-center">
+                <div className="text-xs text-gray-400">Quantum</div>
+                <div className="text-cyan-400 font-bold text-xl">
+                  {swarmPerformance.performance.quantum_enabled}
+                </div>
+              </div>
+            </div>
+
+            {swarmPerformance.recommendations && (
+              <div className="bg-black p-4 rounded border border-purple-400">
+                <div className="text-sm font-bold text-purple-400 mb-2">
+                  AI Recommendations
+                </div>
+                <div className="space-y-2 text-xs">
+                  {swarmPerformance.recommendations.immediate_actions?.map((action, i) => (
+                    <div key={i} className="text-yellow-400">• {action}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </Card>
       )}
     </div>
   );

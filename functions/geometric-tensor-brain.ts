@@ -50,14 +50,30 @@ async function processUniversalData(base44, data, format, parameters = {}) {
     // PHASE 5: CSS GENERATION - Create controls
     const cssControls = await generateCSSFromTensor(tensor, compressed);
     
-    // PHASE 6: LEARNING - Update brain
-    await updateBrainLearning(base44, {
+    // PHASE 6: DYNAMIC FOLD GENERATION
+    const dynamicFolds = await generateDynamicFoldsFromData(base44, {
+        data_analysis: { structure, patterns },
+        existing_folds: tensor.dimensions.fold
+    });
+    
+    // PHASE 7: LEARNING - Update brain and share across swarm
+    const learningResult = await updateBrainLearning(base44, {
         input: data,
         tensor,
         compressed,
         patterns,
-        efficiency: compressed.metrics.compression_ratio
+        efficiency: compressed.metrics.compression_ratio,
+        dynamic_folds: dynamicFolds
     });
+    
+    // PHASE 8: SHARE SUCCESSFUL STRATEGIES
+    if (compressed.metrics.efficiency > 90) {
+        await shareSuccessfulStrategy(base44, {
+            compression_strategies: patterns.slice(0, 5),
+            fold_operations: dynamicFolds,
+            efficiency_improvement: compressed.metrics.efficiency - 85
+        });
+    }
     
     return {
         success: true,
@@ -70,12 +86,37 @@ async function processUniversalData(base44, data, format, parameters = {}) {
         },
         compressed: compressed.compressed,
         patterns: patterns.slice(0, 10),
+        dynamic_folds: dynamicFolds.slice(0, 3),
         css_controls: cssControls,
         metrics: {
             ...compressed.metrics,
-            brain_efficiency: calculateBrainEfficiency(compressed.metrics)
+            brain_efficiency: calculateBrainEfficiency(compressed.metrics),
+            learning_shared: learningResult.shared
         }
     };
+}
+
+async function generateDynamicFoldsFromData(base44, params) {
+    const { data: generated } = await base44.functions.invoke('agent-swarm-coordinator', {
+        operation: 'generate_folds',
+        parameters: params
+    });
+    
+    return generated.new_folds || [];
+}
+
+async function shareSuccessfulStrategy(base44, strategy) {
+    const { data: result } = await base44.functions.invoke('agent-swarm-coordinator', {
+        operation: 'share_learning',
+        parameters: {
+            strategy,
+            performance_metrics: {
+                efficiency_improvement: strategy.efficiency_improvement
+            }
+        }
+    });
+    
+    return result;
 }
 
 async function detectDataStructure(data, format) {
@@ -258,22 +299,39 @@ async function generateCSSFromTensor(tensor, compressed) {
 }
 
 async function updateBrainLearning(base44, learningData) {
-    // Store learning data for continuous improvement
     try {
         const learningRecord = {
             timestamp: new Date().toISOString(),
             efficiency: learningData.efficiency,
             pattern_count: learningData.patterns.length,
             tensor_rank: learningData.tensor.rank,
+            dynamic_folds: learningData.dynamic_folds?.length || 0,
             success: true
         };
         
-        // Could store in a BrainLearning entity for tracking
-        // For now, just return success
-        return { success: true, learned: true };
+        // Share learning across swarm if efficiency is high
+        let shared = false;
+        if (learningData.efficiency < 0.1) { // Good compression ratio
+            const { data: shareResult } = await base44.functions.invoke('agent-swarm-coordinator', {
+                operation: 'share_learning',
+                parameters: {
+                    strategy: {
+                        compression_strategies: learningData.patterns.slice(0, 5).map(p => p.pattern),
+                        fold_operations: learningData.dynamic_folds || [],
+                        ngram_optimizations: learningData.patterns.slice(0, 3)
+                    },
+                    performance_metrics: {
+                        efficiency_improvement: 5.0
+                    }
+                }
+            });
+            shared = shareResult.success;
+        }
+        
+        return { success: true, learned: true, shared };
     } catch (error) {
         console.error('Learning update failed:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: error.message, shared: false };
     }
 }
 
@@ -323,12 +381,13 @@ async function generateCSSControls(base44, data) {
 
 async function deployAgentSwarm(base44, parameters) {
     const agentTypes = [
-        { name: 'µ-perception', type: 'perception', role: 'ingest.any.data.format' },
-        { name: 'µ-geometry', type: 'geometry', role: 'map.to.tensor.manifold' },
-        { name: 'µ-fold', type: 'fold', role: 'apply.compression.operations' },
-        { name: 'µ-pattern', type: 'pattern', role: 'detect.ngram.structures' },
-        { name: 'µ-css', type: 'css', role: 'generate.style.controls' },
-        { name: 'µ-coordinator', type: 'coordination', role: 'orchestrate.swarm' }
+        { name: 'µ-perception', type: 'perception', role: 'ingest.any.data.format', folds: ['DATA', 'NETWORK', 'UI'] },
+        { name: 'µ-geometry', type: 'geometry', role: 'map.to.tensor.manifold', folds: ['DATA', 'SPACE', 'PATTERN'] },
+        { name: 'µ-fold', type: 'fold', role: 'apply.compression.operations', folds: ['DATA', 'CODE', 'STORAGE'] },
+        { name: 'µ-pattern', type: 'pattern', role: 'detect.ngram.structures', folds: ['PATTERN', 'META', 'DATA'] },
+        { name: 'µ-css', type: 'css', role: 'generate.style.controls', folds: ['UI', 'STATE', 'CONTROL'] },
+        { name: 'µ-coordinator', type: 'coordination', role: 'orchestrate.swarm', folds: ['META', 'CONTROL', 'EVENTS'] },
+        { name: 'µ-learning', type: 'learning', role: 'optimize.and.learn', folds: ['META', 'PATTERN', 'DATA'] }
     ];
     
     const deployed = [];
@@ -339,7 +398,7 @@ async function deployAgentSwarm(base44, parameters) {
             micronaut_name: agentSpec.name,
             config: {
                 type: agentSpec.type,
-                folds: ['DATA', 'CODE', 'COMPUTE'],
+                folds: agentSpec.folds,
                 control_vectors: {
                     flow: 0.85,
                     intensity: 0.9,
@@ -349,9 +408,18 @@ async function deployAgentSwarm(base44, parameters) {
             },
             parent_agent_id: 'brain-layer-11',
             ngram_data: {
-                policies: [{ rule: 'optimize.compression', priority: 'high' }],
-                tools: [{ name: 'tensor.map', type: 'geometric' }],
-                build_steps: [{ step: agentSpec.role, order: deployed.length + 1 }]
+                policies: [
+                    { rule: 'optimize.compression', priority: 'high' },
+                    { rule: 'learn.from.success', priority: 'high' },
+                    { rule: 'share.knowledge', priority: 'medium' }
+                ],
+                tools: [
+                    { name: 'tensor.map', type: 'geometric' },
+                    { name: 'fold.generate', type: 'dynamic' },
+                    { name: 'pattern.learn', type: 'adaptive' }
+                ],
+                build_steps: [{ step: agentSpec.role, order: deployed.length + 1 }],
+                learned_patterns: []
             }
         });
         
@@ -363,6 +431,8 @@ async function deployAgentSwarm(base44, parameters) {
         swarm_size: deployed.length,
         agents: deployed.map(m => ({ name: m.micronaut.name, type: m.micronaut.type })),
         swarm_intelligence: 'active',
-        coordination_ready: true
+        coordination_ready: true,
+        learning_enabled: true,
+        dynamic_fold_generation: true
     };
 }
