@@ -15,15 +15,22 @@ export default function CodeLinter({ code, onApplyFix }) {
       setIsAnalyzing(true);
       try {
         const response = await base44.integrations.Core.InvokeLLM({
-          prompt: `Analyze this Python bot script for code quality, potential errors, and optimizations. Return a JSON array with issues.
+          prompt: `Analyze this Python bot script for code quality, potential errors, and optimizations. Return a JSON object with issues array.
           
 Script:
 \`\`\`python
 ${code}
 \`\`\`
 
-Return format: [{"type": "error|warning|suggestion", "line": number, "message": "...", "fix": "..."}]
-Only return the JSON array, no other text.`,
+For each issue, provide:
+- type: "error", "warning", or "suggestion"
+- line: line number where issue occurs
+- message: clear description of the problem
+- fix: brief explanation of how to fix it
+- fix_code: the corrected code snippet (just the fixed lines/function)
+
+Return format: {"issues": [{"type": "error|warning|suggestion", "line": number, "message": "...", "fix": "...", "fix_code": "..."}]}
+Only return valid JSON, no other text.`,
           response_json_schema: {
             type: "object",
             properties: {
@@ -35,7 +42,8 @@ Only return the JSON array, no other text.`,
                     type: { type: "string", enum: ["error", "warning", "suggestion"] },
                     line: { type: "number" },
                     message: { type: "string" },
-                    fix: { type: "string" }
+                    fix: { type: "string" },
+                    fix_code: { type: "string" }
                   }
                 }
               }
