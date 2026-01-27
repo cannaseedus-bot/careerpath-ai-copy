@@ -20,7 +20,10 @@ export default function ProjectScaffold({ onGenerate }) {
             websockets: false,
         },
         language: "javascript",
-        framework: "react"
+        framework: "react",
+        stateManagement: "none",
+        styling: "tailwind",
+        testing: "none"
     });
 
     const handleGenerate = async () => {
@@ -65,6 +68,8 @@ export default function ProjectScaffold({ onGenerate }) {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="web-app">Web Application</SelectItem>
+                            <SelectItem value="mobile-app">Mobile App (React Native)</SelectItem>
+                            <SelectItem value="desktop-app">Desktop App (Electron)</SelectItem>
                             <SelectItem value="api">REST API</SelectItem>
                             <SelectItem value="cli">CLI Tool</SelectItem>
                             <SelectItem value="microservice">Microservice</SelectItem>
@@ -111,13 +116,83 @@ export default function ProjectScaffold({ onGenerate }) {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="react">React</SelectItem>
-                                <SelectItem value="vue">Vue</SelectItem>
-                                <SelectItem value="express">Express</SelectItem>
-                                <SelectItem value="fastapi">FastAPI</SelectItem>
+                                {config.projectType === 'mobile-app' && (
+                                    <SelectItem value="react-native">React Native</SelectItem>
+                                )}
+                                {config.projectType === 'desktop-app' && (
+                                    <SelectItem value="electron">Electron</SelectItem>
+                                )}
+                                {(config.projectType === 'web-app' || config.projectType === 'desktop-app') && (
+                                    <>
+                                        <SelectItem value="react">React</SelectItem>
+                                        <SelectItem value="vue">Vue</SelectItem>
+                                        <SelectItem value="nextjs">Next.js</SelectItem>
+                                    </>
+                                )}
+                                {(config.projectType === 'api' || config.projectType === 'microservice') && (
+                                    <>
+                                        <SelectItem value="express">Express</SelectItem>
+                                        <SelectItem value="fastapi">FastAPI</SelectItem>
+                                        <SelectItem value="flask">Flask</SelectItem>
+                                    </>
+                                )}
                             </SelectContent>
                         </Select>
                     </div>
+                </div>
+
+                {(config.projectType === 'web-app' || config.projectType === 'mobile-app' || config.projectType === 'desktop-app') && (
+                    <>
+                        <div className="space-y-2">
+                            <Label className="text-slate-300">State Management</Label>
+                            <Select value={config.stateManagement} onValueChange={(value) => setConfig({...config, stateManagement: value})}>
+                                <SelectTrigger className="bg-slate-950 border-slate-700 text-white">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">None (React State)</SelectItem>
+                                    <SelectItem value="zustand">Zustand</SelectItem>
+                                    <SelectItem value="redux-toolkit">Redux Toolkit</SelectItem>
+                                    <SelectItem value="mobx">MobX</SelectItem>
+                                    <SelectItem value="recoil">Recoil</SelectItem>
+                                    <SelectItem value="jotai">Jotai</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-slate-300">Styling Solution</Label>
+                            <Select value={config.styling} onValueChange={(value) => setConfig({...config, styling: value})}>
+                                <SelectTrigger className="bg-slate-950 border-slate-700 text-white">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="tailwind">Tailwind CSS</SelectItem>
+                                    <SelectItem value="styled-components">Styled Components</SelectItem>
+                                    <SelectItem value="css-modules">CSS Modules</SelectItem>
+                                    <SelectItem value="emotion">Emotion</SelectItem>
+                                    <SelectItem value="sass">Sass/SCSS</SelectItem>
+                                    <SelectItem value="vanilla-css">Vanilla CSS</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </>
+                )}
+
+                <div className="space-y-2">
+                    <Label className="text-slate-300">Testing Framework</Label>
+                    <Select value={config.testing} onValueChange={(value) => setConfig({...config, testing: value})}>
+                        <SelectTrigger className="bg-slate-950 border-slate-700 text-white">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="none">No Testing</SelectItem>
+                            <SelectItem value="vitest">Vitest</SelectItem>
+                            <SelectItem value="jest">Jest</SelectItem>
+                            <SelectItem value="playwright">Playwright (E2E)</SelectItem>
+                            <SelectItem value="cypress">Cypress (E2E)</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <div className="space-y-3">
