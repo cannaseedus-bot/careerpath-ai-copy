@@ -13,11 +13,12 @@ export default function CompressionDocs() {
         {/* Header */}
         <div className="border-2 border-cyan-400 bg-black mb-6">
           <div className="bg-cyan-400 text-black px-4 py-1">
-            <span className="font-bold">$ mx2lm docs --compression-calculus</span>
+            <span className="font-bold">$ mx2lm docs --scxq2</span>
           </div>
           <div className="p-6">
-            <div className="text-cyan-400 text-3xl mb-2">COMPRESSION CALCULUS REFERENCE</div>
+            <div className="text-cyan-400 text-3xl mb-2">SCXQ2 REFERENCE</div>
             <div className="text-green-400">W3Schools-style documentation for CSS Micronaut & Universal Compression</div>
+            <div className="text-gray-500 text-sm mt-2 italic">Simplified as "Compression Calculus"</div>
           </div>
         </div>
 
@@ -37,10 +38,11 @@ export default function CompressionDocs() {
             <Card className="bg-slate-900 border-2 border-cyan-400 p-6">
               <h2 className="text-2xl text-cyan-400 mb-4 flex items-center gap-2">
                 <Book className="w-6 h-6" />
-                What is Compression Calculus?
+                What is SCXQ2?
               </h2>
               <div className="space-y-3 text-gray-300">
-                <p>Compression Calculus is a formal mathematical system for expressing and reasoning about universal data compression across multiple domains.</p>
+                <p>SCXQ2 is a formal mathematical system for expressing and reasoning about universal data compression across multiple domains.</p>
+                <p className="text-sm text-gray-500 italic">Note: "Compression Calculus" is a simplified definition of SCXQ2 for easier understanding.</p>
                 
                 <div className="bg-black p-4 rounded border border-gray-700">
                   <div className="text-yellow-400 mb-2">Key Concepts:</div>

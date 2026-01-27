@@ -5,6 +5,7 @@ import CLIEditor from './pages/CLIEditor';
 import CLIPlayground from './pages/CLIPlayground';
 import Career from './pages/Career';
 import Commands from './pages/Commands';
+import CompressionDocs from './pages/CompressionDocs';
 import Extensions from './pages/Extensions';
 import Home from './pages/Home';
 import IDEIntegrations from './pages/IDEIntegrations';
@@ -15,7 +16,6 @@ import Pricing from './pages/Pricing';
 import SWOT from './pages/SWOT';
 import ShellAssistant from './pages/ShellAssistant';
 import Success from './pages/Success';
-import CompressionDocs from './pages/CompressionDocs';
 import __Layout from './Layout.jsx';
 
 
@@ -27,6 +27,7 @@ export const PAGES = {
     "CLIPlayground": CLIPlayground,
     "Career": Career,
     "Commands": Commands,
+    "CompressionDocs": CompressionDocs,
     "Extensions": Extensions,
     "Home": Home,
     "IDEIntegrations": IDEIntegrations,
@@ -37,7 +38,6 @@ export const PAGES = {
     "SWOT": SWOT,
     "ShellAssistant": ShellAssistant,
     "Success": Success,
-    "CompressionDocs": CompressionDocs,
 }
 
 export const pagesConfig = {
