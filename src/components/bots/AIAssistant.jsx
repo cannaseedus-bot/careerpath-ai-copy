@@ -218,13 +218,42 @@ Provide code suggestions, XJSON patterns, or tensor schema fixes. Follow XJSON l
             <div className="text-sm text-gray-400">
               Generate lawful boilerplate code for {botType} bots with XJSON envelopes, SVG-3D tensors, and SCXQ2 compression.
             </div>
-            <Button
-              onClick={generateBoilerplate}
-              disabled={loading}
-              className="bg-purple-400 text-black hover:bg-purple-300 w-full"
-            >
-              {loading ? "GENERATING..." : "GENERATE_BOILERPLATE"}
-            </Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                onClick={generateBoilerplate}
+                disabled={loading}
+                className="bg-purple-400 text-black hover:bg-purple-300"
+              >
+                {loading ? "GENERATING..." : "GENERATE_BOILERPLATE"}
+              </Button>
+              <Button
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    const response = await base44.functions.invoke('generate-tensor-schema', {
+                      bot_config: currentConfig || {},
+                      bot_type: botType,
+                      sample_data: currentConfig?.sample_data || null,
+                      script_analysis: currentScript?.slice(0, 1000)
+                    });
+                    setBoilerplate({
+                      code: JSON.stringify(response.schema, null, 2),
+                      explanation: `Generated SVG-3D tensor schema (rank ${response.schema?.tensor_rank || 'N/A'}, shape ${JSON.stringify(response.schema?.tensor_shape || [])}). Includes ${response.ngrams?.length || 0} n-grams and optimized SCXQ2 compression config.`
+                    });
+                    toast.success("Tensor schema generated");
+                  } catch (error) {
+                    toast.error("Failed to generate schema");
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                disabled={loading}
+                className="bg-cyan-400 text-black hover:bg-cyan-300"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                {loading ? "GENERATING..." : "TENSOR_SCHEMA"}
+              </Button>
+            </div>
 
             {boilerplate && (
               <div className="space-y-3">

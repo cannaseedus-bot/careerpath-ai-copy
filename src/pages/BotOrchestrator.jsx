@@ -254,6 +254,14 @@ export default function BotOrchestrator() {
                   />
                 </div>
 
+                {/* Tensor Schema Visualizer */}
+                {formData.config?.tensor_schemas && (
+                  <TensorSchemaVisualizer 
+                    schema={formData.config.tensor_schemas}
+                    onEdit={(schema) => setFormData({...formData, config: {...formData.config, tensor_schemas: schema}})}
+                  />
+                )}
+
                 <div>
                   <label className="text-green-400 text-sm mb-2 flex justify-between items-center">
                     <span>BOT_SCRIPT:</span>
