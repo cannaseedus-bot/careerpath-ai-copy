@@ -49,7 +49,8 @@ export default function ModelBuilderWizard({ onComplete, onCancel }) {
     parameters: "3.8B",
     capabilities: [],
     compression_enabled: false,
-    tensor_sharding: false
+    tensor_sharding: false,
+    dataset_source: ""
   });
 
   const handleNext = () => {
@@ -148,14 +149,39 @@ export default function ModelBuilderWizard({ onComplete, onCancel }) {
                     </Select>
                   </div>
                   <div>
-                    <label className="text-cyan-400 text-sm font-semibold block mb-2">MODEL ID</label>
+                    <label className="text-cyan-400 text-sm font-semibold block mb-2">MODEL ID or URL</label>
                     <Input
-                      placeholder="e.g., microsoft/phi-3-mini"
+                      placeholder="e.g., microsoft/phi-3-mini or direct GGUF URL"
                       value={modelData.model_id}
                       onChange={(e) => setModelData({...modelData, model_id: e.target.value})}
                       className="border-cyan-400"
                     />
                   </div>
+                  
+                  {/* Preset Models */}
+                  {modelData.source === 'huggingface' && (
+                    <div className="bg-slate-900 rounded p-4">
+                      <div className="text-cyan-400 text-xs font-semibold mb-3 uppercase">PRESET MODELS</div>
+                      <div className="space-y-2">
+                        <button
+                          type="button"
+                          onClick={() => setModelData({...modelData, model_id: 'https://huggingface.co/TheBloke/phi-2-GGUF/resolve/main/phi-2.Q2_K.gguf?download=true', name: 'Phi-2 Q2_K (1GB)'})}
+                          className="w-full text-left text-xs border border-cyan-400 p-2 hover:bg-cyan-900/20 rounded text-cyan-300"
+                        >
+                          <div className="font-semibold">Phi-2 Q2_K (1GB)</div>
+                          <div className="text-gray-400 text-xs mt-1">Lightweight, fast inference</div>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setModelData({...modelData, model_id: 'https://huggingface.co/TheBloke/phi-2-GGUF/resolve/main/phi-2.Q8_0.gguf?download=true', name: 'Phi-2 Q8_0 (3GB)'})}
+                          className="w-full text-left text-xs border border-cyan-400 p-2 hover:bg-cyan-900/20 rounded text-cyan-300"
+                        >
+                          <div className="font-semibold">Phi-2 Q8_0 (3GB)</div>
+                          <div className="text-gray-400 text-xs mt-1">Higher quality, more VRAM needed</div>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -262,6 +288,36 @@ export default function ModelBuilderWizard({ onComplete, onCancel }) {
                       />
                       Enable Tensor Sharding
                     </label>
+                  </div>
+
+                  <div className="border-t border-gray-700 pt-4">
+                    <label className="text-cyan-400 text-sm font-semibold block mb-2">TRAINING DATASET (OPTIONAL)</label>
+                    <Select value={modelData.dataset_source} onValueChange={(val) => setModelData({...modelData, dataset_source: val})}>
+                      <SelectTrigger className="border-cyan-400">
+                        <SelectValue placeholder="Select or skip" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={null}>None</SelectItem>
+                        <SelectItem value="ultrachat_200k">UltraChat 200K</SelectItem>
+                        <SelectItem value="llama3.2-1b">Llama 3.2 1B (1.5GB)</SelectItem>
+                        <SelectItem value="llama3.2-3b">Llama 3.2 3B (766MB)</SelectItem>
+                        <SelectItem value="magpie-dpo">Magpie Pro DPO (171MB)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="text-xs text-gray-400 mt-2 space-y-1">
+                      {modelData.dataset_source === 'ultrachat_200k' && (
+                        <div>📦 HuggingFaceH4/ultrachat_200k</div>
+                      )}
+                      {modelData.dataset_source === 'llama3.2-1b' && (
+                        <div>📦 HuggingFaceH4/Llama-3.2-1B-Instruct-best-of-N-completions</div>
+                      )}
+                      {modelData.dataset_source === 'llama3.2-3b' && (
+                        <div>📦 HuggingFaceH4/Llama-3.2-3B-Instruct-best-of-N-completions</div>
+                      )}
+                      {modelData.dataset_source === 'magpie-dpo' && (
+                        <div>📦 HuggingFaceH4/Magpie-Pro-DPO-100K-v0.1-Prompts</div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
