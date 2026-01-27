@@ -115,7 +115,45 @@ ollama pull gpt-oss:120b-cloud
 # Set API key for cloud access
 export OLLAMA_API_KEY=your_api_key`}
                   </pre>
-                  <div className="text-xs text-slate-400 mt-3 mb-2">JavaScript Usage:</div>
+                  <div className="text-xs text-slate-400 mt-3 mb-2">Available Cloud Models:</div>
+                  <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                    <div className="bg-slate-900 p-2 rounded">
+                      <div className="text-blue-400 font-semibold mb-1">Frontier</div>
+                      <div className="text-slate-300 space-y-0.5">
+                        <div>deepseek-v3.1:671b-cloud</div>
+                        <div>kimi-k2:1t-cloud</div>
+                      </div>
+                    </div>
+                    <div className="bg-slate-900 p-2 rounded">
+                      <div className="text-blue-400 font-semibold mb-1">GPT-OSS</div>
+                      <div className="text-slate-300 space-y-0.5">
+                        <div>gpt-oss:120b-cloud</div>
+                        <div>gpt-oss:20b-cloud</div>
+                      </div>
+                    </div>
+                    <div className="bg-slate-900 p-2 rounded">
+                      <div className="text-blue-400 font-semibold mb-1">Qwen</div>
+                      <div className="text-slate-300 space-y-0.5">
+                        <div>qwen3-coder:480b-cloud</div>
+                        <div>qwen3-vl:235b-cloud</div>
+                      </div>
+                    </div>
+                    <div className="bg-slate-900 p-2 rounded">
+                      <div className="text-blue-400 font-semibold mb-1">GLM</div>
+                      <div className="text-slate-300 space-y-0.5">
+                        <div>glm-4.6:cloud</div>
+                        <div>glm-4.7:cloud</div>
+                      </div>
+                    </div>
+                    <div className="bg-slate-900 p-2 rounded col-span-2">
+                      <div className="text-blue-400 font-semibold mb-1">Other</div>
+                      <div className="text-slate-300 space-y-0.5">
+                        <div>minimax-m2.1:cloud</div>
+                        <div>gemini-3-flash-preview:cloud</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-xs text-slate-400 mb-2">JavaScript Usage:</div>
                   <pre className="text-xs text-slate-300 font-mono bg-slate-900 p-3 rounded overflow-x-auto">
 {`import { Ollama } from "ollama";
 
