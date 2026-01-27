@@ -100,10 +100,21 @@ Format: Return a JSON array of suggestions, each with "command" and "description
             const scaffoldData = JSON.parse(prompt);
             
             systemPrompt = `You are a project scaffolding assistant. Generate a comprehensive project setup plan based on user requirements.
+
+Consider the project type and generate appropriate structure:
+- Web App: React/Vue components, routing, state management
+- Mobile App: React Native screens, navigation, native modules
+- Desktop App: Electron main/renderer processes, IPC, native integrations
+- API/Microservice: Route handlers, middleware, controllers
+
+Include state management setup (Zustand, Redux Toolkit, etc.) if specified.
+Include styling configuration (Tailwind, Styled Components, CSS Modules) if specified.
+Include testing framework setup (Vitest, Jest, Playwright) with sample tests if specified.
+
 Return a JSON structure with:
-- files: array of files to create with their content
+- files: array of files to create with their content (include config files for state management, styling, testing)
 - env_variables: array of required environment variables
-- dependencies: array of packages to install
+- dependencies: array of packages to install (including state management, styling, testing libraries)
 - setup_steps: array of setup instructions
 - database_schema: if database is needed, provide schema
 - routes: API/WebSocket routes if needed`;
