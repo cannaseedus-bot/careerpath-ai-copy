@@ -13,7 +13,7 @@ export default function Home() {
         <div className="border-2 border-green-400 bg-black">
           <div className="bg-green-400 text-black px-4 py-1 flex justify-between items-center">
             <span className="font-bold">CLI.MX2LM.COM</span>
-            <span className="text-xs">[ root@nexus ~ ]</span>
+            <span className="text-xs">[ root@mx2lm ~ ]</span>
           </div>
           <div className="p-6 space-y-4">
             <div className="text-green-400">
@@ -21,11 +21,11 @@ export default function Home() {
             </div>
             <div className="ml-4 space-y-2">
               <div>╔════════════════════════════════════════════════════════════╗</div>
-              <div>║  Nexus Studio - Hugging Face Model Management Playground  ║</div>
+              <div>║  MX2LM Studio - Hugging Face Model Management Playground  ║</div>
               <div>║  v2.0 | Powered by Phi-3, Gemma, DeepSeek                ║</div>
               <div>╚════════════════════════════════════════════════════════════╝</div>
               <div className="mt-4 text-blue-400">
-                Welcome to Nexus Studio. Configure, manage, and deploy 
+                Welcome to MX2LM Studio. Configure, manage, and deploy 
                 <br />quantized AI models with a unified command-line interface.
               </div>
             </div>
@@ -41,23 +41,23 @@ export default function Home() {
           </div>
           <div className="p-6 space-y-3">
             <Link to={createPageUrl("ModelManager")} className="block hover:bg-green-900/30 p-3 transition">
-              <div className="text-cyan-400">$ nexus models --list</div>
+              <div className="text-cyan-400">$ mx2lm models --list</div>
               <div className="text-green-400 text-sm ml-4">Manage Hugging Face models and quantization settings</div>
             </Link>
             <Link to={createPageUrl("APIManager")} className="block hover:bg-green-900/30 p-3 transition">
-              <div className="text-cyan-400">$ nexus endpoints --configure</div>
+              <div className="text-cyan-400">$ mx2lm endpoints --configure</div>
               <div className="text-green-400 text-sm ml-4">Set up API endpoints and runtime connections</div>
             </Link>
             <Link to={createPageUrl("CLIPlayground")} className="block hover:bg-green-900/30 p-3 transition">
-              <div className="text-cyan-400">$ nexus playground --test</div>
+              <div className="text-cyan-400">$ mx2lm playground --test</div>
               <div className="text-green-400 text-sm ml-4">Test models and generate CLI configurations</div>
             </Link>
             <Link to={createPageUrl("CLIEditor")} className="block hover:bg-green-900/30 p-3 transition">
-              <div className="text-cyan-400">$ nexus cli --personalize</div>
+              <div className="text-cyan-400">$ mx2lm cli --personalize</div>
               <div className="text-green-400 text-sm ml-4">Create custom CLI with your preferred models</div>
             </Link>
             <Link to={createPageUrl("Monitoring")} className="block hover:bg-green-900/30 p-3 transition">
-              <div className="text-cyan-400">$ nexus monitor --dashboard</div>
+              <div className="text-cyan-400">$ mx2lm monitor --dashboard</div>
               <div className="text-green-400 text-sm ml-4">Track performance metrics and system health</div>
             </Link>
           </div>
@@ -97,9 +97,9 @@ export default function Home() {
           <span className="font-bold">INSTALLATION</span>
         </div>
         <div className="p-6 space-y-3 text-magenta-400">
-          <div><span className="text-yellow-400">$</span> npm install -g nexus-cli</div>
-          <div><span className="text-yellow-400">$</span> nexus init --config</div>
-          <div><span className="text-yellow-400">$</span> nexus models --add phi-3-mini</div>
+          <div><span className="text-yellow-400">$</span> npm install -g mx2lm-cli</div>
+          <div><span className="text-yellow-400">$</span> mx2lm init --config</div>
+          <div><span className="text-yellow-400">$</span> mx2lm models --add phi-3-mini</div>
           <div className="text-gray-500 text-sm mt-2"># Ready to deploy your first model</div>
         </div>
       </div>
@@ -121,7 +121,7 @@ export default function Home() {
       {/* Footer */}
       <div className="max-w-5xl mx-auto text-center border-t-2 border-green-400 pt-6">
         <div className="text-green-400 font-mono text-sm space-y-1">
-          <div>Nexus Studio v2.0 | CLI.MX2LM.COM</div>
+          <div>MX2LM Studio v2.0 | CLI.MX2LM.COM</div>
           <div className="text-gray-600">
             <Link to={createPageUrl("Pricing")} className="text-cyan-400 hover:underline">
               View Pricing
