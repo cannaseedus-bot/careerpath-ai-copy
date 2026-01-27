@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Cpu, Zap, Activity, TrendingUp, Binary } from "lucide-react";
 import { toast } from "sonner";
+import CSSControlsMonitor from "../brain/CSSControlsMonitor";
+import TensorShapeVisualizer from "../brain/TensorShapeVisualizer";
+import NGramPatternVisualizer from "../brain/NGramPatternVisualizer";
 
 export default function CompressionInferenceEngine() {
   const [inputData, setInputData] = useState('The quick brown fox jumps over the lazy dog');
@@ -174,6 +177,21 @@ export default function CompressionInferenceEngine() {
           </div>
         </div>
       </Card>
+
+      {/* Real-time CSS Controls Monitor */}
+      {compressionResult?.css_controls && (
+        <CSSControlsMonitor cssControls={compressionResult.css_controls} />
+      )}
+
+      {/* Tensor Shape Visualization */}
+      {compressionResult?.tensor && (
+        <TensorShapeVisualizer tensorData={compressionResult.tensor} />
+      )}
+
+      {/* N-Gram Pattern Visualization */}
+      {compressionResult?.ngrams && (
+        <NGramPatternVisualizer ngramData={compressionResult.ngrams} />
+      )}
 
       {/* Results Display */}
       {compressionResult && (
