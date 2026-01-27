@@ -97,9 +97,10 @@ export default function Home() {
           <span className="font-bold">INSTALLATION</span>
         </div>
         <div className="p-6 space-y-3 text-magenta-400">
-          <div><span className="text-yellow-400">$</span> npm install -g mx2lm-cli</div>
+          <div><span className="text-yellow-400">$</span> npm install -g @mx2lm/cli</div>
           <div><span className="text-yellow-400">$</span> mx2lm init --config</div>
           <div><span className="text-yellow-400">$</span> mx2lm models --add phi-3-mini</div>
+          <div><span className="text-yellow-400">$</span> mx2lm quantize --method awq --bits 4</div>
           <div className="text-gray-500 text-sm mt-2"># Ready to deploy your first model</div>
         </div>
       </div>

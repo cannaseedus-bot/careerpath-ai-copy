@@ -180,17 +180,20 @@ ${input}
           </CardHeader>
           <CardContent>
             <div className="bg-slate-900 rounded-lg p-4 font-mono text-sm text-slate-300">
-              <div className="text-slate-400 mb-2"># Install CLI from npm:</div>
-              <div className="text-green-400">npm install -g your-cli-tool</div>
+              <div className="text-slate-400 mb-2"># Install MX2LM CLI from npm:</div>
+              <div className="text-green-400">npm install -g @mx2lm/cli</div>
               
               <div className="text-slate-400 mt-4 mb-2"># Or clone from GitHub:</div>
-              <div className="text-green-400">git clone https://github.com/your/repo.git</div>
+              <div className="text-green-400">git clone https://github.com/cannaseedus-bot/MX2LM.git</div>
               
               <div className="text-slate-400 mt-4 mb-2"># Configure with generated config:</div>
-              <div className="text-green-400">cli-tool config --file model-config.json</div>
+              <div className="text-green-400">mx2lm config --file model-config.json</div>
               
               <div className="text-slate-400 mt-4 mb-2"># Run with selected model:</div>
-              <div className="text-green-400">cli-tool run --model phi-3-mini-q4</div>
+              <div className="text-green-400">mx2lm run --model phi-3-mini-q4</div>
+              
+              <div className="text-slate-400 mt-4 mb-2"># Batch quantize models:</div>
+              <div className="text-green-400">mx2lm quantize --batch --method gptq --bits 4</div>
             </div>
           </CardContent>
         </Card>
