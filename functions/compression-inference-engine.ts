@@ -29,6 +29,12 @@ Deno.serve(async (req) => {
             case 'generate_css':
                 result = await generateCSSControls(data);
                 break;
+            case 'save_model':
+                result = await saveTrainedModel(base44, data);
+                break;
+            case 'load_model':
+                result = await loadTrainedModel(base44, parameters.model_id);
+                break;
             default:
                 return Response.json({ error: 'Unknown operation' }, { status: 400 });
         }
@@ -111,19 +117,23 @@ async function trainCompressionModel(base44, trainingData, parameters = {}) {
     const {
         epochs = 10,
         batch_size = 32,
-        learning_rate = 0.01
+        learning_rate = 0.01,
+        model_name = 'scxq2-model',
+        save_model = false
     } = parameters;
     
     const trainingMetrics = {
         epochs: [],
         loss: [],
-        efficiency: []
+        efficiency: [],
+        compression_ratios: []
     };
     
     // Training loop
     for (let epoch = 0; epoch < epochs; epoch++) {
         let epochLoss = 0;
         let epochEfficiency = 0;
+        let epochCompressionRatio = 0;
         
         // Process batches
         const batches = Math.ceil(trainingData.length / batch_size);
@@ -141,24 +151,98 @@ async function trainCompressionModel(base44, trainingData, parameters = {}) {
                 const loss = 1 - (compressed.metrics.efficiency / 100);
                 epochLoss += loss;
                 epochEfficiency += compressed.metrics.efficiency;
+                epochCompressionRatio += parseFloat(compressed.metrics.compression_ratio);
             }
         }
         
         // Average metrics for epoch
         const avgLoss = epochLoss / trainingData.length;
         const avgEfficiency = epochEfficiency / trainingData.length;
+        const avgCompressionRatio = epochCompressionRatio / trainingData.length;
         
         trainingMetrics.epochs.push(epoch + 1);
         trainingMetrics.loss.push(avgLoss);
         trainingMetrics.efficiency.push(avgEfficiency);
+        trainingMetrics.compression_ratios.push(avgCompressionRatio);
+    }
+    
+    const finalEfficiency = trainingMetrics.efficiency[trainingMetrics.efficiency.length - 1];
+    const convergence = trainingMetrics.loss[0] - trainingMetrics.loss[trainingMetrics.loss.length - 1];
+    
+    const modelData = {
+        model: model_name,
+        training_metrics: trainingMetrics,
+        final_efficiency: finalEfficiency,
+        convergence,
+        training_config: {
+            epochs,
+            batch_size,
+            learning_rate,
+            dataset_size: trainingData.length
+        }
+    };
+    
+    // Save model if requested
+    if (save_model) {
+        await saveTrainedModel(base44, {
+            name: model_name,
+            model_type: 'scxq2',
+            training_config: modelData.training_config,
+            training_metrics: trainingMetrics,
+            final_efficiency: finalEfficiency,
+            convergence_score: convergence,
+            model_weights: {
+                intensity: parameters.intensity || 0.941,
+                ngram_size: parameters.ngram_size || 3
+            },
+            dataset_info: {
+                size: trainingData.length,
+                samples: trainingData.slice(0, 3)
+            },
+            status: 'completed'
+        });
     }
     
     return {
         success: true,
-        model: 'compression-calculus-v1',
-        training_metrics: trainingMetrics,
-        final_efficiency: trainingMetrics.efficiency[trainingMetrics.efficiency.length - 1],
-        convergence: trainingMetrics.loss[0] - trainingMetrics.loss[trainingMetrics.loss.length - 1]
+        ...modelData
+    };
+}
+
+// SAVE TRAINED MODEL
+async function saveTrainedModel(base44, modelData) {
+    const model = await base44.entities.CompressionModel.create({
+        name: modelData.name,
+        version: `v${Date.now()}`,
+        model_type: modelData.model_type || 'scxq2',
+        training_config: modelData.training_config,
+        training_metrics: modelData.training_metrics,
+        final_efficiency: modelData.final_efficiency,
+        convergence_score: modelData.convergence_score,
+        model_weights: modelData.model_weights,
+        dataset_info: modelData.dataset_info,
+        status: modelData.status || 'completed',
+        is_active: false
+    });
+    
+    return {
+        success: true,
+        model_id: model.id,
+        message: 'Model saved successfully'
+    };
+}
+
+// LOAD TRAINED MODEL
+async function loadTrainedModel(base44, modelId) {
+    const model = await base44.entities.CompressionModel.filter({ id: modelId });
+    
+    if (!model || model.length === 0) {
+        return { success: false, error: 'Model not found' };
+    }
+    
+    return {
+        success: true,
+        model: model[0]
     };
 }
 
