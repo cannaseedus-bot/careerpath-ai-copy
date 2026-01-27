@@ -107,15 +107,10 @@ export default function APIManager() {
                   <pre className="text-xs text-slate-300 font-mono bg-slate-900 p-3 rounded overflow-x-auto">
 {`import { Ollama } from "ollama";
 
-const ollama = new Ollama({
-  host: "https://ollama.com",
-  headers: {
-    Authorization: "Bearer " + process.env.OLLAMA_API_KEY,
-  },
-});
+const ollama = new Ollama();
 
 const response = await ollama.chat({
-  model: "gpt-oss:120b",
+  model: "gpt-oss:120b-cloud",
   messages: [{ role: "user", content: "Explain quantum computing" }],
   stream: true,
 });
