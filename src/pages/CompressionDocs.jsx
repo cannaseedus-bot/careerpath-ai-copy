@@ -28,6 +28,7 @@ export default function CompressionDocs() {
             <TabsTrigger value="folds">Folds</TabsTrigger>
             <TabsTrigger value="micronauts">Micronauts</TabsTrigger>
             <TabsTrigger value="patterns">Patterns</TabsTrigger>
+            <TabsTrigger value="brans">Brans</TabsTrigger>
             <TabsTrigger value="examples">Examples</TabsTrigger>
           </TabsList>
 
@@ -197,6 +198,78 @@ export default function CompressionDocs() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </Card>
+          </TabsContent>
+
+          {/* Brans */}
+          <TabsContent value="brans" className="space-y-4">
+            <Card className="bg-slate-900 border-2 border-orange-400 p-6">
+              <h2 className="text-2xl text-orange-400 mb-4 flex items-center gap-2">
+                <Zap className="w-6 h-6" />
+                Brans: N-Gram Data Execution
+              </h2>
+
+              <div className="space-y-4">
+                <div className="bg-black p-4 rounded border border-orange-400">
+                  <div className="text-yellow-400 mb-2">Paradigm Shift:</div>
+                  <div className="text-gray-300 space-y-2">
+                    <p>Brans (Brain Constellation Access Nodes) replace traditional databases with compressed n-gram execution.</p>
+                    <ul className="list-disc list-inside text-sm space-y-1">
+                      <li>Data compressed to n-grams for AI recall</li>
+                      <li>GraphQL-style mapping delivers compressed data</li>
+                      <li>Execution-ready without separate DB system</li>
+                      <li>Session-based or persistent compression modes</li>
+                      <li>Network and database replaced by compression folds</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-black p-4 rounded border border-orange-400">
+                  <div className="text-yellow-400 mb-2">Bran Query Example:</div>
+                  <pre className="text-xs text-green-400 overflow-auto">
+{`{
+  Bot {
+    name
+    bot_type
+    status
+  }
+  Micronaut {
+    name
+    type
+    assigned_folds
+  }
+}`}</pre>
+                  <div className="text-gray-400 text-xs mt-2">
+                    → Mapped to n-gram compressed data<br/>
+                    → Executed via compression folds<br/>
+                    → No traditional database queries
+                  </div>
+                </div>
+
+                <div className="bg-black p-4 rounded border border-orange-400">
+                  <div className="text-yellow-400 mb-2">Execution Modes:</div>
+                  <div className="space-y-2 text-xs">
+                    <div className="text-gray-300">
+                      <span className="text-cyan-400">session-based:</span> Ephemeral data for current session
+                    </div>
+                    <div className="text-gray-300">
+                      <span className="text-purple-400">persistent-compressed:</span> Recalled across sessions via n-grams
+                    </div>
+                    <div className="text-gray-300">
+                      <span className="text-green-400">ephemeral-execution:</span> Decompress, execute, discard
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-black p-4 rounded border border-orange-400">
+                  <div className="text-yellow-400 mb-2">Compression Folds:</div>
+                  <pre className="text-xs text-green-400 overflow-auto">
+{`⟁NGRAM_DATA_FOLD⟁ - N-gram compressed data
+⟁BRAN_EXECUTION_FOLD⟁ - Execution context
+⟁DATA_FOLD⟁ - Entity compression
+⟁TENSOR_FOLD⟁ - Tensor n-grams`}</pre>
+                </div>
               </div>
             </Card>
           </TabsContent>

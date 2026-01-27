@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Zap, Activity, Cpu, Database, Code } from "lucide-react";
 import { toast } from "sonner";
+import NGramDataVisualizer from "./NGramDataVisualizer";
 
 export default function MicronautDashboard() {
   const [command, setCommand] = useState('');
@@ -52,6 +53,9 @@ export default function MicronautDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* N-Gram Data Visualizer */}
+      <NGramDataVisualizer />
+
       {/* LLM Command Interface */}
       <div className="border-2 border-purple-400 bg-black">
         <div className="bg-purple-400 text-black px-4 py-1 font-bold">
