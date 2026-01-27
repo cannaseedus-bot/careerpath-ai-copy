@@ -103,10 +103,14 @@ export default function APIManager() {
             <CardContent>
               {formData.endpoint_type === "ollama" && (
                 <div className="mb-4 p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
-                  <div className="text-sm text-blue-300 font-semibold mb-2">Ollama Integration Example:</div>
+                  <div className="text-sm text-blue-300 font-semibold mb-2">Ollama Cloud API Integration:</div>
+                  <div className="text-xs text-slate-400 mb-3">
+                    For cloud access, set <code className="bg-slate-800 px-1 py-0.5 rounded">OLLAMA_API_KEY</code> environment variable
+                  </div>
                   <pre className="text-xs text-slate-300 font-mono bg-slate-900 p-3 rounded overflow-x-auto">
 {`import { Ollama } from "ollama";
 
+// Cloud API access (requires OLLAMA_API_KEY)
 const ollama = new Ollama();
 
 const response = await ollama.chat({
@@ -117,7 +121,10 @@ const response = await ollama.chat({
 
 for await (const part of response) {
   process.stdout.write(part.message.content);
-}`}
+}
+
+// List available models
+// curl https://ollama.com/api/tags`}
                   </pre>
                 </div>
               )}
