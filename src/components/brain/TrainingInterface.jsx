@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { TrendingUp, Play, Save, Database, Activity } from "lucide-react";
 import { toast } from "sonner";
 import TrainingProgressChart from "./TrainingProgressChart";
+import ModelManagement from "./ModelManagement";
 
 export default function TrainingInterface() {
   const queryClient = useQueryClient();
@@ -260,8 +261,11 @@ export default function TrainingInterface() {
         <TrainingProgressChart trainingData={trainingProgress} />
       )}
 
-      {/* Saved Models */}
-      <Card className="bg-slate-900 border-2 border-green-400">
+      {/* Model Management */}
+      <ModelManagement />
+
+      {/* Legacy Saved Models View (keeping for backwards compat) */}
+      <Card className="bg-slate-900 border-2 border-green-400 hidden">
         <div className="p-4">
           <div className="flex items-center gap-2 mb-4">
             <Save className="w-5 h-5 text-green-400" />

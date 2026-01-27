@@ -35,6 +35,15 @@ Deno.serve(async (req) => {
             case 'load_model':
                 result = await loadTrainedModel(base44, parameters.model_id);
                 break;
+            case 'delete_model':
+                result = await deleteModel(base44, parameters.model_id);
+                break;
+            case 'export_model':
+                result = await exportModel(base44, parameters.model_id);
+                break;
+            case 'compare_models':
+                result = await compareModels(base44, parameters.model_ids);
+                break;
             default:
                 return Response.json({ error: 'Unknown operation' }, { status: 400 });
         }
@@ -243,6 +252,88 @@ async function loadTrainedModel(base44, modelId) {
     return {
         success: true,
         model: model[0]
+    };
+}
+
+// DELETE MODEL
+async function deleteModel(base44, modelId) {
+    await base44.entities.CompressionModel.delete(modelId);
+    
+    return {
+        success: true,
+        message: 'Model deleted successfully'
+    };
+}
+
+// EXPORT MODEL
+async function exportModel(base44, modelId) {
+    const models = await base44.entities.CompressionModel.filter({ id: modelId });
+    
+    if (!models || models.length === 0) {
+        return { success: false, error: 'Model not found' };
+    }
+    
+    const model = models[0];
+    
+    // Create exportable package
+    const exportPackage = {
+        metadata: {
+            name: model.name,
+            version: model.version,
+            model_type: model.model_type,
+            exported_at: new Date().toISOString(),
+            final_efficiency: model.final_efficiency,
+            convergence_score: model.convergence_score
+        },
+        model_weights: model.model_weights,
+        training_config: model.training_config,
+        compression_dictionary: {
+            ngram_size: model.model_weights.ngram_size,
+            intensity: model.model_weights.intensity
+        },
+        usage_instructions: {
+            inference: "Use model_weights parameters for compression operations",
+            ngram_extraction: `Extract n-grams with size ${model.model_weights.ngram_size}`,
+            compression_intensity: `Apply compression with intensity ${model.model_weights.intensity}`
+        }
+    };
+    
+    return {
+        success: true,
+        export_package: exportPackage,
+        download_name: `${model.name}-${model.version}.json`
+    };
+}
+
+// COMPARE MODELS
+async function compareModels(base44, modelIds) {
+    const models = await base44.entities.CompressionModel.list();
+    const selectedModels = models.filter(m => modelIds.includes(m.id));
+    
+    if (selectedModels.length === 0) {
+        return { success: false, error: 'No models found' };
+    }
+    
+    const comparison = {
+        models: selectedModels.map(m => ({
+            id: m.id,
+            name: m.name,
+            version: m.version,
+            final_efficiency: m.final_efficiency,
+            convergence_score: m.convergence_score,
+            epochs: m.training_config?.epochs,
+            batch_size: m.training_config?.batch_size,
+            dataset_size: m.training_config?.dataset_size,
+            created_date: m.created_date
+        })),
+        best_efficiency: Math.max(...selectedModels.map(m => m.final_efficiency || 0)),
+        best_convergence: Math.max(...selectedModels.map(m => m.convergence_score || 0)),
+        avg_efficiency: selectedModels.reduce((sum, m) => sum + (m.final_efficiency || 0), 0) / selectedModels.length
+    };
+    
+    return {
+        success: true,
+        comparison
     };
 }
 
