@@ -8,15 +8,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bot, Plus, Play, Pause, Trash2, Network, Database, Globe, Cpu, Zap, AlertCircle, Sparkles } from "lucide-react";
+import { Bot, Plus, Play, Pause, Trash2, Network, Database, Globe, Cpu, Zap, AlertCircle, Sparkles, Rocket } from "lucide-react";
 import { toast } from "sonner";
 import BotTemplates from "@/components/bots/BotTemplates";
 import AIAssistant from "@/components/bots/AIAssistant";
+import DeploymentManager from "@/components/bots/DeploymentManager";
 
 export default function BotOrchestrator() {
   const [showForm, setShowForm] = useState(false);
   const [editingBot, setEditingBot] = useState(null);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [selectedBotForDeployment, setSelectedBotForDeployment] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     bot_type: "custom",
@@ -181,8 +183,21 @@ export default function BotOrchestrator() {
           </div>
         )}
 
+        {/* Deployment Manager */}
+        {selectedBotForDeployment && (
+          <div className="mb-6">
+            <DeploymentManager bot={selectedBotForDeployment} />
+            <button
+              onClick={() => setSelectedBotForDeployment(null)}
+              className="mt-3 border-2 border-red-400 text-red-400 px-4 py-2 hover:bg-red-900/30 transition w-full"
+            >
+              CLOSE_DEPLOYMENT_MANAGER
+            </button>
+          </div>
+        )}
+
         {/* Bot Templates */}
-        {!showForm && (
+        {!showForm && !selectedBotForDeployment && (
           <BotTemplates onSelectTemplate={handleTemplateSelect} />
         )}
 
@@ -325,6 +340,13 @@ export default function BotOrchestrator() {
                           {bot.status === "running" ? "PAUSE" : "START"}
                         </button>
                         <button
+                          onClick={() => setSelectedBotForDeployment(bot)}
+                          className="border-2 border-cyan-400 text-cyan-400 px-3 py-1 hover:bg-cyan-900/30 transition flex items-center gap-2"
+                        >
+                          <Rocket className="w-4 h-4" />
+                          DEPLOY
+                        </button>
+                        <button
                           onClick={() => handleEdit(bot)}
                           className="border-2 border-yellow-400 text-yellow-400 px-3 py-1 hover:bg-yellow-900/30 transition"
                         >
@@ -379,6 +401,13 @@ export default function BotOrchestrator() {
                           className="flex-1 border border-green-400 text-green-400 px-2 py-1 hover:bg-green-900/30 transition text-xs"
                         >
                           {bot.status === "running" ? "PAUSE" : "START"}
+                        </button>
+                        <button
+                          onClick={() => setSelectedBotForDeployment(bot)}
+                          className="border border-cyan-400 text-cyan-400 px-2 py-1 hover:bg-cyan-900/30 transition text-xs"
+                          title="Deploy"
+                        >
+                          <Rocket className="w-3 h-3" />
                         </button>
                         <button
                           onClick={() => handleEdit(bot)}
