@@ -8,11 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Edit, Power, PowerOff, Cpu, Code, Zap, Layers } from "lucide-react";
+import { toast } from "sonner";
 import BatchQuantizationDialog from "@/components/models/BatchQuantizationDialog";
+import ModelBuilderWizard from "@/components/bots/ModelBuilderWizard";
 
 export default function ModelManager() {
   const [showForm, setShowForm] = useState(false);
   const [showBatchDialog, setShowBatchDialog] = useState(false);
+  const [showWizard, setShowWizard] = useState(false);
   const [editingModel, setEditingModel] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -131,6 +134,10 @@ export default function ModelManager() {
                   <Layers className="w-4 h-4 inline mr-2" />
                   BATCH
                 </button>
+                <button onClick={() => setShowWizard(true)} className="border-2 border-cyan-400 text-cyan-400 px-4 py-2 hover:bg-cyan-900/30 transition font-bold">
+                  <Zap className="w-4 h-4 inline mr-2" />
+                  BUILD_MODEL
+                </button>
                 <button onClick={() => setShowForm(!showForm)} className="bg-green-400 text-black px-4 py-2 hover:bg-green-300 transition font-bold">
                   <Plus className="w-4 h-4 inline mr-2" />
                   ADD_MODEL
@@ -139,6 +146,19 @@ export default function ModelManager() {
             </div>
           </div>
         </div>
+
+        {showWizard && (
+          <div className="mb-8">
+            <ModelBuilderWizard
+              onComplete={(modelData) => {
+                createMutation.mutate(modelData);
+                setShowWizard(false);
+                toast.success("Model created via wizard");
+              }}
+              onCancel={() => setShowWizard(false)}
+            />
+          </div>
+        )}
 
         {showForm && (
           <Card className="mb-8 bg-slate-800 border-slate-700">
