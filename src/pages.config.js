@@ -9,6 +9,10 @@ import Nemesis from './pages/Nemesis';
 import Pricing from './pages/Pricing';
 import SWOT from './pages/SWOT';
 import Success from './pages/Success';
+import IDEIntegrations from './pages/IDEIntegrations';
+import CIPipelines from './pages/CIPipelines';
+import Extensions from './pages/Extensions';
+import Commands from './pages/Commands';
 import __Layout from './Layout.jsx';
 
 
@@ -24,6 +28,10 @@ export const PAGES = {
     "Pricing": Pricing,
     "SWOT": SWOT,
     "Success": Success,
+    "IDEIntegrations": IDEIntegrations,
+    "CIPipelines": CIPipelines,
+    "Extensions": Extensions,
+    "Commands": Commands,
 }
 
 export const pagesConfig = {
