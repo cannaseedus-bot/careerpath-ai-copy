@@ -11,6 +11,7 @@ import HFModelsPanel from "@/components/runtime/HFModelsPanel";
 import ClusterSelector from "@/components/shared/ClusterSelector";
 import WidgetTray from "@/components/runtime/WidgetTray";
 import WidgetModal from "@/components/runtime/WidgetModal";
+import AIAssistant from "@/components/bots/AIAssistant";
 import { Zap, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -58,6 +59,7 @@ if __name__ == "__main__":
   const [remoteApiUrl, setRemoteApiUrl] = useState(null);
   const [selectedCluster, setSelectedCluster] = useState(null);
   const [activeWidget, setActiveWidget] = useState(null);
+  const [showAITooltip, setShowAITooltip] = useState(true);
 
   const handleRunScript = async (code) => {
     setIsRunning(true);
@@ -251,8 +253,28 @@ if __name__ == "__main__":
         <RemoteRuntimeConfig onConnect={setRemoteApiUrl} />
       </WidgetModal>
 
+      <WidgetModal
+        isOpen={activeWidget === "ai-assistant"}
+        title="AI Studio Assistant"
+        onClose={() => {
+          setActiveWidget(null);
+          setShowAITooltip(false);
+        }}
+      >
+        <AIAssistant
+          botType="runtime-script"
+          currentScript={scriptCode}
+          currentConfig={{ envVars, selectedCluster }}
+          onApplySuggestion={setScriptCode}
+        />
+      </WidgetModal>
+
       {/* Widget Tray */}
-      <WidgetTray activeWidget={activeWidget} onWidgetClick={setActiveWidget} />
+      <WidgetTray 
+        activeWidget={activeWidget} 
+        onWidgetClick={setActiveWidget}
+        showTooltip={showAITooltip}
+      />
 
       {/* Info Bar */}
       <div className="border-t border-cyan-400 bg-slate-900 p-3 text-xs text-gray-400">
