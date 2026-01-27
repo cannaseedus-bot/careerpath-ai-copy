@@ -21,9 +21,10 @@ import BotCreationWizard from "@/components/bots/BotCreationWizard";
 import DeploymentWizard from "@/components/bots/DeploymentWizard";
 import OptimizationWizard from "@/components/bots/OptimizationWizard";
 import TemplateWizard from "@/components/bots/TemplateWizard";
+import ModelBuilderWizard from "@/components/bots/ModelBuilderWizard";
 
 export default function BotOrchestrator() {
-  const [activeView, setActiveView] = useState('dashboard'); // dashboard, create, deploy, optimize, template
+  const [activeView, setActiveView] = useState('dashboard'); // dashboard, create, deploy, optimize, template, model
   const [editingBot, setEditingBot] = useState(null);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [selectedBot, setSelectedBot] = useState(null);
@@ -328,6 +329,19 @@ export default function BotOrchestrator() {
                 }}
               />
             )}
+          </div>
+        )}
+
+        {/* Model Builder View */}
+        {activeView === 'model' && (
+          <div className="mb-6">
+            <ModelBuilderWizard
+              onComplete={(modelData) => {
+                toast.success('Model configuration saved');
+                setActiveView('dashboard');
+              }}
+              onCancel={() => setActiveView('dashboard')}
+            />
           </div>
         )}
 
