@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Terminal, Settings, Database, Cpu, Sparkles } from "lucide-react";
+import { Terminal, Settings, Database, Cpu, Sparkles, Code } from "lucide-react";
 
 const widgets = [
   { id: "env-vars", label: "Environment", icon: Database, color: "text-yellow-400" },
   { id: "hf-models", label: "Models", icon: Cpu, color: "text-blue-400" },
   { id: "remote-config", label: "Runtime", icon: Settings, color: "text-green-400" },
-  { id: "ai-assistant", label: "AI Assistant", icon: Sparkles, color: "text-purple-400" }
+  { id: "ai-assistant", label: "AI Assistant", icon: Sparkles, color: "text-purple-400" },
+  { id: "code-generator", label: "Code Generator", icon: Code, color: "text-cyan-400" }
 ];
 
 export default function WidgetTray({ activeWidget, onWidgetClick, showTooltip = false }) {
