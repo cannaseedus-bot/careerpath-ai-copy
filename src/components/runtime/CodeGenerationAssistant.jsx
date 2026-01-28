@@ -14,6 +14,7 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
   const [result, setResult] = useState(null);
   const [includeTests, setIncludeTests] = useState(true);
   const [includeMicronaut, setIncludeMicronaut] = useState(true);
+  const [generationType, setGenerationType] = useState('standard');
 
   const handleGenerate = async () => {
     if (!description.trim()) {
@@ -27,7 +28,8 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
         description,
         codeContext: currentCode,
         includeTests,
-        includeMicronaut
+        includeMicronaut,
+        generationType
       });
 
       if (response.success) {
@@ -74,34 +76,57 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
 
       {/* Input Section */}
       <div className="p-4 border-b border-slate-700 space-y-3">
+        <div>
+          <label className="text-xs text-gray-400 mb-1 block">Generation Type</label>
+          <select
+            value={generationType}
+            onChange={(e) => setGenerationType(e.target.value)}
+            className="w-full bg-black border border-slate-700 rounded px-2 py-2 text-sm text-cyan-400"
+          >
+            <option value="standard">Standard Module</option>
+            <option value="micronaut_service">Micronaut Service</option>
+            <option value="micronaut_entity">Micronaut Entity</option>
+            <option value="api_documentation">API Documentation</option>
+            <option value="data_model">Data Model/Schema</option>
+          </select>
+        </div>
+
         <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Describe what you want to build...&#10;&#10;Example: 'Create a data validation module that checks CSV files for missing values, duplicates, and type mismatches. It should support custom validation rules and generate detailed reports.'"
+          placeholder={
+            generationType === 'micronaut_service' ? "Describe the Micronaut service...&#10;&#10;Example: 'Create a μ-vector-ctrl service that manages CSS control vectors for runtime optimization.'" :
+            generationType === 'micronaut_entity' ? "Describe the entity...&#10;&#10;Example: 'Create an entity for tracking bot deployments with version, status, and cluster info.'" :
+            generationType === 'api_documentation' ? "Describe the API or paste controller code...&#10;&#10;Example: 'Generate OpenAPI docs for a bot orchestration API with endpoints for create, list, execute.'" :
+            generationType === 'data_model' ? "Describe the data model...&#10;&#10;Example: 'Create a User model with profile info, roles, and audit fields.'" :
+            "Describe what you want to build...&#10;&#10;Example: 'Create a data validation module that checks CSV files for missing values, duplicates, and type mismatches.'"
+          }
           className="min-h-32 bg-black border-slate-700 text-cyan-400 placeholder:text-gray-600"
           disabled={generating}
         />
 
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={includeTests}
-              onChange={(e) => setIncludeTests(e.target.checked)}
-              className="rounded"
-            />
-            Include Tests
-          </label>
-          <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={includeMicronaut}
-              onChange={(e) => setIncludeMicronaut(e.target.checked)}
-              className="rounded"
-            />
-            Include Micronaut
-          </label>
-        </div>
+        {generationType === 'standard' && (
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={includeTests}
+                onChange={(e) => setIncludeTests(e.target.checked)}
+                className="rounded"
+              />
+              Include Tests
+            </label>
+            <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={includeMicronaut}
+                onChange={(e) => setIncludeMicronaut(e.target.checked)}
+                className="rounded"
+              />
+              Include Micronaut
+            </label>
+          </div>
+        )}
 
         <Button
           onClick={handleGenerate}
@@ -185,26 +210,29 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
 
             {/* Code Tabs */}
             <Tabs defaultValue="main" className="w-full">
-              <TabsList className="bg-slate-800 w-full">
-                <TabsTrigger value="main" className="flex-1">
+              <TabsList className="bg-slate-800 w-full grid grid-cols-4">
+                <TabsTrigger value="main">
                   <Code className="w-3 h-3 mr-1" />
-                  Main Code
+                  {result.type === 'micronaut_entity' ? 'Schema' : 'Code'}
                 </TabsTrigger>
-                {result.tests && (
-                  <TabsTrigger value="tests" className="flex-1">
-                    <TestTube className="w-3 h-3 mr-1" />
-                    Tests
+                {(result.tests || result.entity_schema || result.json_schema) && (
+                  <TabsTrigger value="secondary">
+                    {result.type === 'micronaut_service' ? 'Entity' : 
+                     result.type === 'data_model' ? 'JSON Schema' : 'Tests'}
                   </TabsTrigger>
                 )}
-                {result.micronaut && (
-                  <TabsTrigger value="micronaut" className="flex-1">
-                    <Zap className="w-3 h-3 mr-1" />
-                    Micronaut
+                {(result.micronaut || result.openapi || result.sql_schema) && (
+                  <TabsTrigger value="tertiary">
+                    {result.type === 'api_documentation' ? 'OpenAPI' :
+                     result.type === 'data_model' ? 'SQL' : 'Micronaut'}
                   </TabsTrigger>
                 )}
-                <TabsTrigger value="usage" className="flex-1">
-                  Usage
-                </TabsTrigger>
+                {(result.usage_example || result.markdown || result.typescript_interface) && (
+                  <TabsTrigger value="extra">
+                    {result.type === 'api_documentation' ? 'Markdown' :
+                     result.type === 'data_model' ? 'TypeScript' : 'Usage'}
+                  </TabsTrigger>
+                )}
               </TabsList>
 
               <TabsContent value="main" className="mt-2">
@@ -214,37 +242,39 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => copyToClipboard(result.code)}
+                        onClick={() => copyToClipboard(result.code || result.schema)}
                         className="border-slate-600 text-cyan-400"
                       >
                         <Copy className="w-3 h-3 mr-1" />
                         Copy
                       </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => applyToEditor(result.code)}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        <Zap className="w-3 h-3 mr-1" />
-                        Apply to Editor
-                      </Button>
+                      {result.code && (
+                        <Button
+                          size="sm"
+                          onClick={() => applyToEditor(result.code)}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          <Zap className="w-3 h-3 mr-1" />
+                          Apply to Editor
+                        </Button>
+                      )}
                     </div>
                     <pre className="p-4 overflow-x-auto text-xs text-cyan-300 max-h-96">
-                      {result.code}
+                      {result.code || result.schema || result.openapi}
                     </pre>
                   </CardContent>
                 </Card>
               </TabsContent>
 
-              {result.tests && (
-                <TabsContent value="tests" className="mt-2">
+              {(result.entity_schema || result.tests || result.json_schema) && (
+                <TabsContent value="secondary" className="mt-2">
                   <Card className="bg-slate-900 border-slate-700">
                     <CardContent className="p-0">
                       <div className="flex items-center justify-end gap-2 p-2 border-b border-slate-700">
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => copyToClipboard(result.tests)}
+                          onClick={() => copyToClipboard(result.entity_schema || result.tests || result.json_schema)}
                           className="border-slate-600 text-cyan-400"
                         >
                           <Copy className="w-3 h-3 mr-1" />
@@ -252,22 +282,22 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
                         </Button>
                       </div>
                       <pre className="p-4 overflow-x-auto text-xs text-cyan-300 max-h-96">
-                        {result.tests}
+                        {result.entity_schema || result.tests || result.json_schema}
                       </pre>
                     </CardContent>
                   </Card>
                 </TabsContent>
               )}
 
-              {result.micronaut && (
-                <TabsContent value="micronaut" className="mt-2">
+              {(result.micronaut || result.openapi || result.sql_schema) && (
+                <TabsContent value="tertiary" className="mt-2">
                   <Card className="bg-slate-900 border-slate-700">
                     <CardContent className="p-0">
                       <div className="flex items-center justify-end gap-2 p-2 border-b border-slate-700">
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => copyToClipboard(result.micronaut)}
+                          onClick={() => copyToClipboard(result.micronaut || result.openapi || result.sql_schema)}
                           className="border-slate-600 text-cyan-400"
                         >
                           <Copy className="w-3 h-3 mr-1" />
@@ -275,31 +305,37 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
                         </Button>
                       </div>
                       <pre className="p-4 overflow-x-auto text-xs text-cyan-300 max-h-96">
-                        {result.micronaut}
+                        {result.micronaut || result.openapi || result.sql_schema}
                       </pre>
                     </CardContent>
                   </Card>
                 </TabsContent>
               )}
 
-              <TabsContent value="usage" className="mt-2">
-                <Card className="bg-slate-900 border-slate-700">
-                  <CardHeader>
-                    <CardTitle className="text-sm text-gray-400">How to Use</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <pre className="text-xs text-gray-300 whitespace-pre-wrap">
-                      {result.usage_example}
-                    </pre>
-                    {result.explanation && (
-                      <div className="mt-3 pt-3 border-t border-slate-700">
-                        <p className="text-xs text-gray-400">{result.explanation}</p>
+              {(result.usage_example || result.markdown || result.typescript_interface) && (
+                <TabsContent value="extra" className="mt-2">
+                  <Card className="bg-slate-900 border-slate-700">
+                    <CardContent className="p-0">
+                      <div className="flex items-center justify-end gap-2 p-2 border-b border-slate-700">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => copyToClipboard(result.usage_example || result.markdown || result.typescript_interface)}
+                          className="border-slate-600 text-cyan-400"
+                        >
+                          <Copy className="w-3 h-3 mr-1" />
+                          Copy
+                        </Button>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+                      <pre className="p-4 overflow-x-auto text-xs text-cyan-300 max-h-96 whitespace-pre-wrap">
+                        {result.usage_example || result.markdown || result.typescript_interface}
+                      </pre>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              )}
+
+
           </div>
         )}
 
