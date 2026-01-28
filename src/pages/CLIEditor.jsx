@@ -23,7 +23,7 @@ import json
 import subprocess
 
 # SDK Imports (install via pip)
-# pip install anthropic google-generativeai ollama transformers powershell-utils
+# pip install anthropic google-generativeai ollama transformers powershell-utils requests
 
 # ═══════════════════════════════════════════════════════════════
 # AI PROVIDER INITIALIZATION
@@ -44,6 +44,37 @@ def init_ollama():
     """Initialize Ollama for local models"""
     import ollama
     return ollama
+
+def init_ollama_cloud():
+    """Initialize Ollama Cloud API for remote models (gpt-oss, etc.)"""
+    from ollama import Ollama
+    return Ollama(
+        host="https://ollama.com",
+        headers={"Authorization": "Bearer " + os.getenv("OLLAMA_API_KEY", "")}
+    )
+
+async def ollama_cloud_chat(prompt, model="gpt-oss:120b", stream=True):
+    """Chat with Ollama Cloud models"""
+    client = init_ollama_cloud()
+    response = await client.chat(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        stream=stream
+    )
+    if stream:
+        result = ""
+        async for part in response:
+            result += part.message.content
+            print(part.message.content, end="", flush=True)
+        return result
+    return response.message.content
+
+def ollama_cloud_list_models():
+    """List available Ollama Cloud models"""
+    import requests
+    headers = {"Authorization": "Bearer " + os.getenv("OLLAMA_API_KEY", "")}
+    response = requests.get("https://ollama.com/api/tags", headers=headers)
+    return response.json() if response.ok else None
 
 def init_local_phi3():
     """Initialize local phi-3-instruct with WebGPU/browser inference"""
@@ -154,7 +185,7 @@ def ps_get_file_hash(filepath, algorithm='SHA256'):
 def main():
     print("╔════════════════════════════════════════════════════════════╗")
     print("║  MX2LM CLI v2.0 - Multi-Provider AI Interface              ║")
-    print("║  Providers: Claude | Gemini | Ollama | phi-3               ║")
+    print("║  Providers: Claude | Gemini | Ollama Cloud | phi-3          ║")
     print("║  PowerShell: XCFE-PS-ENVELOPE Governed Execution           ║")
     print("╚════════════════════════════════════════════════════════════╝")
     
@@ -181,6 +212,7 @@ export default function CLIEditor() {
     { key: "ANTHROPIC_API_KEY", value: "", description: "Claude SDK" },
     { key: "GEMINI_API_KEY", value: "", description: "Google Gemini" },
     { key: "OLLAMA_HOST", value: "http://localhost:11434", description: "Ollama Local" },
+    { key: "OLLAMA_API_KEY", value: "", description: "Ollama Cloud API" },
     { key: "PS_AUDIT_ENABLED", value: "true", description: "PowerShell CM-1 Audit" },
     { key: "PS_STRICT_MODE", value: "true", description: "PS Denylist Enforcement" }
   ]);
@@ -374,7 +406,7 @@ export default function CLIEditor() {
               <Server className="w-5 h-5 text-green-400" />
               <div>
                 <div className="text-white text-sm font-semibold">Ollama</div>
-                <div className="text-xs text-green-400">Local Models</div>
+                <div className="text-xs text-green-400">Local + Cloud</div>
               </div>
             </CardContent>
           </Card>
