@@ -74,10 +74,10 @@ export default function CareerPage() {
             </div>
             <div className="ml-4 space-y-2">
               <div className="text-3xl md:text-4xl font-bold text-white">Michael Pickett, Jr</div>
-              <div className="text-xl text-cyan-400">Visual Designer & Strategist</div>
+              <div className="text-xl text-cyan-400">Full Stack Developer</div>
               <div className="mt-4 flex flex-wrap gap-3 text-sm">
-                <Badge className="bg-purple-600"><Target className="w-3 h-3 mr-1" /> Luxury Brands</Badge>
-                <Badge className="bg-blue-600"><Globe className="w-3 h-3 mr-1" /> Vancouver, BC</Badge>
+                <Badge className="bg-purple-600"><Target className="w-3 h-3 mr-1" /> Full Stack</Badge>
+                <Badge className="bg-blue-600"><Globe className="w-3 h-3 mr-1" /> Bullhead City, AZ</Badge>
                 <Badge className="bg-green-600"><Zap className="w-3 h-3 mr-1" /> Available</Badge>
               </div>
             </div>
@@ -337,7 +337,7 @@ export default function CareerPage() {
               <div className="border-2 border-cyan-400 bg-gradient-to-r from-cyan-900/30 to-purple-900/30 p-6 text-center">
                 <div className="text-2xl font-bold text-white mb-2">Let's Connect</div>
                 <div className="text-cyan-400 font-mono mb-4">michael.pickett@email.com</div>
-                <div className="text-slate-400">Vancouver, BC • Available for opportunities</div>
+                <div className="text-slate-400">Bullhead City, AZ • Available for opportunities</div>
                 <Button className="mt-4 bg-white text-black hover:bg-gray-200">
                   <MessageCircle className="w-4 h-4 mr-2" /> Get in Touch
                 </Button>
