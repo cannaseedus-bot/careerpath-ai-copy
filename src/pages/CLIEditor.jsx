@@ -513,20 +513,73 @@ def ps_get_disks():
 
 def main():
     print("╔═══════════════════════════════════════════════════════════════╗")
-    print("║  MX2LM CLI v2.1 - KUHUL π Governed Multi-Provider Interface  ║")
-    print("║  AI: Claude | Gemini | Ollama Cloud (gpt-oss:120b) | phi-3   ║")
+    print("║  MX2LM CLI v3.0 - Hybrid Multi-Agent Framework               ║")
+    print("║  Core: @posthog/code-agent                                    ║")
+    print("║  Sub-CLIs: /claude  /gemini  /codex  /ollama  /phi3          ║")
     print("║  PS: XCFE-PS-ENVELOPE + PS-DSL v1 + CM-1 Audit Trail         ║")
     print("╚═══════════════════════════════════════════════════════════════╝")
+    print("")
+    print("  Type /agents to list available sub-CLIs")
+    print("  Type /claude, /gemini, /codex to spawn dedicated terminals")
+    print("  Type 'help' for commands, 'exit' to quit")
+    print("")
     
-    # === OLLAMA CLOUD EXAMPLE ===
-    # client = OllamaCloud()
-    # response = client.chat("Explain quantum computing", model="gpt-oss:120b")
+    agent = PostHogCodeAgent()
     
-    # === PS-DSL EXAMPLE (KUHUL-governed) ===
-    # result = ps_get_processes()
-    # if result['success']:
-    #     print(result['output'])
-    
+    while True:
+        try:
+            user_input = input("mx2lm> ").strip()
+            
+            if not user_input:
+                continue
+            
+            if user_input.lower() in ['exit', 'quit', 'q']:
+                print("[MX2LM] Goodbye!")
+                break
+            
+            if user_input.lower() in ['help', '?']:
+                print("\\nCommands:")
+                print("  /agents        - List available agent sub-CLIs")
+                print("  /claude [msg]  - Launch Claude Code CLI")
+                print("  /gemini [msg]  - Launch Gemini CLI")
+                print("  /codex [msg]   - Launch OpenAI CLI")
+                print("  /ollama [msg]  - Launch Ollama")
+                print("  /phi3 [msg]    - Run Phi-3 locally")
+                print("  /posthog       - Launch PostHog Code Agent")
+                print("  ps:[action]    - Run PowerShell (ps:process.list)")
+                print("  exit           - Quit MX2LM CLI")
+                print("")
+                continue
+            
+            if user_input.lower() == '/agents':
+                AgentRouter.list_agents()
+                continue
+            
+            # Check for agent prefix commands
+            prefix, config, remaining = AgentRouter.parse_command(user_input)
+            if prefix:
+                AgentRouter.spawn_agent(prefix, remaining)
+                continue
+            
+            # Check for PS-DSL commands
+            if user_input.startswith('ps:'):
+                action = user_input[3:].strip()
+                intent = {'@dsl': 'ps-dsl.v1', 'action': action, 'params': {}}
+                result = ps_execute_dsl(intent)
+                if result['success']:
+                    print(result['output'])
+                else:
+                    print(f"[PS-DSL] Error: {result['error']}")
+                continue
+            
+            # Default: run through PostHog agent with auto-routing
+            agent.run(user_input)
+            
+        except KeyboardInterrupt:
+            print("\\n[MX2LM] Use 'exit' to quit")
+        except Exception as e:
+            print(f"[MX2LM] Error: {e}")
+
 if __name__ == "__main__":
     main()
 `;
