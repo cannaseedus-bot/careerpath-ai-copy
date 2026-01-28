@@ -12,6 +12,7 @@ import ClusterSelector from "@/components/shared/ClusterSelector";
 import WidgetTray from "@/components/runtime/WidgetTray";
 import WidgetModal from "@/components/runtime/WidgetModal";
 import AIAssistant from "@/components/bots/AIAssistant";
+import CodeGenerationAssistant from "@/components/runtime/CodeGenerationAssistant";
 import { Zap, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -266,6 +267,17 @@ if __name__ == "__main__":
           currentScript={scriptCode}
           currentConfig={{ envVars, selectedCluster }}
           onApplySuggestion={setScriptCode}
+        />
+      </WidgetModal>
+
+      <WidgetModal
+        isOpen={activeWidget === "code-generator"}
+        title="AI Code Generator"
+        onClose={() => setActiveWidget(null)}
+      >
+        <CodeGenerationAssistant
+          onCodeGenerated={setScriptCode}
+          currentCode={scriptCode}
         />
       </WidgetModal>
 
