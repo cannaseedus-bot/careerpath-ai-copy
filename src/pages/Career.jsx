@@ -163,6 +163,24 @@ export default function CareerPage() {
     <div className="min-h-screen bg-black text-green-400 font-mono p-4">
       <div className="max-w-6xl mx-auto">
         
+        {/* Auth Controls */}
+        <div className="flex justify-end gap-2 mb-4">
+          {isAuthenticated ? (
+            <>
+              <Button size="sm" variant="outline" onClick={() => setShowWizard(true)} className="border-cyan-600 text-cyan-400 hover:bg-cyan-900/30">
+                <Edit className="w-4 h-4 mr-1" /> Edit Profile
+              </Button>
+              <Button size="sm" variant="outline" onClick={handleLogout} className="border-slate-600 text-slate-400">
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Button size="sm" onClick={handleLogin} className="bg-cyan-600 hover:bg-cyan-700">
+              <LogIn className="w-4 h-4 mr-1" /> Login to Create Your Portfolio
+            </Button>
+          )}
+        </div>
+
         {/* Terminal Header */}
         <div className="border-2 border-cyan-400 bg-black mb-6">
           <div className="bg-gradient-to-r from-cyan-500 to-purple-500 text-black px-4 py-2 flex justify-between items-center">
@@ -171,19 +189,21 @@ export default function CareerPage() {
               <span className="font-bold text-lg">CAREER TERMINAL</span>
               <Badge className="bg-black text-cyan-400">v1.0</Badge>
             </div>
-            <span className="text-xs">[ michael.pickett@career ~ ]</span>
+            <span className="text-xs">[ {profile.email || 'guest'}@career ~ ]</span>
           </div>
           <div className="p-6">
             <div className="text-cyan-400 mb-2">
               <span className="text-yellow-400">$</span> ./whoami.sh
             </div>
             <div className="ml-4 space-y-2">
-              <div className="text-3xl md:text-4xl font-bold text-white">Michael Pickett, Jr</div>
-              <div className="text-xl text-cyan-400">Full Stack Developer</div>
+              <div className="text-3xl md:text-4xl font-bold text-white">{profile.full_name}</div>
+              <div className="text-xl text-cyan-400">{profile.title}</div>
               <div className="mt-4 flex flex-wrap gap-3 text-sm">
-                <Badge className="bg-purple-600"><Target className="w-3 h-3 mr-1" /> Full Stack</Badge>
-                <Badge className="bg-blue-600"><Globe className="w-3 h-3 mr-1" /> Bullhead City, AZ</Badge>
-                <Badge className="bg-green-600"><Zap className="w-3 h-3 mr-1" /> Available</Badge>
+                <Badge className="bg-purple-600"><Target className="w-3 h-3 mr-1" /> {profile.title?.split(' ')[0] || 'Developer'}</Badge>
+                <Badge className="bg-blue-600"><Globe className="w-3 h-3 mr-1" /> {profile.location}</Badge>
+                <Badge className={profile.availability === 'available' ? 'bg-green-600' : profile.availability === 'busy' ? 'bg-orange-600' : 'bg-slate-600'}>
+                  <Zap className="w-3 h-3 mr-1" /> {profile.availability?.charAt(0).toUpperCase() + profile.availability?.slice(1) || 'Available'}
+                </Badge>
               </div>
             </div>
           </div>
@@ -197,7 +217,7 @@ export default function CareerPage() {
               <span className="text-purple-400 font-bold">MISSION STATEMENT</span>
             </div>
             <p className="text-white text-lg leading-relaxed">
-              To architect intelligent, scalable full-stack solutions that bridge multi-agent AI systems with modern web technologies, empowering developers with next-generation CLI tools and collaborative frameworks.
+              {profile.mission_statement}
             </p>
           </div>
         </div>
@@ -441,9 +461,9 @@ export default function CareerPage() {
               </div>
               <div className="border-2 border-cyan-400 bg-gradient-to-r from-cyan-900/30 to-purple-900/30 p-6 text-center">
                 <div className="text-2xl font-bold text-white mb-2">Let's Connect</div>
-                <div className="text-cyan-400 font-mono mb-4">canna.seed.usa@gmail.com</div>
-                <div className="text-slate-400">Bullhead City, AZ • Available for opportunities</div>
-                <Button className="mt-4 bg-white text-black hover:bg-gray-200">
+                <div className="text-cyan-400 font-mono mb-4">{profile.email}</div>
+                <div className="text-slate-400">{profile.location} • {profile.availability === 'available' ? 'Available for opportunities' : profile.availability}</div>
+                <Button className="mt-4 bg-white text-black hover:bg-gray-200" onClick={() => window.location.href = `mailto:${profile.email}`}>
                   <MessageCircle className="w-4 h-4 mr-2" /> Get in Touch
                 </Button>
               </div>
