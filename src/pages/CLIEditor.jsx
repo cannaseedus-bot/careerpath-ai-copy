@@ -82,11 +82,11 @@ class AgentRouter:
             'description': 'Ollama local/cloud model runner'
         },
         '/deepseek': {
-            'name': 'DeepSeek Dev v2',
-            'package': 'deepseek-dev-cli',
-            'cmd': 'python -m mx2lm.deepseek_dev_cli',
+            'name': 'DeepSeek T-UI v2',
+            'package': 'deepseek-tui',
+            'cmd': 'python -m mx2lm.deepseek_tui',
             'env_key': 'DEEPSEEK_API_KEY',
-            'description': 'DeepSeek Dev CLI v2.0 - Micro-agents + Code Analysis + Security Scanner'
+            'description': 'DeepSeek T-UI v2.0 - Sandbox containers + Prompt history + Multi-layout'
         },
         '/phi3': {
             'name': 'Phi-3 Local',
@@ -1005,7 +1005,7 @@ export default function CLIEditor() {
               <Zap className="w-5 h-5 text-emerald-400" />
               <div>
                 <div className="text-white text-sm font-semibold">DeepSeek</div>
-                <div className="text-xs text-emerald-400">Dev v2 + Agents</div>
+                <div className="text-xs text-emerald-400">T-UI v2</div>
               </div>
             </CardContent>
           </Card>
