@@ -148,13 +148,13 @@ export default function Home() {
 
         <div className="border-2 border-green-400 bg-black">
           <div className="bg-green-400 text-black px-4 py-1">
-            <span className="font-bold">⚖️ GOVERNANCE</span>
+            <span className="font-bold">👥 COLLABORATION</span>
           </div>
           <div className="p-4 space-y-2 text-sm text-green-400">
-            <div>├─ KUHUL π collapse</div>
-            <div>├─ XCFE legality gates</div>
-            <div>├─ CM-1 audit trails</div>
-            <div>└─ MX2LM-SR-1 server</div>
+            <div>├─ Multi-agent sessions</div>
+            <div>├─ Role-based review</div>
+            <div>├─ Real-time code sync</div>
+            <div>└─ WebSocket comms</div>
           </div>
         </div>
       </div>

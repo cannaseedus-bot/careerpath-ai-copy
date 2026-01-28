@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Code, Save, Download, Sparkles, Crown, Plus, Trash2, Bug, Wand2, History, GitBranch, Cpu, Globe, Server, Zap, Terminal, Shield } from "lucide-react";
+import { Code, Save, Download, Sparkles, Crown, Plus, Trash2, Bug, Wand2, History, GitBranch, Cpu, Globe, Server, Zap, Terminal, Shield, Users } from "lucide-react";
+import SessionManager from "@/components/cli/SessionManager";
 import { toast } from "sonner";
 
 const defaultScript = `#!/usr/bin/env python3
@@ -1112,6 +1113,7 @@ export default function CLIEditor() {
         <Tabs defaultValue="script" className="space-y-4">
           <TabsList className="bg-slate-800 border-slate-700 flex-wrap">
             <TabsTrigger value="script"><Code className="w-4 h-4 mr-1" />Script</TabsTrigger>
+            <TabsTrigger value="collab"><Users className="w-4 h-4 mr-1" />Collaborate</TabsTrigger>
             <TabsTrigger value="env"><Server className="w-4 h-4 mr-1" />Env Vars</TabsTrigger>
             <TabsTrigger value="models">Models</TabsTrigger>
             <TabsTrigger value="endpoints">Endpoints</TabsTrigger>
@@ -1171,6 +1173,20 @@ export default function CLIEditor() {
                     )}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="collab">
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Users className="w-5 h-5 text-cyan-400" />
+                  Real-Time Collaboration
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SessionManager />
               </CardContent>
             </Card>
           </TabsContent>
