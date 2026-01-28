@@ -18,7 +18,8 @@ import {
     Globe,
     FileText,
     Play,
-    Network
+    Network,
+    Shield
 } from "lucide-react";
 import { toast } from "sonner";
 import ProjectScaffold from "@/components/shell/ProjectScaffold";
