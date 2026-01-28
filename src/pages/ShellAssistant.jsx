@@ -347,6 +347,14 @@ export default function ShellAssistant() {
                             <Network className="w-4 h-4 mr-2" />
                             Cluster
                         </Button>
+                        <Button
+                            onClick={() => processCommand('powershell')}
+                            disabled={loading || !input.trim()}
+                            className="bg-blue-700 hover:bg-blue-800 border border-blue-500"
+                        >
+                            <Shield className="w-4 h-4 mr-2" />
+                            PowerShell
+                        </Button>
                     </div>
                     </div>
 
