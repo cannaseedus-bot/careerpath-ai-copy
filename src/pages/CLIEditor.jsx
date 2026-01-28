@@ -81,6 +81,13 @@ class AgentRouter:
             'env_key': 'OLLAMA_HOST',
             'description': 'Ollama local/cloud model runner'
         },
+        '/deepseek': {
+            'name': 'DeepSeek Enterprise',
+            'package': 'deepseek-cli',
+            'cmd': 'python -m mx2lm.deepseek_cli',
+            'env_key': 'DEEPSEEK_API_KEY',
+            'description': 'DeepSeek Enterprise CLI - modern terminal interface'
+        },
         '/phi3': {
             'name': 'Phi-3 Local',
             'package': 'transformers',
@@ -802,6 +809,7 @@ export default function CLIEditor() {
   const [envVars, setEnvVars] = useState([
     { key: "ANTHROPIC_API_KEY", value: "", description: "Claude SDK" },
     { key: "GEMINI_API_KEY", value: "", description: "Google Gemini" },
+    { key: "DEEPSEEK_API_KEY", value: "", description: "DeepSeek Enterprise" },
     { key: "OLLAMA_HOST", value: "http://localhost:11434", description: "Ollama Local" },
     { key: "OLLAMA_API_KEY", value: "", description: "Ollama Cloud API" },
     { key: "PS_AUDIT_ENABLED", value: "true", description: "PowerShell CM-1 Audit" },
@@ -957,7 +965,7 @@ export default function CLIEditor() {
                   <Badge className="bg-green-600 text-xs">Open Source SDKs</Badge>
                 </div>
                 <div className="text-slate-400 text-sm">
-                  Anthropic Claude • Google Gemini • Ollama • phi-3-instruct • PowerShell XCFE
+                  Anthropic Claude • Google Gemini • DeepSeek • Ollama • phi-3 • PowerShell XCFE
                 </div>
               </div>
               <div className="flex gap-2">
@@ -973,13 +981,13 @@ export default function CLIEditor() {
         </div>
 
         {/* SDK Quick Links */}
-        <div className="grid grid-cols-5 gap-3 mb-6">
+        <div className="grid grid-cols-6 gap-3 mb-6">
           <Card className="bg-orange-900/20 border-orange-600">
             <CardContent className="p-3 flex items-center gap-2">
               <Cpu className="w-5 h-5 text-orange-400" />
               <div>
-                <div className="text-white text-sm font-semibold">Anthropic</div>
-                <div className="text-xs text-orange-400">@anthropic-ai/sdk</div>
+                <div className="text-white text-sm font-semibold">Claude</div>
+                <div className="text-xs text-orange-400">@anthropic</div>
               </div>
             </CardContent>
           </Card>
@@ -988,7 +996,16 @@ export default function CLIEditor() {
               <Globe className="w-5 h-5 text-blue-400" />
               <div>
                 <div className="text-white text-sm font-semibold">Gemini</div>
-                <div className="text-xs text-blue-400">@google/gemini-cli</div>
+                <div className="text-xs text-blue-400">@google</div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-emerald-900/20 border-emerald-600">
+            <CardContent className="p-3 flex items-center gap-2">
+              <Zap className="w-5 h-5 text-emerald-400" />
+              <div>
+                <div className="text-white text-sm font-semibold">DeepSeek</div>
+                <div className="text-xs text-emerald-400">Enterprise</div>
               </div>
             </CardContent>
           </Card>
@@ -997,13 +1014,13 @@ export default function CLIEditor() {
               <Server className="w-5 h-5 text-green-400" />
               <div>
                 <div className="text-white text-sm font-semibold">Ollama</div>
-                <div className="text-xs text-green-400">Local + Cloud</div>
+                <div className="text-xs text-green-400">Local/Cloud</div>
               </div>
             </CardContent>
           </Card>
           <Card className="bg-purple-900/20 border-purple-600">
             <CardContent className="p-3 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-purple-400" />
+              <Cpu className="w-5 h-5 text-purple-400" />
               <div>
                 <div className="text-white text-sm font-semibold">phi-3</div>
                 <div className="text-xs text-purple-400">WebGPU</div>
@@ -1014,8 +1031,8 @@ export default function CLIEditor() {
             <CardContent className="p-3 flex items-center gap-2">
               <Terminal className="w-5 h-5 text-cyan-400" />
               <div>
-                <div className="text-white text-sm font-semibold">PowerShell</div>
-                <div className="text-xs text-cyan-400">XCFE-PS</div>
+                <div className="text-white text-sm font-semibold">PS-DSL</div>
+                <div className="text-xs text-cyan-400">XCFE</div>
               </div>
             </CardContent>
           </Card>
