@@ -740,7 +740,7 @@ export default function CLIEditor() {
             <div className="flex items-center gap-3">
               <Zap className="w-5 h-5" />
               <span className="font-bold text-lg">MX2LM CLI EDITOR</span>
-              <Badge className="bg-black text-cyan-400">v2.0</Badge>
+              <Badge className="bg-black text-cyan-400">v3.0</Badge>
             </div>
             <span className="text-xs">[ @posthog/code-agent • /claude • /gemini • /codex • /ollama ]</span>
           </div>
