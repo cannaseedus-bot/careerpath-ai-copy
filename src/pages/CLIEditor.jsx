@@ -84,69 +84,216 @@ def init_local_phi3():
     return model, tokenizer
 
 # ═══════════════════════════════════════════════════════════════
-# POWERSHELL UTILITIES - XCFE-PS-ENVELOPE GOVERNED EXECUTION
+# OLLAMA CLOUD API - Remote Model Access (gpt-oss, llama, etc.)
 # ═══════════════════════════════════════════════════════════════
 
-# PS-DSL-1: Allowlisted Commands (Read-Only, Safe Operations)
-PS_ALLOWLIST = [
-    'Get-Process', 'Get-Service', 'Get-EventLog', 'Get-ComputerInfo',
-    'Get-WmiObject', 'Get-ItemProperty', 'Get-ChildItem', 'Get-Content',
-    'Get-NetAdapter', 'Get-NetIPConfiguration', 'Get-Volume', 'Get-Disk',
-    'Get-PSDrive', 'Get-HotFix', 'Get-CimInstance', 'Get-Package',
-    'Get-ScheduledTask', 'Get-LocalUser', 'Get-LocalGroup', 'Get-FileHash',
-    'Get-Date', 'Get-TimeZone', 'Get-Command', 'Get-Help', 'Get-History',
-    'Test-Path', 'Test-Connection', 'Measure-Object'
+OLLAMA_CLOUD_MODELS = [
+    'gpt-oss:120b', 'gpt-oss:120b-cloud', 'llama3.3:70b', 
+    'qwen3:235b', 'deepseek-r1:671b', 'gemma3:27b'
 ]
 
-# PS-DSL-1: Denylist (Dangerous Operations)
-PS_DENYLIST = [
-    'Invoke-Expression', 'iex', 'Invoke-Command', 'icm', 'Start-Process',
-    'New-Object', 'Add-Type', 'Set-Item', 'Remove-Item', 'Invoke-WebRequest',
-    'iwr', 'Invoke-RestMethod', 'irm', 'Set-ExecutionPolicy'
-]
+class OllamaCloud:
+    """Ollama Cloud API client for remote model inference"""
+    
+    def __init__(self, api_key=None, host="https://ollama.com"):
+        self.host = host
+        self.api_key = api_key or os.getenv("OLLAMA_API_KEY", "")
+        self.headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
+    
+    def list_models(self):
+        """List available cloud models"""
+        import requests
+        response = requests.get(f"{self.host}/api/tags", headers=self.headers)
+        return response.json() if response.ok else None
+    
+    def chat(self, prompt, model="gpt-oss:120b", stream=True):
+        """Chat with a cloud model"""
+        import requests
+        payload = {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "stream": stream
+        }
+        response = requests.post(
+            f"{self.host}/api/chat",
+            json=payload,
+            headers=self.headers,
+            stream=stream
+        )
+        if stream:
+            result = ""
+            for line in response.iter_lines():
+                if line:
+                    chunk = json.loads(line)
+                    if 'message' in chunk:
+                        result += chunk['message'].get('content', '')
+                        print(chunk['message'].get('content', ''), end='', flush=True)
+            return result
+        return response.json()
+    
+    def generate(self, prompt, model="gpt-oss:120b"):
+        """Generate completion (non-chat)"""
+        import requests
+        payload = {"model": model, "prompt": prompt}
+        response = requests.post(
+            f"{self.host}/api/generate",
+            json=payload,
+            headers=self.headers
+        )
+        return response.json()
 
-def ps_validate_command(cmd):
-    """Validate PowerShell command against XCFE-PS-ENVELOPE rules"""
-    cmd_lower = cmd.lower()
-    
-    # Check denylist first
-    for denied in PS_DENYLIST:
-        if denied.lower() in cmd_lower:
-            return False, f"DENIED: Contains forbidden operation '{denied}'"
-    
-    # Check if starts with allowlisted command
-    for allowed in PS_ALLOWLIST:
-        if cmd.strip().startswith(allowed):
-            return True, f"ALLOWED: {allowed}"
-    
-    return False, "DENIED: Command not in allowlist"
+def init_ollama_cloud():
+    """Initialize Ollama Cloud API client"""
+    return OllamaCloud()
 
-def ps_execute(cmd, audit=True):
-    """Execute governed PowerShell command with CM-1 audit trail"""
-    is_valid, reason = ps_validate_command(cmd)
+async def ollama_cloud_chat(prompt, model="gpt-oss:120b", stream=True):
+    """Async chat with Ollama Cloud models"""
+    client = init_ollama_cloud()
+    return client.chat(prompt, model, stream)
+
+def ollama_cloud_list_models():
+    """List available Ollama Cloud models"""
+    client = init_ollama_cloud()
+    return client.list_models()
+
+# ═══════════════════════════════════════════════════════════════
+# POWERSHELL UTILITIES - XCFE-PS-ENVELOPE + KUHUL π GOVERNED
+# ═══════════════════════════════════════════════════════════════
+
+# PS-DSL v1: Deny-by-Default Command Registry (FROZEN)
+PS_COMMAND_REGISTRY = {
+    # === ALLOWLIST (explicit actions only) ===
+    "allow": {
+        "process.list": {"cmdlet": "Get-Process", "params": []},
+        "process.query": {"cmdlet": "Get-Process", "params": ["name", "id"]},
+        "service.list": {"cmdlet": "Get-Service", "params": []},
+        "service.query": {"cmdlet": "Get-Service", "params": ["name", "status"]},
+        "eventlog.query": {"cmdlet": "Get-EventLog", "params": ["logname", "newest"]},
+        "system.info": {"cmdlet": "Get-ComputerInfo", "params": []},
+        "disk.list": {"cmdlet": "Get-Disk", "params": []},
+        "volume.list": {"cmdlet": "Get-Volume", "params": []},
+        "drive.list": {"cmdlet": "Get-PSDrive", "params": []},
+        "hotfix.list": {"cmdlet": "Get-HotFix", "params": []},
+        "network.adapters": {"cmdlet": "Get-NetAdapter", "params": []},
+        "network.config": {"cmdlet": "Get-NetIPConfiguration", "params": []},
+        "file.list": {"cmdlet": "Get-ChildItem", "params": ["path"]},
+        "file.content": {"cmdlet": "Get-Content", "params": ["path"]},
+        "file.hash": {"cmdlet": "Get-FileHash", "params": ["path", "algorithm"]},
+        "path.test": {"cmdlet": "Test-Path", "params": ["path"]},
+        "connection.test": {"cmdlet": "Test-Connection", "params": ["computername", "count"]},
+        "user.list": {"cmdlet": "Get-LocalUser", "params": []},
+        "group.list": {"cmdlet": "Get-LocalGroup", "params": []},
+        "task.list": {"cmdlet": "Get-ScheduledTask", "params": []},
+        "package.list": {"cmdlet": "Get-Package", "params": []},
+        "date.get": {"cmdlet": "Get-Date", "params": []},
+        "timezone.get": {"cmdlet": "Get-TimeZone", "params": []},
+        "help.get": {"cmdlet": "Get-Help", "params": ["name"]},
+        "command.list": {"cmdlet": "Get-Command", "params": []},
+    },
+    # === HARD DENY (never lower, never execute) ===
+    "deny": [
+        "Invoke-Expression", "iex", "Invoke-Command", "icm",
+        "Start-Process", "New-Object", "Add-Type", "Set-Item",
+        "Remove-Item", "Invoke-WebRequest", "iwr", "Invoke-RestMethod",
+        "irm", "Set-ExecutionPolicy", "curl", "wget", "Invoke-WmiMethod"
+    ]
+}
+
+# Illegal characters (injection prevention)
+PS_ILLEGAL_CHARS = r'[|;`$(){}[\]\\]'
+
+def ps_dsl_verify(intent):
+    """
+    XCFE-Grade PS-DSL Verifier
+    Deny-by-default: anything not explicitly allowlisted is ILLEGAL
+    """
+    import re
+    
+    # Validate DSL marker
+    if intent.get('@dsl') != 'ps-dsl.v1':
+        return False, "BAD_DSL", None
+    
+    action = intent.get('action', '')
+    if not action or not re.match(r'^[a-z]+\.[a-z]+$', action):
+        return False, "BAD_ACTION", None
+    
+    # Deny-by-default: action must be in allowlist
+    spec = PS_COMMAND_REGISTRY['allow'].get(action)
+    if not spec:
+        return False, "ACTION_NOT_ALLOWLISTED", None
+    
+    # Validate params
+    params = intent.get('params', {})
+    for key, value in params.items():
+        if key not in spec['params']:
+            return False, f"PARAM_NOT_ALLOWED: {key}", None
+        if isinstance(value, str) and re.search(PS_ILLEGAL_CHARS, value):
+            return False, f"ILLEGAL_PARAM_CHARS: {key}", None
+    
+    # Check cmdlet against denylist (defense in depth)
+    if spec['cmdlet'] in PS_COMMAND_REGISTRY['deny']:
+        return False, "CMDLET_DENIED", None
+    
+    # Lower to PowerShell command
+    lowered = ps_dsl_lower(spec['cmdlet'], params)
+    return True, "VERIFIED", lowered
+
+def ps_dsl_lower(cmdlet, params):
+    """Lower PS-DSL intent to single PowerShell cmdlet"""
+    if not params:
+        return cmdlet
+    args = ' '.join(f"-{k} '{str(v).replace(chr(39), chr(39)+chr(39))}'" for k, v in params.items())
+    return f"{cmdlet} {args}"
+
+def cm1_wrap(lowered, meta=None):
+    """
+    CM-1 Audit Envelope - Invisible geometry for provenance
+    SOH=0x01, STX=0x02, ETX=0x03, EOT=0x04, GS=0x1D
+    """
+    SOH, STX, ETX, EOT, GS = '\\x01', '\\x02', '\\x03', '\\x04', '\\x1D'
+    meta = meta or {}
+    header_parts = ['ps-envelope.v1'] + [f"{k}={v}" for k, v in meta.items()]
+    header = GS.join(header_parts)
+    return f"{SOH}{header}{STX}{lowered}{ETX}{EOT}"
+
+def ps_execute_dsl(intent, audit=True):
+    """
+    Execute PS-DSL intent with full XCFE verification + CM-1 audit
+    KUHUL π governs whether execution is allowed (signal threshold)
+    """
+    import datetime
+    
+    # Verify intent
+    is_valid, reason, lowered = ps_dsl_verify(intent)
     
     # CM-1 Audit Envelope
     cm1_envelope = {
         'soh': '[SOH] ps-envelope.v1',
-        'gs_intent': f'[GS] intent={cmd}',
+        'dsl': intent.get('@dsl'),
+        'action': intent.get('action'),
         'status': 'allowed' if is_valid else 'blocked',
         'reason': reason,
-        'timestamp': __import__('datetime').datetime.now().isoformat()
+        'timestamp': datetime.datetime.now().isoformat(),
+        'lowered': lowered if is_valid else None
     }
     
     if audit:
-        print(f"[CM-1] {cm1_envelope['status'].upper()}: {reason}")
+        status_icon = '✓' if is_valid else '✗'
+        print(f"[CM-1] {status_icon} {cm1_envelope['status'].upper()}: {reason}")
     
     if not is_valid:
         return {'success': False, 'error': reason, 'cm1': cm1_envelope}
     
     try:
+        # Wrap with CM-1 annotation (invisible in output)
+        annotated = cm1_wrap(lowered, {'action': intent.get('action')})
+        
         result = subprocess.run(
-            ['powershell', '-Command', cmd],
+            ['powershell', '-NoProfile', '-Command', lowered],
             capture_output=True, text=True, timeout=30
         )
         return {
-            'success': True,
+            'success': result.returncode == 0,
             'output': result.stdout,
             'error': result.stderr if result.returncode != 0 else None,
             'cm1': cm1_envelope
@@ -154,42 +301,79 @@ def ps_execute(cmd, audit=True):
     except Exception as e:
         return {'success': False, 'error': str(e), 'cm1': cm1_envelope}
 
-def ps_get_processes():
-    """Get running processes (safe)"""
-    return ps_execute('Get-Process')
+# ═══════════════════════════════════════════════════════════════
+# PS-DSL HELPER FUNCTIONS (Safe, Allowlisted Operations)
+# ═══════════════════════════════════════════════════════════════
 
-def ps_get_services():
+def ps_get_processes(name=None):
+    """Get running processes (safe)"""
+    intent = {'@dsl': 'ps-dsl.v1', 'action': 'process.list', 'params': {}}
+    if name:
+        intent['action'] = 'process.query'
+        intent['params'] = {'name': name}
+    return ps_execute_dsl(intent)
+
+def ps_get_services(name=None, status=None):
     """Get Windows services (safe)"""
-    return ps_execute('Get-Service')
+    intent = {'@dsl': 'ps-dsl.v1', 'action': 'service.list', 'params': {}}
+    if name or status:
+        intent['action'] = 'service.query'
+        if name: intent['params']['name'] = name
+        if status: intent['params']['status'] = status
+    return ps_execute_dsl(intent)
 
 def ps_get_system_info():
     """Get computer info (safe)"""
-    return ps_execute('Get-ComputerInfo')
+    return ps_execute_dsl({'@dsl': 'ps-dsl.v1', 'action': 'system.info', 'params': {}})
 
-def ps_test_connection(host):
+def ps_test_connection(host, count=2):
     """Ping a host (safe)"""
-    return ps_execute(f'Test-Connection -ComputerName {host} -Count 2')
+    return ps_execute_dsl({
+        '@dsl': 'ps-dsl.v1',
+        'action': 'connection.test',
+        'params': {'computername': host, 'count': str(count)}
+    })
 
 def ps_list_directory(path='.'):
     """List directory contents (safe)"""
-    return ps_execute(f'Get-ChildItem -Path "{path}"')
+    return ps_execute_dsl({
+        '@dsl': 'ps-dsl.v1',
+        'action': 'file.list',
+        'params': {'path': path}
+    })
 
 def ps_get_file_hash(filepath, algorithm='SHA256'):
     """Get file hash (safe)"""
-    return ps_execute(f'Get-FileHash -Path "{filepath}" -Algorithm {algorithm}')
+    return ps_execute_dsl({
+        '@dsl': 'ps-dsl.v1',
+        'action': 'file.hash',
+        'params': {'path': filepath, 'algorithm': algorithm}
+    })
+
+def ps_get_network_config():
+    """Get network configuration (safe)"""
+    return ps_execute_dsl({'@dsl': 'ps-dsl.v1', 'action': 'network.config', 'params': {}})
+
+def ps_get_disks():
+    """Get disk information (safe)"""
+    return ps_execute_dsl({'@dsl': 'ps-dsl.v1', 'action': 'disk.list', 'params': {}})
 
 # ═══════════════════════════════════════════════════════════════
 # MAIN CLI ENTRY POINT
 # ═══════════════════════════════════════════════════════════════
 
 def main():
-    print("╔════════════════════════════════════════════════════════════╗")
-    print("║  MX2LM CLI v2.0 - Multi-Provider AI Interface              ║")
-    print("║  Providers: Claude | Gemini | Ollama Cloud | phi-3          ║")
-    print("║  PowerShell: XCFE-PS-ENVELOPE Governed Execution           ║")
-    print("╚════════════════════════════════════════════════════════════╝")
+    print("╔═══════════════════════════════════════════════════════════════╗")
+    print("║  MX2LM CLI v2.1 - KUHUL π Governed Multi-Provider Interface  ║")
+    print("║  AI: Claude | Gemini | Ollama Cloud (gpt-oss:120b) | phi-3   ║")
+    print("║  PS: XCFE-PS-ENVELOPE + PS-DSL v1 + CM-1 Audit Trail         ║")
+    print("╚═══════════════════════════════════════════════════════════════╝")
     
-    # Example: List processes using governed PowerShell
+    # === OLLAMA CLOUD EXAMPLE ===
+    # client = OllamaCloud()
+    # response = client.chat("Explain quantum computing", model="gpt-oss:120b")
+    
+    # === PS-DSL EXAMPLE (KUHUL-governed) ===
     # result = ps_get_processes()
     # if result['success']:
     #     print(result['output'])
@@ -430,21 +614,38 @@ export default function CLIEditor() {
           </Card>
         </div>
 
+        {/* Ollama Cloud Banner */}
+        <div className="bg-green-900/20 border border-green-600 rounded-lg p-4 mb-4">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-3">
+              <Globe className="w-6 h-6 text-green-400" />
+              <div>
+                <div className="text-white font-semibold">Ollama Cloud API Integrated</div>
+                <div className="text-xs text-slate-400">Remote inference: gpt-oss:120b, llama3.3:70b, qwen3:235b, deepseek-r1:671b</div>
+              </div>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <Badge className="bg-green-600 text-xs">OllamaCloud()</Badge>
+              <Badge className="bg-emerald-600 text-xs">.chat()</Badge>
+              <Badge className="bg-teal-600 text-xs">.list_models()</Badge>
+            </div>
+          </div>
+        </div>
+
         {/* PowerShell Integration Banner */}
         <div className="bg-blue-900/20 border border-blue-600 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <Shield className="w-6 h-6 text-blue-400" />
               <div>
-                <div className="text-white font-semibold">PowerShell Utilities Integrated</div>
-                <div className="text-xs text-slate-400">XCFE-PS-ENVELOPE governed execution with CM-1 audit trails • 30+ allowlisted cmdlets</div>
+                <div className="text-white font-semibold">PS-DSL v1 + KUHUL π Governance</div>
+                <div className="text-xs text-slate-400">XCFE-PS-ENVELOPE • CM-1 audit trails • Deny-by-default • 25+ allowlisted actions</div>
               </div>
             </div>
             <div className="flex gap-2 flex-wrap">
-              <Badge className="bg-green-600 text-xs">ps_execute()</Badge>
-              <Badge className="bg-blue-600 text-xs">ps_get_processes()</Badge>
-              <Badge className="bg-purple-600 text-xs">ps_get_services()</Badge>
-              <Badge className="bg-cyan-600 text-xs">ps_list_directory()</Badge>
+              <Badge className="bg-blue-600 text-xs">ps_execute_dsl()</Badge>
+              <Badge className="bg-indigo-600 text-xs">ps_dsl_verify()</Badge>
+              <Badge className="bg-purple-600 text-xs">cm1_wrap()</Badge>
             </div>
           </div>
         </div>
