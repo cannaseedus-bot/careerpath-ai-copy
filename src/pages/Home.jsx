@@ -21,16 +21,16 @@ export default function Home() {
             </div>
             <div className="ml-4 space-y-2">
               <div>╔════════════════════════════════════════════════════════════╗</div>
-              <div>║  MX2LM Studio - Hugging Face Model Management Playground  ║</div>
-              <div>║  v2.0 | Powered by Phi-3, Gemma, DeepSeek                ║</div>
+              <div>║  MX2LM Studio v3.0 - Hybrid Multi-Agent Framework         ║</div>
+              <div>║  Core: @posthog/code-agent • KUHUL π Governed             ║</div>
               <div>╚════════════════════════════════════════════════════════════╝</div>
               <div className="mt-4 text-blue-400">
-                Welcome to MX2LM Studio. Configure, manage, and deploy 
-                <br />quantized AI models with a unified command-line interface.
+                Unified CLI orchestrating Claude, Gemini, Codex, Ollama & phi-3
+                <br />with XCFE security, CM-1 audit trails, and π-governed server runtime.
               </div>
               <div className="mt-4 text-purple-400 flex items-center gap-2">
                 <Zap className="w-4 h-4" />
-                Powered by Claude 3.5 Sonnet Agent SDK
+                Sub-CLIs: /claude  /gemini  /codex  /ollama  /phi3
               </div>
             </div>
           </div>
@@ -40,8 +40,8 @@ export default function Home() {
         <div className="border-2 border-cyan-400 bg-gradient-to-r from-cyan-900/30 to-purple-900/30 mt-6">
           <div className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
-              <div className="text-cyan-400 text-xl font-bold mb-1">⚡ Get MX2LM CLI — Ready to Go</div>
-              <div className="text-slate-400 text-sm">Pre-configured with Anthropic, Gemini, Ollama & phi-3 support. No setup required.</div>
+              <div className="text-cyan-400 text-xl font-bold mb-1">⚡ MX2LM CLI v3.0 — Hybrid Multi-Agent</div>
+              <div className="text-slate-400 text-sm">@posthog/code-agent core with KUHUL π governance & MX2LM-SR-1 server runtime.</div>
             </div>
             <a 
               href="https://github.com/anthropics/anthropic-cookbook/archive/refs/heads/main.zip"
@@ -49,15 +49,15 @@ export default function Home() {
               className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-6 py-3 flex items-center gap-2 transition-all"
             >
               <Download className="w-5 h-5" />
-              Download CLI v2.0
+              Download CLI v3.0
             </a>
           </div>
           <div className="border-t border-cyan-800 px-6 py-3 text-xs text-slate-500 flex flex-wrap gap-4">
-            <span>✓ Anthropic Claude SDK</span>
-            <span>✓ Google Gemini CLI</span>
-            <span>✓ Ollama Local Models</span>
-            <span>✓ phi-3-instruct WebGPU</span>
-            <span>✓ SCXQ2 Compression</span>
+            <span>✓ /claude /gemini /codex</span>
+            <span>✓ /ollama /phi3</span>
+            <span>✓ KUHUL π Decay</span>
+            <span>✓ XCFE Legality</span>
+            <span>✓ CM-1 Audit</span>
           </div>
         </div>
       </div>
@@ -121,53 +121,53 @@ export default function Home() {
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <div className="border-2 border-cyan-400 bg-black">
           <div className="bg-cyan-400 text-black px-4 py-1">
-            <span className="font-bold">XJSON RUNTIME</span>
+            <span className="font-bold">MX2LM-SR-1 SERVER</span>
           </div>
           <div className="p-4 space-y-2 text-sm text-cyan-400">
-            <div>├─ Phase law: @Pop → @Wo → @Sek → @Collapse</div>
-            <div>├─ SVG-3D tensor schemas</div>
-            <div>├─ SCXQ2 delta compression</div>
-            <div>└─ Distributed cluster nodes</div>
+            <div>├─ localhost:4141 (read-only)</div>
+            <div>├─ WS status streaming</div>
+            <div>├─ π decay auto-restart</div>
+            <div>└─ CLI-launched, KUHUL-governed</div>
           </div>
         </div>
 
         <div className="border-2 border-purple-400 bg-black">
           <div className="bg-purple-400 text-black px-4 py-1">
-            <span className="font-bold">CLAUDE SDK</span>
+            <span className="font-bold">MULTI-AGENT</span>
           </div>
           <div className="p-4 space-y-2 text-sm text-purple-400">
-            <div>├─ Context-aware file analysis</div>
-            <div>├─ PowerShell security (XCFE-PS-ENVELOPE)</div>
-            <div>├─ CM-1 audit trails</div>
-            <div>└─ Natural language → commands</div>
+            <div>├─ /claude - Anthropic Claude</div>
+            <div>├─ /gemini - Google Gemini</div>
+            <div>├─ /codex - OpenAI Codex</div>
+            <div>└─ /ollama /phi3 - Local</div>
           </div>
         </div>
 
         <div className="border-2 border-green-400 bg-black">
           <div className="bg-green-400 text-black px-4 py-1">
-            <span className="font-bold">DEPLOYMENT</span>
+            <span className="font-bold">GOVERNANCE</span>
           </div>
           <div className="p-4 space-y-2 text-sm text-green-400">
-            <div>├─ Version control & rollback</div>
-            <div>├─ Multi-environment (local/staging/prod)</div>
-            <div>├─ Cluster health monitoring</div>
-            <div>└─ Invariant enforcement</div>
+            <div>├─ KUHUL π collapse thresholds</div>
+            <div>├─ XCFE legality gates</div>
+            <div>├─ CM-1 audit envelopes</div>
+            <div>└─ PS-DSL-1 PowerShell</div>
           </div>
         </div>
       </div>
 
       {/* Getting Started */}
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="border-2 border-magenta-400 bg-black">
-          <div className="bg-magenta-400 text-black px-4 py-1">
+        <div className="border-2 border-pink-400 bg-black">
+          <div className="bg-pink-400 text-black px-4 py-1">
             <span className="font-bold">QUICK START</span>
           </div>
-          <div className="p-4 space-y-2 text-magenta-400 text-sm">
-            <div><span className="text-yellow-400">$</span> npm install -g @mx2lm/cli</div>
-            <div><span className="text-yellow-400">$</span> mx2lm init --config</div>
-            <div><span className="text-yellow-400">$</span> mx2lm assistant --claude</div>
-            <div><span className="text-yellow-400">$</span> mx2lm models --add phi-3-mini</div>
-            <div className="text-gray-500 text-xs mt-2"># Claude-powered AI assistance</div>
+          <div className="p-4 space-y-2 text-pink-400 text-sm">
+            <div><span className="text-yellow-400">$</span> pip install mx2lm</div>
+            <div><span className="text-yellow-400">$</span> mx2lm init</div>
+            <div><span className="text-yellow-400">$</span> mx2lm server start</div>
+            <div><span className="text-yellow-400">$</span> /claude "analyze this repo"</div>
+            <div className="text-gray-500 text-xs mt-2"># Hybrid multi-agent CLI</div>
           </div>
         </div>
 
@@ -187,29 +187,29 @@ export default function Home() {
       {/* System Status */}
       <div className="max-w-5xl mx-auto border-2 border-green-400 bg-black mb-8">
         <div className="bg-green-400 text-black px-4 py-1 flex justify-between items-center">
-          <span className="font-bold">CLUSTER STATUS</span>
-          <span className="text-xs">XJSON Runtime v2.0</span>
+          <span className="font-bold">RUNTIME STATUS</span>
+          <span className="text-xs">MX2LM-SR-1.0.0</span>
         </div>
         <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-green-400 text-sm">
           <div>
-            <div className="text-gray-500 text-xs">Runtime</div>
-            <div className="font-bold">ONLINE</div>
+            <div className="text-gray-500 text-xs">Server</div>
+            <div className="font-bold">localhost:4141</div>
           </div>
           <div>
-            <div className="text-gray-500 text-xs">Active Bots</div>
-            <div className="font-bold">0</div>
+            <div className="text-gray-500 text-xs">π Support</div>
+            <div className="font-bold">1.00</div>
           </div>
           <div>
-            <div className="text-gray-500 text-xs">Tensor Schemas</div>
-            <div className="font-bold">NGT-SVG-3D v1</div>
+            <div className="text-gray-500 text-xs">Agents</div>
+            <div className="font-bold">5 loaded</div>
           </div>
           <div>
-            <div className="text-gray-500 text-xs">Compression</div>
-            <div className="font-bold">SCXQ2</div>
+            <div className="text-gray-500 text-xs">Governance</div>
+            <div className="font-bold">KUHUL π</div>
           </div>
         </div>
         <div className="px-6 pb-6 text-xs text-gray-600">
-          <div>Phase pipeline: @Pop → @Wo → @Sek → @Collapse</div>
+          <div>Collapse thresholds: &lt;0.3 deny | 0.3-0.6 advertise | &gt;0.6 launch | &gt;0.9 heal</div>
           <div className="mt-1">Last sync: {new Date().toISOString()}</div>
         </div>
       </div>
@@ -217,7 +217,7 @@ export default function Home() {
       {/* Footer */}
       <div className="max-w-5xl mx-auto text-center border-t-2 border-green-400 pt-6">
         <div className="text-green-400 font-mono text-sm space-y-1">
-          <div>MX2LM Studio v2.0 | CLI.MX2LM.COM</div>
+          <div>MX2LM Studio v3.0 | CLI.MX2LM.COM | MX2LM-SR-1</div>
           <div className="text-gray-600">
             <Link to={createPageUrl("Pricing")} className="text-cyan-400 hover:underline">
               View Pricing
