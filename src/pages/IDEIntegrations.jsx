@@ -8,8 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Code2, Plus, Download, Copy, Terminal, CheckCircle2, Package } from "lucide-react";
+import { Code2, Plus, Download, Copy, Terminal, CheckCircle2, Package, Shield } from "lucide-react";
 import { toast } from "sonner";
+import PowerShellIntegration from "@/components/ide/PowerShellIntegration";
+import IDECard from "@/components/ide/IDECard";
 
 const ideTemplates = {
   "vscode": {
@@ -132,25 +134,38 @@ export default function IDEIntegrations() {
           </div>
         </div>
 
+        {/* XCFE PowerShell Integration */}
+        <div className="mb-8">
+          <PowerShellIntegration />
+        </div>
+
         {/* Quick Setup Templates */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {Object.entries(ideTemplates).map(([key, template]) => (
-            <Card key={key} className="bg-slate-800 border-slate-700 hover:border-blue-500 transition-all cursor-pointer" onClick={() => handleQuickSetup(key)}>
-              <CardContent className="p-6">
-                <div className="text-center">
-                  <div className="text-5xl mb-3">{template.icon}</div>
-                  <h3 className="text-xl font-bold text-white mb-2">{template.name}</h3>
-                  <Badge className="bg-blue-600 mb-4">{key}</Badge>
-                  <div className="bg-slate-900 rounded p-2 text-xs font-mono text-slate-300 mb-3 text-left">
-                    {template.installCommand}
-                  </div>
-                  <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700">
-                    Quick Setup
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-green-400 mb-4 flex items-center gap-2">
+            <Terminal className="w-5 h-5" />
+            Quick Setup Templates
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {Object.entries(ideTemplates).map(([key, template]) => (
+              <IDECard
+                key={key}
+                integration={{
+                  name: template.name,
+                  description: `MX2LM extension for ${template.name}`,
+                  status: 'available',
+                  icon: <span className="text-3xl">{template.icon}</span>,
+                  features: [
+                    'AI code completion',
+                    'Inline suggestions',
+                    'Model management',
+                    'XCFE PowerShell (read-only)'
+                  ],
+                  docs: '#'
+                }}
+                onDownload={() => handleQuickSetup(key)}
+              />
+            ))}
+          </div>
         </div>
 
         {showForm && (
