@@ -400,23 +400,33 @@ export default function CareerPage() {
                 <span className="font-bold">MX2LM TOOLKIT INTEGRATION</span>
               </div>
               <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Link to={createPageUrl("Home")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-white transition-all block">
+                  <Zap className="w-6 h-6 text-white mb-2" />
+                  <div className="text-white font-bold">Home</div>
+                  <div className="text-slate-400 text-sm">Landing page</div>
+                </Link>
+                <Link to={createPageUrl("ModelManager")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-blue-600 transition-all block">
+                  <Brain className="w-6 h-6 text-blue-400 mb-2" />
+                  <div className="text-white font-bold">Model Manager</div>
+                  <div className="text-slate-400 text-sm">Manage HF models</div>
+                </Link>
+                <Link to={createPageUrl("APIManager")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-green-600 transition-all block">
+                  <Globe className="w-6 h-6 text-green-400 mb-2" />
+                  <div className="text-white font-bold">API Manager</div>
+                  <div className="text-slate-400 text-sm">Endpoint configuration</div>
+                </Link>
                 <Link to={createPageUrl("CLIPlayground")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-cyan-600 transition-all block">
                   <Code className="w-6 h-6 text-cyan-400 mb-2" />
                   <div className="text-white font-bold">CLI Playground</div>
                   <div className="text-slate-400 text-sm">Test AI models</div>
                 </Link>
-                <Link to={createPageUrl("ProjectDashboard")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-green-600 transition-all block">
-                  <FolderKanban className="w-6 h-6 text-green-400 mb-2" />
-                  <div className="text-white font-bold">Project Manager</div>
-                  <div className="text-slate-400 text-sm">Track portfolio projects</div>
-                </Link>
                 <Link to={createPageUrl("CLIEditor")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-purple-600 transition-all block">
-                  <Users className="w-6 h-6 text-purple-400 mb-2" />
-                  <div className="text-white font-bold">Collaboration</div>
+                  <Terminal className="w-6 h-6 text-purple-400 mb-2" />
+                  <div className="text-white font-bold">CLI Editor</div>
                   <div className="text-slate-400 text-sm">Multi-agent sessions</div>
                 </Link>
                 <Link to={createPageUrl("ShellAssistant")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-orange-600 transition-all block">
-                  <Brain className="w-6 h-6 text-orange-400 mb-2" />
+                  <MessageCircle className="w-6 h-6 text-orange-400 mb-2" />
                   <div className="text-white font-bold">Shell Assistant</div>
                   <div className="text-slate-400 text-sm">AI-powered help</div>
                 </Link>
@@ -425,10 +435,70 @@ export default function CareerPage() {
                   <div className="text-white font-bold">Bot Orchestrator</div>
                   <div className="text-slate-400 text-sm">Automate workflows</div>
                 </Link>
+                <Link to={createPageUrl("ProjectDashboard")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-emerald-600 transition-all block">
+                  <FolderKanban className="w-6 h-6 text-emerald-400 mb-2" />
+                  <div className="text-white font-bold">Project Dashboard</div>
+                  <div className="text-slate-400 text-sm">Track projects & tasks</div>
+                </Link>
                 <Link to={createPageUrl("Monitoring")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-red-600 transition-all block">
                   <Server className="w-6 h-6 text-red-400 mb-2" />
                   <div className="text-white font-bold">Monitoring</div>
                   <div className="text-slate-400 text-sm">System health</div>
+                </Link>
+                <Link to={createPageUrl("ClusterManagement")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-indigo-600 transition-all block">
+                  <Server className="w-6 h-6 text-indigo-400 mb-2" />
+                  <div className="text-white font-bold">Cluster Management</div>
+                  <div className="text-slate-400 text-sm">Manage clusters</div>
+                </Link>
+                <Link to={createPageUrl("RuntimeStudio")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-pink-600 transition-all block">
+                  <Zap className="w-6 h-6 text-pink-400 mb-2" />
+                  <div className="text-white font-bold">Runtime Studio</div>
+                  <div className="text-slate-400 text-sm">Code execution</div>
+                </Link>
+                <Link to={createPageUrl("IDEIntegrations")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-teal-600 transition-all block">
+                  <Code className="w-6 h-6 text-teal-400 mb-2" />
+                  <div className="text-white font-bold">IDE Integrations</div>
+                  <div className="text-slate-400 text-sm">Editor plugins</div>
+                </Link>
+                <Link to={createPageUrl("CIPipelines")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-amber-600 transition-all block">
+                  <GitMerge className="w-6 h-6 text-amber-400 mb-2" />
+                  <div className="text-white font-bold">CI Pipelines</div>
+                  <div className="text-slate-400 text-sm">CI/CD configs</div>
+                </Link>
+                <Link to={createPageUrl("Extensions")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-violet-600 transition-all block">
+                  <Star className="w-6 h-6 text-violet-400 mb-2" />
+                  <div className="text-white font-bold">Extensions</div>
+                  <div className="text-slate-400 text-sm">Plugins & addons</div>
+                </Link>
+                <Link to={createPageUrl("Commands")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-lime-600 transition-all block">
+                  <Terminal className="w-6 h-6 text-lime-400 mb-2" />
+                  <div className="text-white font-bold">Commands</div>
+                  <div className="text-slate-400 text-sm">CLI commands</div>
+                </Link>
+                <Link to={createPageUrl("CompressionDocs")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-rose-600 transition-all block">
+                  <Shield className="w-6 h-6 text-rose-400 mb-2" />
+                  <div className="text-white font-bold">Compression Docs</div>
+                  <div className="text-slate-400 text-sm">SCXQ2 documentation</div>
+                </Link>
+                <Link to={createPageUrl("Pricing")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-yellow-500 transition-all block">
+                  <DollarSign className="w-6 h-6 text-yellow-500 mb-2" />
+                  <div className="text-white font-bold">Pricing</div>
+                  <div className="text-slate-400 text-sm">Plans & billing</div>
+                </Link>
+                <Link to={createPageUrl("SWOT")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-cyan-500 transition-all block">
+                  <Target className="w-6 h-6 text-cyan-500 mb-2" />
+                  <div className="text-white font-bold">SWOT</div>
+                  <div className="text-slate-400 text-sm">Strategic analysis</div>
+                </Link>
+                <Link to={createPageUrl("Nemesis")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-red-500 transition-all block">
+                  <Zap className="w-6 h-6 text-red-500 mb-2" />
+                  <div className="text-white font-bold">Nemesis</div>
+                  <div className="text-slate-400 text-sm">Design project</div>
+                </Link>
+                <Link to={createPageUrl("Career")} className="bg-slate-900 border border-cyan-500 p-4 rounded hover:border-cyan-400 transition-all block">
+                  <User className="w-6 h-6 text-cyan-400 mb-2" />
+                  <div className="text-white font-bold">Career</div>
+                  <div className="text-slate-400 text-sm">Portfolio (You are here)</div>
                 </Link>
               </div>
             </div>
