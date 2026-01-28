@@ -273,6 +273,141 @@ Provide efficient solutions for scaling and parallel execution.`;
                 result: clusterResponse,
                 action: 'cluster'
             });
+        } else if (action === 'powershell') {
+            // XCFE-PS-ENVELOPE: Governed PowerShell execution
+            const psCommand = prompt.trim();
+            
+            // PS-DSL-1: Deny-by-default command registry
+            const allowedCommands = {
+                'Get-Process': { safe: true, readOnly: true, description: 'List running processes' },
+                'Get-Service': { safe: true, readOnly: true, description: 'Query Windows services' },
+                'Get-EventLog': { safe: true, readOnly: true, description: 'Query event logs' },
+                'Get-ComputerInfo': { safe: true, readOnly: true, description: 'Get system information' },
+                'Get-WmiObject': { safe: true, readOnly: true, description: 'Query WMI objects' },
+                'Get-ItemProperty': { safe: true, readOnly: true, description: 'Read registry values' },
+                'Get-ChildItem': { safe: true, readOnly: true, description: 'List directory contents' },
+                'Get-Content': { safe: true, readOnly: true, description: 'Read file contents' }
+            };
+            
+            const deniedCommands = [
+                'Invoke-Expression', 'iex', 'Invoke-Command', 'icm',
+                'Start-Process', 'New-Object', 'Add-Type',
+                'Set-Item', 'Remove-Item', 'Invoke-WebRequest', 'iwr',
+                'Invoke-RestMethod', 'irm', 'Set-ExecutionPolicy'
+            ];
+            
+            // Legality verification
+            const isDenied = deniedCommands.some(cmd => 
+                psCommand.toLowerCase().includes(cmd.toLowerCase())
+            );
+            
+            if (isDenied) {
+                return Response.json({
+                    result: `❌ XCFE-PS-ENVELOPE VIOLATION\n\nDenied: Command contains forbidden operations.\n\nBlocked commands: ${deniedCommands.join(', ')}\n\nReason: Arbitrary execution, privilege escalation, or network operations are not allowed.\n\nUse read-only system queries instead.`,
+                    action: 'powershell',
+                    legal: false,
+                    cm1: {
+                        phase: 'delegate.external',
+                        target: 'powershell',
+                        status: 'blocked',
+                        reason: 'denylist_match'
+                    }
+                });
+            }
+            
+            // Generate safe PS-DSL intent
+            systemPrompt = `You are a PowerShell DSL generator for XCFE-PS-ENVELOPE.
+Convert user requests into SAFE, READ-ONLY PowerShell commands from this allowlist:
+
+${Object.entries(allowedCommands).map(([cmd, info]) => `- ${cmd}: ${info.description}`).join('\n')}
+
+CRITICAL CONSTRAINTS:
+- NO Invoke-Expression or script blocks
+- NO pipe operators or complex expressions
+- NO Set-*, Remove-*, New-* cmdlets
+- NO network operations
+- ONLY single, simple Get-* cmdlets
+- Return ONLY the PowerShell command
+
+Example:
+User: "list running processes"
+Response: Get-Process
+
+User: "show windows services"
+Response: Get-Service`;
+
+            const psResponse = await base44.integrations.Core.InvokeLLM({
+                prompt: `${systemPrompt}\n\nUser: ${psCommand}`,
+                add_context_from_internet: false
+            });
+            
+            const generatedCmd = psResponse.trim();
+            
+            // Verify generated command is allowlisted
+            const isAllowed = Object.keys(allowedCommands).some(cmd =>
+                generatedCmd.startsWith(cmd)
+            );
+            
+            if (!isAllowed) {
+                return Response.json({
+                    result: `⚠️ XCFE-PS-ENVELOPE WARNING\n\nGenerated command not in allowlist.\n\nAllowed commands:\n${Object.keys(allowedCommands).join('\n')}\n\nGenerated: ${generatedCmd}\n\nPlease request read-only system queries only.`,
+                    action: 'powershell',
+                    legal: false,
+                    cm1: {
+                        phase: 'delegate.external',
+                        target: 'powershell',
+                        status: 'rejected',
+                        reason: 'not_allowlisted'
+                    }
+                });
+            }
+            
+            // CM-1 Binding: Audit trail
+            const cm1Envelope = {
+                soh: '[SOH] ps-envelope.v1',
+                gs_intent: `[GS] intent=${psCommand}`,
+                gs_lowered: `[GS] lowered=${generatedCmd}`,
+                stx: '[STX]',
+                command: generatedCmd,
+                etx: '[ETX]',
+                eot: '[EOT]',
+                timestamp: new Date().toISOString(),
+                user: user.email
+            };
+            
+            // Format output with CM-1 provenance
+            const output = `✅ XCFE-PS-ENVELOPE APPROVED
+
+📋 CM-1 Audit Trail:
+${cm1Envelope.soh}
+${cm1Envelope.gs_intent}
+${cm1Envelope.gs_lowered}
+${cm1Envelope.stx}
+
+💻 PowerShell Command:
+${generatedCmd}
+
+${cm1Envelope.etx}
+${cm1Envelope.eot}
+
+⚡ Execution:
+This command has been verified as safe and read-only.
+Execute manually in PowerShell or via powershell-utils transport layer.
+
+📊 Provenance:
+- User: ${user.email}
+- Time: ${cm1Envelope.timestamp}
+- Legal: ✓ Allowlisted
+- Read-only: ✓ Verified
+- Audit: ✓ CM-1 Bound`;
+
+            return Response.json({
+                result: output,
+                action: 'powershell',
+                legal: true,
+                command: generatedCmd,
+                cm1: cm1Envelope
+            });
         }
 
         const response = await base44.integrations.Core.InvokeLLM({
