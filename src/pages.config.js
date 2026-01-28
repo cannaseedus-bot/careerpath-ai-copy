@@ -1,7 +1,6 @@
 import APIManager from './pages/APIManager';
 import BotOrchestrator from './pages/BotOrchestrator';
 import CIPipelines from './pages/CIPipelines';
-import CLIEditor from './pages/CLIEditor';
 import CLIPlayground from './pages/CLIPlayground';
 import Career from './pages/Career';
 import ClusterManagement from './pages/ClusterManagement';
@@ -25,7 +24,6 @@ export const PAGES = {
     "APIManager": APIManager,
     "BotOrchestrator": BotOrchestrator,
     "CIPipelines": CIPipelines,
-    "CLIEditor": CLIEditor,
     "CLIPlayground": CLIPlayground,
     "Career": Career,
     "ClusterManagement": ClusterManagement,
