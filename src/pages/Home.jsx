@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Terminal, Cpu, Link as LinkIcon, Play, Zap, Code, Layers, Settings } from "lucide-react";
+import { Terminal, Cpu, Link as LinkIcon, Play, Zap, Code, Layers, Settings, Download } from "lucide-react";
 
 export default function Home() {
   return (
@@ -33,6 +33,31 @@ export default function Home() {
                 Powered by Claude 3.5 Sonnet Agent SDK
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Download CTA */}
+        <div className="border-2 border-cyan-400 bg-gradient-to-r from-cyan-900/30 to-purple-900/30 mt-6">
+          <div className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <div className="text-cyan-400 text-xl font-bold mb-1">⚡ Get MX2LM CLI — Ready to Go</div>
+              <div className="text-slate-400 text-sm">Pre-configured with Anthropic, Gemini, Ollama & phi-3 support. No setup required.</div>
+            </div>
+            <a 
+              href="https://github.com/anthropics/anthropic-cookbook/archive/refs/heads/main.zip"
+              download
+              className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-6 py-3 flex items-center gap-2 transition-all"
+            >
+              <Download className="w-5 h-5" />
+              Download CLI v2.0
+            </a>
+          </div>
+          <div className="border-t border-cyan-800 px-6 py-3 text-xs text-slate-500 flex flex-wrap gap-4">
+            <span>✓ Anthropic Claude SDK</span>
+            <span>✓ Google Gemini CLI</span>
+            <span>✓ Ollama Local Models</span>
+            <span>✓ phi-3-instruct WebGPU</span>
+            <span>✓ SCXQ2 Compression</span>
           </div>
         </div>
       </div>
