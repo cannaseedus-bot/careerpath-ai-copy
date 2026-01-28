@@ -151,6 +151,10 @@ export default function Home() {
               <div className="text-cyan-400">$ mx2lm bots --orchestrate</div>
               <div className="text-green-400 text-sm ml-4">XJSON Runtime Cluster with SVG-3D tensors & SCXQ2 compression</div>
             </Link>
+            <Link to={createPageUrl("ProjectDashboard")} className="block hover:bg-green-900/30 p-3 transition">
+              <div className="text-cyan-400">$ mx2lm projects --manage</div>
+              <div className="text-green-400 text-sm ml-4">Project management with Kanban boards & collaborative sessions</div>
+            </Link>
             <Link to={createPageUrl("Monitoring")} className="block hover:bg-green-900/30 p-3 transition">
               <div className="text-cyan-400">$ mx2lm monitor --cluster</div>
               <div className="text-green-400 text-sm ml-4">Real-time cluster health and bot performance metrics</div>
