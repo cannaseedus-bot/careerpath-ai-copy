@@ -92,7 +92,7 @@ export default function CareerPage() {
               <span className="text-purple-400 font-bold">MISSION STATEMENT</span>
             </div>
             <p className="text-white text-lg leading-relaxed">
-              To design cinematic, culturally-rooted luxury identities that translate Bengali heritage into modern premium systems.
+              To architect intelligent, scalable full-stack solutions that bridge multi-agent AI systems with modern web technologies, empowering developers with next-generation CLI tools and collaborative frameworks.
             </p>
           </div>
         </div>
