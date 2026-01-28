@@ -513,10 +513,10 @@ export default function ShellAssistant() {
                     </div>
                     <div className="space-y-2 text-sm">
                         <button
-                            onClick={() => setInput("add-context package.json")}
+                            onClick={() => setInput("generate XJSON tensor schema")}
                             className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
                         >
-                            → Analyze project file
+                            → Generate XJSON schema
                         </button>
                         <button
                             onClick={() => setInput("create fold-based compression model")}

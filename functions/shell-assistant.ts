@@ -458,6 +458,28 @@ Execute manually in PowerShell or via powershell-utils transport layer.
                 command: generatedCmd,
                 cm1: cm1Envelope
             });
+        } else if (action === 'xjson-schema') {
+            // Generate XJSON schema from natural language
+            const schemaResult = await base44.functions.invoke('generate-xjson-schema', {
+                description: prompt,
+                schemaType: 'auto-detect',
+                context: contextFiles.length > 0 ? `Context files: ${contextFiles.join(', ')}` : null
+            });
+
+            if (schemaResult.data.error) {
+                return Response.json({
+                    result: `❌ Schema generation failed: ${schemaResult.data.error}`,
+                    action: 'xjson-schema'
+                });
+            }
+
+            const formattedSchema = JSON.stringify(schemaResult.data.schema, null, 2);
+            
+            return Response.json({
+                result: `✅ XJSON Schema Generated\n\n${formattedSchema}\n\n💡 Use this schema with:\n- Bot configurations\n- Tensor definitions\n- Entity schemas\n- Micronaut services`,
+                action: 'xjson-schema',
+                schema: schemaResult.data.schema
+            });
         } else if (action === 'suggest-cmdlet') {
             // Handle cmdlet suggestion for allowlist
             const suggestion = {
