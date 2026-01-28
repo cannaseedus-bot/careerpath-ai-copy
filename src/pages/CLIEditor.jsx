@@ -742,7 +742,7 @@ export default function CLIEditor() {
               <span className="font-bold text-lg">MX2LM CLI EDITOR</span>
               <Badge className="bg-black text-cyan-400">v2.0</Badge>
             </div>
-            <span className="text-xs">[ SCXQ2 Runtime • Claude SDK • Gemini CLI • Ollama • PowerShell ]</span>
+            <span className="text-xs">[ @posthog/code-agent • /claude • /gemini • /codex • /ollama ]</span>
           </div>
           <div className="p-6 bg-gradient-to-br from-slate-900 to-black">
             <div className="flex justify-between items-center">
