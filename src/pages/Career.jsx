@@ -22,10 +22,10 @@ const studios = [
 ];
 
 const roles = [
-  { rank: "1", title: "Brand Identity Designer / Art Director", subtitle: "luxury & cultural brands" },
-  { rank: "2", title: "Senior Visual Designer", subtitle: "packaging, editorial, typographic systems" },
-  { rank: "3", title: "Motion & Systems Designer", subtitle: "brand motion, launch assets, campaigns" },
-  { rank: "4", title: "Design Lead", subtitle: "small boutique studio (project ownership)" }
+  { rank: "1", title: "Full Stack AI Engineer", subtitle: "LLM integration & agent frameworks" },
+  { rank: "2", title: "Runtime & Language Developer", subtitle: "DSL design, compilers, interpreters" },
+  { rank: "3", title: "Infrastructure Architect", subtitle: "server, hosting, network systems" },
+  { rank: "4", title: "Open Source Lead", subtitle: "MX2LM framework & community" }
 ];
 
 const coreSkills = [
@@ -46,12 +46,12 @@ const growthSkills = [
 ];
 
 const milestones = [
-  { month: "1", title: "Foundation", tasks: ["2 portfolio case study outlines", "Start luxury identity project", "Publish process shots weekly"] },
-  { month: "2", title: "Development", tasks: ["Complete luxury identity case study", "Create packaging mockups", "Outreach to photographer/print house"] },
-  { month: "3", title: "Digital Presence", tasks: ["Build portfolio page (Figma → Webflow)", "Start motion tests for logo reveal", "Refine case studies"] },
-  { month: "4", title: "Refinement", tasks: ["Polish case studies", "Request reviews from mentors", "Submit to Design Week / Behance"] },
-  { month: "5", title: "Applications", tasks: ["Target applications: Rethink", "Small boutiques outreach", "Speculative briefs for Pentagram/COLLINS"] },
-  { month: "6", title: "Launch", tasks: ["Refine pitch deck", "Rehearse presentation", "Interview prep and network follow-ups"] }
+  { month: "1", title: "Core Framework", tasks: ["MX2LM CLI v3.2 Release", "KUHUL π Governance Engine", "PS-DSL v2 Security Layer"] },
+  { month: "2", title: "Agent Ecosystem", tasks: ["Multi-Agent Orchestration Module", "DeepSeek T-UI v2.1 Integration", "Ollama Cloud API Connector"] },
+  { month: "3", title: "Runtime & Plugins", tasks: ["WebGPU Runtime for phi-3", "SCXQ2 Compression Plugin", "ASX State Management Addon"] },
+  { month: "4", title: "Collaboration Tools", tasks: ["Real-time Session Sync", "Git Integration Module", "Team Workspace Features"] },
+  { month: "5", title: "Enterprise Features", tasks: ["Custom Branding Module", "SSO/Auth Plugin", "Audit & Compliance Tools"] },
+  { month: "6", title: "Launch & Scale", tasks: ["Public API Release", "Documentation Portal", "Community Marketplace"] }
 ];
 
 export default function CareerPage() {
