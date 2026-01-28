@@ -15,10 +15,10 @@ import {
 import CountdownTimer from '@/components/shared/CountdownTimer';
 
 const studios = [
-  { rank: "1", name: "PENTAGRAM", location: "Global", founded: "1972", team: "20+ Partners", specialty: "Brand Identity", description: "World-renowned interdisciplinary design collective", alignment: "Global prestige and luxury system mastery", website: "pentagram.com", url: "https://www.pentagram.com" },
-  { rank: "2", name: "RETHINK", location: "Vancouver", founded: "1999", team: "150+ People", specialty: "Brand Strategy", description: "Canadian creative agency with strong presence", alignment: "Local connection with growing design focus", website: "rethinkideas.com", url: "https://www.rethinkideas.com" },
-  { rank: "3", name: "ANAGRAMA", location: "Mexico City", founded: "2011", team: "30+ Designers", specialty: "Packaging", description: "Boutique studio for material-driven brand systems", alignment: "Material craft and packaging expertise", website: "anagrama.com", url: "https://www.anagrama.com" },
-  { rank: "4", name: "COLLINS", location: "New York / SF", founded: "2008", team: "100+ Team", specialty: "Transformation", description: "Transformation & brand studio end-to-end", alignment: "End-to-end brand transformation focus", website: "wearecollins.com", url: "https://www.wearecollins.com" }
+  { rank: "1", name: "ANTHROPIC", location: "San Francisco", founded: "2021", team: "500+ Engineers", specialty: "LLM/Claude", description: "AI safety company building reliable, interpretable AI systems", alignment: "Claude SDK integration & agent frameworks", website: "anthropic.com", url: "https://www.anthropic.com" },
+  { rank: "2", name: "HUGGING FACE", location: "New York / Paris", founded: "2016", team: "200+ Team", specialty: "ML Platform", description: "The AI community hub for models, datasets, and spaces", alignment: "Model hosting, transformers, and inference APIs", website: "huggingface.co", url: "https://huggingface.co" },
+  { rank: "3", name: "OLLAMA", location: "Remote", founded: "2023", team: "Growing", specialty: "Local LLMs", description: "Run large language models locally with ease", alignment: "Local model deployment & CLI tooling", website: "ollama.ai", url: "https://ollama.ai" },
+  { rank: "4", name: "DEEPSEEK", location: "China / Global", founded: "2023", team: "100+ Researchers", specialty: "Open Models", description: "Open-source LLMs pushing efficiency boundaries", alignment: "Cost-effective inference & open-weight models", website: "deepseek.com", url: "https://www.deepseek.com" }
 ];
 
 const roles = [
