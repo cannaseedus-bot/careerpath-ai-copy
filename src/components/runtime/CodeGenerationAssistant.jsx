@@ -190,47 +190,116 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
               </Card>
             )}
 
-            {/* Dependencies */}
-            {result.dependencies?.length > 0 && (
-              <Card className="bg-slate-900 border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-sm text-gray-400">Dependencies</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {result.dependencies.map((dep, idx) => (
-                      <Badge key={idx} className="bg-slate-800 text-cyan-400">
-                        {dep}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {/* Metadata Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* Dependencies */}
+              {result.dependencies?.length > 0 && (
+                <Card className="bg-slate-900 border-slate-700">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm text-gray-400">Dependencies</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {result.dependencies.map((dep, idx) => (
+                        <Badge key={idx} className="bg-slate-800 text-cyan-400">
+                          {dep}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Control Vectors */}
+              {result.control_vectors && (
+                <Card className="bg-slate-900 border-slate-700">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm text-gray-400">Control Vectors</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-1 text-xs">
+                      {Object.entries(result.control_vectors).map(([key, value]) => (
+                        <div key={key} className="flex justify-between">
+                          <span className="text-gray-400">{key}:</span>
+                          <span className="text-cyan-400">{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Relationships */}
+              {result.relationships?.length > 0 && (
+                <Card className="bg-slate-900 border-slate-700">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm text-gray-400">Relationships</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="text-xs text-gray-300 space-y-1">
+                      {result.relationships.map((rel, idx) => (
+                        <li key={idx}>• {rel}</li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Assigned Folds */}
+              {result.assigned_folds?.length > 0 && (
+                <Card className="bg-slate-900 border-slate-700">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm text-gray-400">Assigned Folds</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {result.assigned_folds.map((fold, idx) => (
+                        <Badge key={idx} className="bg-purple-900/30 text-purple-400">
+                          Fold {fold}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
 
             {/* Code Tabs */}
             <Tabs defaultValue="main" className="w-full">
-              <TabsList className="bg-slate-800 w-full grid grid-cols-4">
-                <TabsTrigger value="main">
+              <TabsList className="bg-slate-800 w-full flex flex-wrap">
+                <TabsTrigger value="main" className="flex-1 min-w-[80px]">
                   <Code className="w-3 h-3 mr-1" />
-                  {result.type === 'micronaut_entity' ? 'Schema' : 'Code'}
+                  {result.type === 'micronaut_entity' ? 'Schema' : 
+                   result.type === 'data_model' ? 'Dataclass' : 'Code'}
                 </TabsTrigger>
-                {(result.tests || result.entity_schema || result.json_schema) && (
-                  <TabsTrigger value="secondary">
+                {(result.tests || result.entity_schema || result.pydantic_model) && (
+                  <TabsTrigger value="secondary" className="flex-1 min-w-[80px]">
+                    <TestTube className="w-3 h-3 mr-1" />
                     {result.type === 'micronaut_service' ? 'Entity' : 
-                     result.type === 'data_model' ? 'JSON Schema' : 'Tests'}
+                     result.type === 'data_model' ? 'Pydantic' : 'Tests'}
                   </TabsTrigger>
                 )}
-                {(result.micronaut || result.openapi || result.sql_schema) && (
-                  <TabsTrigger value="tertiary">
+                {(result.micronaut || result.openapi || result.json_schema) && (
+                  <TabsTrigger value="tertiary" className="flex-1 min-w-[80px]">
                     {result.type === 'api_documentation' ? 'OpenAPI' :
-                     result.type === 'data_model' ? 'SQL' : 'Micronaut'}
+                     result.type === 'data_model' ? 'JSON' : 'Micronaut'}
                   </TabsTrigger>
                 )}
-                {(result.usage_example || result.markdown || result.typescript_interface) && (
-                  <TabsTrigger value="extra">
+                {(result.usage_example || result.markdown || result.sql_schema) && (
+                  <TabsTrigger value="fourth" className="flex-1 min-w-[80px]">
                     {result.type === 'api_documentation' ? 'Markdown' :
-                     result.type === 'data_model' ? 'TypeScript' : 'Usage'}
+                     result.type === 'data_model' ? 'SQL' : 'Usage'}
+                  </TabsTrigger>
+                )}
+                {(result.postman || result.typescript_interface || result.orm_model) && (
+                  <TabsTrigger value="fifth" className="flex-1 min-w-[80px]">
+                    {result.type === 'api_documentation' ? 'Postman' :
+                     result.type === 'data_model' ? 'TypeScript' : 'Extra'}
+                  </TabsTrigger>
+                )}
+                {(result.migration_script || result.error_guide) && (
+                  <TabsTrigger value="sixth" className="flex-1 min-w-[80px]">
+                    {result.type === 'data_model' ? 'Migration' : 'Errors'}
                   </TabsTrigger>
                 )}
               </TabsList>
@@ -266,7 +335,7 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
                 </Card>
               </TabsContent>
 
-              {(result.entity_schema || result.tests || result.json_schema) && (
+              {(result.entity_schema || result.tests || result.pydantic_model) && (
                 <TabsContent value="secondary" className="mt-2">
                   <Card className="bg-slate-900 border-slate-700">
                     <CardContent className="p-0">
@@ -274,7 +343,7 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => copyToClipboard(result.entity_schema || result.tests || result.json_schema)}
+                          onClick={() => copyToClipboard(result.entity_schema || result.tests || result.pydantic_model)}
                           className="border-slate-600 text-cyan-400"
                         >
                           <Copy className="w-3 h-3 mr-1" />
@@ -282,14 +351,14 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
                         </Button>
                       </div>
                       <pre className="p-4 overflow-x-auto text-xs text-cyan-300 max-h-96">
-                        {result.entity_schema || result.tests || result.json_schema}
+                        {result.entity_schema || result.tests || result.pydantic_model}
                       </pre>
                     </CardContent>
                   </Card>
                 </TabsContent>
               )}
 
-              {(result.micronaut || result.openapi || result.sql_schema) && (
+              {(result.micronaut || result.openapi || result.json_schema) && (
                 <TabsContent value="tertiary" className="mt-2">
                   <Card className="bg-slate-900 border-slate-700">
                     <CardContent className="p-0">
@@ -297,7 +366,7 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => copyToClipboard(result.micronaut || result.openapi || result.sql_schema)}
+                          onClick={() => copyToClipboard(result.micronaut || result.openapi || result.json_schema)}
                           className="border-slate-600 text-cyan-400"
                         >
                           <Copy className="w-3 h-3 mr-1" />
@@ -305,22 +374,22 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
                         </Button>
                       </div>
                       <pre className="p-4 overflow-x-auto text-xs text-cyan-300 max-h-96">
-                        {result.micronaut || result.openapi || result.sql_schema}
+                        {result.micronaut || result.openapi || result.json_schema}
                       </pre>
                     </CardContent>
                   </Card>
                 </TabsContent>
               )}
 
-              {(result.usage_example || result.markdown || result.typescript_interface) && (
-                <TabsContent value="extra" className="mt-2">
+              {(result.usage_example || result.markdown || result.sql_schema) && (
+                <TabsContent value="fourth" className="mt-2">
                   <Card className="bg-slate-900 border-slate-700">
                     <CardContent className="p-0">
                       <div className="flex items-center justify-end gap-2 p-2 border-b border-slate-700">
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => copyToClipboard(result.usage_example || result.markdown || result.typescript_interface)}
+                          onClick={() => copyToClipboard(result.usage_example || result.markdown || result.sql_schema)}
                           className="border-slate-600 text-cyan-400"
                         >
                           <Copy className="w-3 h-3 mr-1" />
@@ -328,7 +397,53 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
                         </Button>
                       </div>
                       <pre className="p-4 overflow-x-auto text-xs text-cyan-300 max-h-96 whitespace-pre-wrap">
-                        {result.usage_example || result.markdown || result.typescript_interface}
+                        {result.usage_example || result.markdown || result.sql_schema}
+                      </pre>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              )}
+
+              {(result.postman || result.typescript_interface || result.orm_model) && (
+                <TabsContent value="fifth" className="mt-2">
+                  <Card className="bg-slate-900 border-slate-700">
+                    <CardContent className="p-0">
+                      <div className="flex items-center justify-end gap-2 p-2 border-b border-slate-700">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => copyToClipboard(result.postman || result.typescript_interface || result.orm_model)}
+                          className="border-slate-600 text-cyan-400"
+                        >
+                          <Copy className="w-3 h-3 mr-1" />
+                          Copy
+                        </Button>
+                      </div>
+                      <pre className="p-4 overflow-x-auto text-xs text-cyan-300 max-h-96">
+                        {result.postman || result.typescript_interface || result.orm_model}
+                      </pre>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              )}
+
+              {(result.migration_script || result.error_guide) && (
+                <TabsContent value="sixth" className="mt-2">
+                  <Card className="bg-slate-900 border-slate-700">
+                    <CardContent className="p-0">
+                      <div className="flex items-center justify-end gap-2 p-2 border-b border-slate-700">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => copyToClipboard(result.migration_script || result.error_guide)}
+                          className="border-slate-600 text-cyan-400"
+                        >
+                          <Copy className="w-3 h-3 mr-1" />
+                          Copy
+                        </Button>
+                      </div>
+                      <pre className="p-4 overflow-x-auto text-xs text-cyan-300 max-h-96 whitespace-pre-wrap">
+                        {result.migration_script || result.error_guide}
                       </pre>
                     </CardContent>
                   </Card>
