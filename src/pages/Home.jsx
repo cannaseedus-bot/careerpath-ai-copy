@@ -129,7 +129,7 @@ export default function Home() {
             <div>├─ /claude - Anthropic</div>
             <div>├─ /gemini - Google</div>
             <div>├─ /codex - OpenAI</div>
-            <div>├─ /deepseek - DeepSeek</div>
+            <div>├─ /deepseek - DeepSeek Dev v2</div>
             <div>└─ /ollama /phi3 - Local</div>
           </div>
         </div>
