@@ -55,7 +55,7 @@ export default function Home() {
             </a>
           </div>
           <div className="border-t border-cyan-800 px-6 py-3 text-xs text-slate-500 flex flex-wrap gap-4">
-            <span>✓ /claude /gemini /codex /ollama</span>
+            <span>✓ /claude /gemini /codex /deepseek</span>
             <span>✓ FREE Search (Google+DDG+Brave)</span>
             <span>✓ PyTorch + WebGPU</span>
             <span>✓ MX2LM-SR-1 Server</span>
@@ -129,6 +129,7 @@ export default function Home() {
             <div>├─ /claude - Anthropic</div>
             <div>├─ /gemini - Google</div>
             <div>├─ /codex - OpenAI</div>
+            <div>├─ /deepseek - DeepSeek</div>
             <div>└─ /ollama /phi3 - Local</div>
           </div>
         </div>
@@ -200,7 +201,7 @@ export default function Home() {
           </div>
           <div>
             <div className="text-gray-500 text-xs">Agents</div>
-            <div className="font-bold">5 loaded</div>
+            <div className="font-bold">6 loaded</div>
           </div>
           <div>
             <div className="text-gray-500 text-xs">Search</div>
@@ -216,8 +217,8 @@ export default function Home() {
           </div>
         </div>
         <div className="px-6 pb-6 text-xs text-gray-600">
-          <div>Agents: /claude /gemini /codex /ollama /phi3 | Search: Google CSE → DDG → Brave</div>
-          <div className="mt-1">π thresholds: &lt;0.3 deny | 0.3-0.6 advertise | &gt;0.6 launch | &gt;0.9 heal</div>
+        <div>Agents: /claude /gemini /codex /deepseek /ollama /phi3 | Search: Google CSE → DDG → Brave</div>
+        <div className="mt-1">π thresholds: &lt;0.3 deny | 0.3-0.6 advertise | &gt;0.6 launch | &gt;0.9 heal</div>
         </div>
       </div>
 

@@ -686,9 +686,9 @@ class ServerLifecycle:
 
 def main():
     print("╔═══════════════════════════════════════════════════════════════╗")
-    print("║  MX2LM CLI v3.0 - Hybrid Multi-Agent Framework               ║")
-    print("║  Core: @posthog/code-agent                                    ║")
-    print("║  Sub-CLIs: /claude  /gemini  /codex  /ollama  /phi3          ║")
+    print("║  MX2LM CLI v3.1 - Hybrid Multi-Agent Framework               ║")
+    print("║  Core: @posthog/code-agent + XJSON Cluster OS 2.1            ║")
+    print("║  Sub-CLIs: /claude /gemini /codex /deepseek /ollama /phi3    ║")
     print("║  PS: XCFE-PS-ENVELOPE + PS-DSL v1 + CM-1 Audit Trail         ║")
     print("╚═══════════════════════════════════════════════════════════════╝")
     print("")
@@ -716,9 +716,12 @@ def main():
                 print("  /claude [msg]  - Launch Claude Code CLI")
                 print("  /gemini [msg]  - Launch Gemini CLI")
                 print("  /codex [msg]   - Launch OpenAI CLI")
+                print("  /deepseek [msg]- Launch DeepSeek Enterprise CLI")
                 print("  /ollama [msg]  - Launch Ollama")
                 print("  /phi3 [msg]    - Run Phi-3 locally")
                 print("  /posthog       - Launch PostHog Code Agent")
+                print("  /search [q]    - FREE web search (Google+DDG+Brave)")
+                print("  /research [t]  - FREE deep research")
                 print("  ps:[action]    - Run PowerShell (ps:process.list)")
                 print("  server start   - Start MX2LM Server Runtime")
                 print("  server stop    - Stop server")
@@ -942,9 +945,9 @@ export default function CLIEditor() {
             <div className="flex items-center gap-3">
               <Zap className="w-5 h-5" />
               <span className="font-bold text-lg">MX2LM CLI EDITOR</span>
-              <Badge className="bg-black text-cyan-400">v3.0</Badge>
+              <Badge className="bg-black text-cyan-400">v3.1</Badge>
             </div>
-            <span className="text-xs">[ @posthog/code-agent • /claude • /gemini • /codex • /ollama ]</span>
+            <span className="text-xs">[ @posthog/code-agent • /claude • /gemini • /codex • /deepseek • /ollama ]</span>
           </div>
           <div className="p-6 bg-gradient-to-br from-slate-900 to-black">
             <div className="flex justify-between items-center">
