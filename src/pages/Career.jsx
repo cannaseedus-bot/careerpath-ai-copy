@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,25 +12,27 @@ import {
   Target, User, Briefcase, Star, Globe, Users, GitMerge, MapPin, 
   ExternalLink, CheckCircle, TrendingUp, CalendarCheck, MessageCircle, 
   Heart, Zap, Code, Terminal, Shield, Cpu, Server, Download,
-  FolderKanban, ListTodo, Brain, Search, DollarSign
+  FolderKanban, ListTodo, Brain, Search, DollarSign, LogIn, Edit, Loader2
 } from 'lucide-react';
 import CountdownTimer from '@/components/shared/CountdownTimer';
+import ProfileSetupWizard from '@/components/career/ProfileSetupWizard';
 
-const studios = [
+// Default data for demo/non-logged-in users
+const defaultStudios = [
   { rank: "1", name: "ANTHROPIC", location: "San Francisco", founded: "2021", team: "500+ Engineers", specialty: "LLM/Claude", description: "AI safety company building reliable, interpretable AI systems", alignment: "Claude SDK integration & agent frameworks", website: "anthropic.com", url: "https://www.anthropic.com" },
   { rank: "2", name: "HUGGING FACE", location: "New York / Paris", founded: "2016", team: "200+ Team", specialty: "ML Platform", description: "The AI community hub for models, datasets, and spaces", alignment: "Model hosting, transformers, and inference APIs", website: "huggingface.co", url: "https://huggingface.co" },
   { rank: "3", name: "OLLAMA", location: "Remote", founded: "2023", team: "Growing", specialty: "Local LLMs", description: "Run large language models locally with ease", alignment: "Local model deployment & CLI tooling", website: "ollama.ai", url: "https://ollama.ai" },
   { rank: "4", name: "DEEPSEEK", location: "China / Global", founded: "2023", team: "100+ Researchers", specialty: "Open Models", description: "Open-source LLMs pushing efficiency boundaries", alignment: "Cost-effective inference & open-weight models", website: "deepseek.com", url: "https://www.deepseek.com" }
 ];
 
-const roles = [
+const defaultRoles = [
   { rank: "1", title: "Full Stack AI Engineer", subtitle: "LLM integration & agent frameworks" },
   { rank: "2", title: "Runtime & Language Developer", subtitle: "DSL design, compilers, interpreters" },
   { rank: "3", title: "Infrastructure Architect", subtitle: "server, hosting, network systems" },
   { rank: "4", title: "Open Source Lead", subtitle: "MX2LM framework & community" }
 ];
 
-const coreSkills = [
+const defaultCoreSkills = [
   { name: "React / Node.js", level: 92 },
   { name: "Python / AI/ML", level: 88 },
   { name: "MX2LM / MATRIX Frameworks", level: 95 },
@@ -37,7 +41,7 @@ const coreSkills = [
   { name: "Server Infrastructure / Hosting", level: 88 }
 ];
 
-const growthSkills = [
+const defaultGrowthSkills = [
   { name: "ATOMIC CODING Patterns", level: 75 },
   { name: "Runtime Development", level: 70 },
   { name: "Language Design & DSLs", level: 65 },
@@ -45,7 +49,7 @@ const growthSkills = [
   { name: "Multi-Agent Orchestration", level: 70 }
 ];
 
-const milestones = [
+const defaultMilestones = [
   { month: "1", title: "Core Framework", tasks: ["MX2LM CLI v3.2 Release", "KUHUL π Governance Engine", "PS-DSL v2 Security Layer"] },
   { month: "2", title: "Agent Ecosystem", tasks: ["Multi-Agent Orchestration Module", "DeepSeek T-UI v2.1 Integration", "Ollama Cloud API Connector"] },
   { month: "3", title: "Runtime & Plugins", tasks: ["WebGPU Runtime for phi-3", "SCXQ2 Compression Plugin", "ASX State Management Addon"] },
@@ -54,7 +58,107 @@ const milestones = [
   { month: "6", title: "Launch & Scale", tasks: ["Public API Release", "Documentation Portal", "Community Marketplace"] }
 ];
 
+const defaultProfile = {
+  full_name: "Michael Pickett, Jr",
+  title: "Full Stack Developer",
+  location: "Bullhead City, AZ",
+  email: "canna.seed.usa@gmail.com",
+  availability: "available",
+  mission_statement: "To architect intelligent, scalable full-stack solutions that bridge multi-agent AI systems with modern web technologies, empowering developers with next-generation CLI tools and collaborative frameworks.",
+  target_studios: defaultStudios,
+  target_roles: defaultRoles,
+  core_skills: defaultCoreSkills,
+  growth_skills: defaultGrowthSkills,
+  action_plan: defaultMilestones,
+  setup_complete: true
+};
+
 export default function CareerPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showWizard, setShowWizard] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  // Check authentication
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const authenticated = await base44.auth.isAuthenticated();
+        setIsAuthenticated(authenticated);
+        if (authenticated) {
+          const userData = await base44.auth.me();
+          setUser(userData);
+        }
+      } catch (e) {
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  // Fetch user's profile
+  const { data: profiles = [], isLoading: profileLoading } = useQuery({
+    queryKey: ['userProfile', user?.email],
+    queryFn: () => base44.entities.UserProfile.filter({ created_by: user?.email }),
+    enabled: !!user?.email
+  });
+
+  const userProfile = profiles[0];
+
+  // Save profile mutation
+  const saveMutation = useMutation({
+    mutationFn: (data) => {
+      if (userProfile?.id) {
+        return base44.entities.UserProfile.update(userProfile.id, data);
+      }
+      return base44.entities.UserProfile.create(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      setShowWizard(false);
+    }
+  });
+
+  const handleLogin = () => {
+    base44.auth.redirectToLogin(window.location.href);
+  };
+
+  const handleLogout = () => {
+    base44.auth.logout();
+  };
+
+  const handleWizardComplete = (profileData) => {
+    saveMutation.mutate(profileData);
+  };
+
+  // Determine which data to display
+  const profile = userProfile?.setup_complete ? userProfile : defaultProfile;
+  const studios = profile.target_studios || defaultStudios;
+  const roles = profile.target_roles || defaultRoles;
+  const coreSkills = profile.core_skills || defaultCoreSkills;
+  const growthSkills = profile.growth_skills || defaultGrowthSkills;
+  const milestones = profile.action_plan || defaultMilestones;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
+      </div>
+    );
+  }
+
+  // Show wizard for new authenticated users
+  if (isAuthenticated && !profileLoading && (!userProfile || !userProfile.setup_complete || showWizard)) {
+    return (
+      <ProfileSetupWizard 
+        onComplete={handleWizardComplete} 
+        initialData={userProfile || { ...defaultProfile, full_name: user?.full_name || '', email: user?.email || '', setup_complete: false }}
+      />
+    );
+  }
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono p-4">
       <div className="max-w-6xl mx-auto">
