@@ -45,14 +45,58 @@ export default function Home() {
               <div className="text-cyan-400 text-xl font-bold mb-1">⚡ MX2LM + XJSON Cluster — Unified Platform</div>
               <div className="text-slate-400 text-sm">Multi-agent CLI + FREE AI research. KUHUL π governed. Zero API costs.</div>
             </div>
-            <a 
-              href="https://github.com/anthropics/anthropic-cookbook/archive/refs/heads/main.zip"
-              download
-              className="bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-400 hover:to-green-400 text-black font-bold px-6 py-3 flex items-center gap-2 transition-all"
-            >
-              <Download className="w-5 h-5" />
-              Download v3.1
-            </a>
+            <div className="flex gap-2">
+              <a 
+                href="https://github.com/anthropics/anthropic-cookbook/archive/refs/heads/main.zip"
+                download
+                className="bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-400 hover:to-green-400 text-black font-bold px-4 py-3 flex items-center gap-2 transition-all"
+              >
+                <Download className="w-5 h-5" />
+                Installer
+              </a>
+              <button 
+                onClick={() => {
+                  const packageJson = {
+                    name: "mx2lm-cli",
+                    version: "3.1.0",
+                    description: "MX2LM + XJSON Cluster OS - Unified AI Platform",
+                    scripts: {
+                      start: "python -m mx2lm.cli",
+                      server: "python -m mx2lm.server",
+                      tui: "python -m mx2lm.deepseek_tui"
+                    },
+                    dependencies: {
+                      rich: "^13.0.0",
+                      "prompt-toolkit": "^3.0.0",
+                      pygments: "^2.0.0",
+                      anthropic: "^0.18.0",
+                      "google-generativeai": "^0.4.0",
+                      openai: "^1.12.0",
+                      ollama: "^0.1.0",
+                      transformers: "^4.38.0",
+                      torch: "^2.2.0",
+                      requests: "^2.31.0",
+                      websockets: "^12.0",
+                      beautifulsoup4: "^4.12.0",
+                      numpy: "^1.26.0"
+                    },
+                    python: ">=3.10",
+                    keywords: ["cli", "ai", "multi-agent", "deepseek", "claude", "gemini"]
+                  };
+                  const blob = new Blob([JSON.stringify(packageJson, null, 2)], { type: 'application/json' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'package.json';
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="bg-purple-500 hover:bg-purple-400 text-black font-bold px-4 py-3 flex items-center gap-2 transition-all cursor-pointer"
+              >
+                <Code className="w-5 h-5" />
+                package.json
+              </button>
+            </div>
           </div>
           <div className="border-t border-cyan-800 px-6 py-3 text-xs text-slate-500 flex flex-wrap gap-4">
             <span>✓ /claude /gemini /codex /deepseek</span>
