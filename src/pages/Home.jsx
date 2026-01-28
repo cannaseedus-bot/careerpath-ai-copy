@@ -28,6 +28,10 @@ export default function Home() {
                 Welcome to MX2LM Studio. Configure, manage, and deploy 
                 <br />quantized AI models with a unified command-line interface.
               </div>
+              <div className="mt-4 text-purple-400 flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                Powered by Claude 3.5 Sonnet Agent SDK
+              </div>
             </div>
           </div>
         </div>
@@ -69,8 +73,8 @@ export default function Home() {
               <div className="text-green-400 text-sm ml-4">Create and manage custom CLI commands</div>
             </Link>
             <Link to={createPageUrl("ShellAssistant")} className="block hover:bg-green-900/30 p-3 transition">
-              <div className="text-cyan-400">$ mx2lm assistant --ai</div>
-              <div className="text-green-400 text-sm ml-4">AI-powered shell assistant for natural language commands</div>
+              <div className="text-cyan-400">$ mx2lm assistant --ai --claude</div>
+              <div className="text-green-400 text-sm ml-4">Claude 3.5 Sonnet shell assistant with file analysis & XCFE-PS security</div>
             </Link>
             <Link to={createPageUrl("BotOrchestrator")} className="block hover:bg-green-900/30 p-3 transition">
               <div className="text-cyan-400">$ mx2lm bots --orchestrate</div>
@@ -104,13 +108,13 @@ export default function Home() {
 
         <div className="border-2 border-purple-400 bg-black">
           <div className="bg-purple-400 text-black px-4 py-1">
-            <span className="font-bold">BOT ORCHESTRATION</span>
+            <span className="font-bold">CLAUDE SDK</span>
           </div>
           <div className="p-4 space-y-2 text-sm text-purple-400">
-            <div>├─ Web scrapers (HuggingFace datasets)</div>
-            <div>├─ N-gram builders</div>
-            <div>├─ Tensor processors (three.js)</div>
-            <div>└─ AI authoring assistant</div>
+            <div>├─ Context-aware file analysis</div>
+            <div>├─ PowerShell security (XCFE-PS-ENVELOPE)</div>
+            <div>├─ CM-1 audit trails</div>
+            <div>└─ Natural language → commands</div>
           </div>
         </div>
 
@@ -136,9 +140,9 @@ export default function Home() {
           <div className="p-4 space-y-2 text-magenta-400 text-sm">
             <div><span className="text-yellow-400">$</span> npm install -g @mx2lm/cli</div>
             <div><span className="text-yellow-400">$</span> mx2lm init --config</div>
+            <div><span className="text-yellow-400">$</span> mx2lm assistant --claude</div>
             <div><span className="text-yellow-400">$</span> mx2lm models --add phi-3-mini</div>
-            <div><span className="text-yellow-400">$</span> mx2lm bots create --type scraper</div>
-            <div className="text-gray-500 text-xs mt-2"># Deploy to cluster in minutes</div>
+            <div className="text-gray-500 text-xs mt-2"># Claude-powered AI assistance</div>
           </div>
         </div>
 
