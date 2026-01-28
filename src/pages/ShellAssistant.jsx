@@ -83,11 +83,41 @@ export default function ShellAssistant() {
 
         if (input.startsWith('add-context ')) {
             const filePath = input.substring(12).trim();
-            setContextFiles(prev => [...prev, filePath]);
-            const message = { type: 'assistant', content: `Added to context: ${filePath}`, timestamp: new Date() };
-            setHistory(prev => [...prev, { type: 'user', content: input, timestamp: new Date() }, message]);
-            setInput("");
-            toast.success(`Added: ${filePath}`);
+            
+            const userMessage = { type: 'user', content: input, timestamp: new Date() };
+            setHistory(prev => [...prev, userMessage]);
+            setLoading(true);
+            
+            try {
+                // Analyze the file
+                const response = await base44.functions.invoke('analyze-file', {
+                    filePath,
+                    workingDir
+                });
+                
+                setContextFiles(prev => [...prev, filePath]);
+                
+                const analysisMessage = { 
+                    type: 'assistant', 
+                    content: `📁 File Context Added: ${filePath}\n\n${response.data.analysis}`,
+                    timestamp: new Date() 
+                };
+                
+                setHistory(prev => [...prev, analysisMessage]);
+                toast.success(`Analyzed: ${filePath}`);
+            } catch (error) {
+                const errorMessage = { 
+                    type: 'assistant', 
+                    content: `⚠️ Added to context: ${filePath}\n\nNote: File analysis unavailable. File added for reference only.`,
+                    timestamp: new Date() 
+                };
+                setHistory(prev => [...prev, errorMessage]);
+                setContextFiles(prev => [...prev, filePath]);
+                toast.warning('File added without analysis');
+            } finally {
+                setLoading(false);
+                setInput("");
+            }
             return;
         }
 
@@ -483,10 +513,10 @@ export default function ShellAssistant() {
                     </div>
                     <div className="space-y-2 text-sm">
                         <button
-                            onClick={() => setInput("generate XJSON entity schema for tensor data")}
+                            onClick={() => setInput("add-context package.json")}
                             className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
                         >
-                            → XJSON entity schema
+                            → Analyze project file
                         </button>
                         <button
                             onClick={() => setInput("create fold-based compression model")}
