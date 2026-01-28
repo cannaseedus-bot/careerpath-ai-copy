@@ -29,19 +29,20 @@ const roles = [
 ];
 
 const coreSkills = [
-  { name: "Logo systems", level: 85 },
-  { name: "Adobe CC (PS/AI/ID)", level: 90 },
-  { name: "Figma", level: 80 },
-  { name: "Photography & composition", level: 75 },
-  { name: "Brand concepting", level: 85 }
+  { name: "React / Node.js", level: 92 },
+  { name: "Python / AI/ML", level: 88 },
+  { name: "MX2LM / MATRIX Frameworks", level: 95 },
+  { name: "KUHUL / SCXQ2 / ASX", level: 90 },
+  { name: "Databases (SQL/NoSQL)", level: 85 },
+  { name: "Server Infrastructure / Hosting", level: 88 }
 ];
 
 const growthSkills = [
-  { name: "Packaging production", level: 30 },
-  { name: "Motion identity & AE", level: 25 },
-  { name: "Design systems (digital)", level: 40 },
-  { name: "Client storytelling", level: 35 },
-  { name: "Custom typography", level: 45 }
+  { name: "ATOMIC CODING Patterns", level: 75 },
+  { name: "Runtime Development", level: 70 },
+  { name: "Language Design & DSLs", level: 65 },
+  { name: "Network Architecture", level: 60 },
+  { name: "Multi-Agent Orchestration", level: 70 }
 ];
 
 const milestones = [
