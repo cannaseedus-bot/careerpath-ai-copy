@@ -506,18 +506,52 @@ export default function ShellAssistant() {
                     </div>
                 </div>
 
+                <div className="bg-slate-900 border border-cyan-800 rounded-lg p-4">
+                   <div className="flex items-center gap-2 mb-3">
+                       <Code className="w-5 h-5 text-cyan-400" />
+                       <h3 className="font-semibold text-white">XJSON Schemas</h3>
+                       <Badge className="bg-purple-600 text-xs">Claude</Badge>
+                   </div>
+                   <div className="space-y-2 text-sm">
+                       <button
+                           onClick={() => setInput("generate XJSON schema for user profile with preferences and settings")}
+                           className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
+                       >
+                           → Entity schema
+                       </button>
+                       <button
+                           onClick={() => setInput("create tensor schema for SVG-3D geometric weights")}
+                           className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
+                       >
+                           → Tensor schema
+                       </button>
+                       <button
+                           onClick={() => setInput("generate bot config with n-gram compression and tools")}
+                           className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
+                       >
+                           → Bot configuration
+                       </button>
+                       <button
+                           onClick={() => setInput("create micronaut service schema with control vectors")}
+                           className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
+                       >
+                           → Micronaut service
+                       </button>
+                   </div>
+                </div>
+
                 <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                        <Code className="w-5 h-5 text-blue-400" />
-                        <h3 className="font-semibold text-white">MX2LM CLI</h3>
-                    </div>
-                    <div className="space-y-2 text-sm">
-                        <button
-                            onClick={() => setInput("generate XJSON tensor schema")}
-                            className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
-                        >
-                            → Generate XJSON schema
-                        </button>
+                   <div className="flex items-center gap-2 mb-3">
+                       <Code className="w-5 h-5 text-blue-400" />
+                       <h3 className="font-semibold text-white">MX2LM CLI</h3>
+                   </div>
+                   <div className="space-y-2 text-sm">
+                       <button
+                           onClick={() => setInput("generate Python compression module")}
+                           className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
+                       >
+                           → Python module
+                       </button>
                         <button
                             onClick={() => setInput("create fold-based compression model")}
                             className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
