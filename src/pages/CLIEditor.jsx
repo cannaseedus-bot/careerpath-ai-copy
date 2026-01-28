@@ -24,6 +24,7 @@ import subprocess
 
 # SDK Imports (install via pip)
 # pip install anthropic google-generativeai ollama transformers powershell-utils requests
+# npm install @posthog/code-agent ollama @anthropic-ai/sdk @google/generative-ai
 
 # ═══════════════════════════════════════════════════════════════
 # AI PROVIDER INITIALIZATION
