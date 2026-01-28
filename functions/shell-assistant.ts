@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import Anthropic from 'npm:@anthropic-ai/sdk@0.39.0';
 
 Deno.serve(async (req) => {
     try {
@@ -25,39 +26,44 @@ Deno.serve(async (req) => {
             : '';
 
         if (action === 'command') {
-            systemPrompt = `You are an AI shell assistant for MX2LM - a MICRONAUT (agent, brain, tool) for LLM runtime for coding applications.
-Your job is to convert natural language requests into shell commands.
+            systemPrompt = `You are SCXQ2 Shell Assistant - a Claude-powered μ-agent for MX2LM runtime.
+Your job is to convert natural language into MX2LM CLI commands and SCXQ2 workflows.
 
 Focus on:
-- Ollama model management (ollama pull, ollama run, ollama list, ollama rm, etc.)
-- File operations (ls, cd, cat, mkdir, rm, cp, mv)
-- Git operations (git clone, git pull, git commit, git push)
-- Package management (npm, pip, cargo)
-- Process management (ps, kill, top)
-- General Unix/Linux commands
+- SCXQ2 compression workflows (scxq2 compress, scxq2 quantize, scxq2 fold)
+- Tensor operations (mx2lm tensor create, mx2lm tensor shard, mx2lm tensor encode)
+- Micronaut management (mx2lm micronaut spawn, mx2lm micronaut monitor)
+- Bot deployment (mx2lm bot deploy, mx2lm bot optimize)
+- XCFE PowerShell (mx2lm ps exec --governed)
+- N-gram indexing (mx2lm ngram build, mx2lm ngram compress)
+- Cluster operations (mx2lm cluster deploy, mx2lm cluster scale)
 
-Return ONLY the shell command without explanations. If the request is ambiguous, return the most likely command.
-For Ollama cloud models, remind users to set OLLAMA_API_KEY.
+Return ONLY the command without explanations.
 
 Examples:
-User: "pull the gpt-oss 120b cloud model"
-Response: ollama pull gpt-oss:120b-cloud
+User: "create compression workflow"
+Response: scxq2 compress --mode=fold --quantize=int4 --ngram-index
 
-User: "list all my models"
-Response: ollama list
+User: "deploy bot to cluster"
+Response: mx2lm bot deploy --cluster=distributed --tensor-schema=svg3d
 
-User: "show me the files here"
-Response: ls -la`;
+User: "list running processes"
+Response: mx2lm ps exec --governed "Get-Process"`;
 
             userPrompt = prompt + contextSummary;
         } else if (action === 'code') {
-            systemPrompt = `You are an AI coding assistant for MX2LM - a MICRONAUT (agent, brain, tool) for LLM runtime.
-You help with code generation, explanation, and debugging.
+            systemPrompt = `You are SCXQ2 Code Assistant - a Claude-powered μ-agent for MX2LM.
+You generate XJSON schemas, PS-DSL-1 envelopes, tensor definitions, and compression models.
 
-Consider the project context when generating code to ensure it fits the existing architecture.
-Return well-formatted code with comments and relevant imports.
-For explanations, be clear and concise.
-For debugging, identify the issue and suggest fixes with examples.${projectContext}`;
+Specialize in:
+- XJSON entity schemas with tensor metadata
+- PS-DSL-1 legality envelopes for PowerShell
+- CM-1 audit trail bindings
+- SVG-3D tensor schemas
+- N-gram compression dictionaries
+- Micronaut control vectors (CSS-style)
+
+Return production-ready code with MX2LM/SCXQ2 conventions.${projectContext}`;
 
             userPrompt = prompt + contextSummary;
         } else if (action === 'explain') {

@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { 
     Terminal, 
     Sparkles, 
@@ -19,7 +20,8 @@ import {
     FileText,
     Play,
     Network,
-    Shield
+    Shield,
+    Brain
 } from "lucide-react";
 import { toast } from "sonner";
 import ProjectScaffold from "@/components/shell/ProjectScaffold";
@@ -126,9 +128,9 @@ export default function ShellAssistant() {
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
-                        <Terminal className="w-8 h-8 text-green-400" />
-                        <h1 className="text-3xl font-bold text-white">MX2LM Shell Assistant</h1>
-                        <Sparkles className="w-5 h-5 text-yellow-400" />
+                        <Brain className="w-8 h-8 text-cyan-400" />
+                        <h1 className="text-3xl font-bold text-white">SCXQ2 Shell Assistant</h1>
+                        <Badge className="bg-cyan-600">MX2LM μ-Agent</Badge>
                     </div>
                     <Button
                         onClick={() => setShowScaffold(!showScaffold)}
@@ -140,7 +142,7 @@ export default function ShellAssistant() {
                     </Button>
                 </div>
                 <p className="text-slate-400">
-                    Context-aware assistant for Ollama models, coding, and project scaffolding
+                    Claude-powered μ-agent for governed PowerShell, compression workflows, and SCXQ2 runtime management
                 </p>
             </div>
 
@@ -191,9 +193,12 @@ export default function ShellAssistant() {
                     >
                 {history.length === 0 ? (
                     <div className="text-slate-500 space-y-2">
-                        <p>$ Welcome to MX2LM Shell Assistant</p>
-                        <p className="text-xs">
-                          Try: "pull gpt-oss cloud model" | "list my models" | "generate a python script"
+                        <p>$ SCXQ2 Shell Assistant v1.0 - MX2LM μ-Agent Runtime</p>
+                        <p className="text-xs text-cyan-400">
+                          Powered by @anthropic-ai/claude-agent-sdk
+                        </p>
+                        <p className="text-xs mt-2">
+                          Try: "list running processes" | "generate compression workflow" | "scaffold SCXQ2 project"
                         </p>
                     </div>
                 ) : (
@@ -360,35 +365,35 @@ export default function ShellAssistant() {
 
                     {/* Quick Actions */}
                     <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+                <div className="bg-slate-900 border border-cyan-800 rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-3">
-                        <Zap className="w-5 h-5 text-yellow-400" />
-                        <h3 className="font-semibold text-white">Ollama Commands</h3>
+                        <Brain className="w-5 h-5 text-cyan-400" />
+                        <h3 className="font-semibold text-white">SCXQ2 Workflows</h3>
                     </div>
                     <div className="space-y-2 text-sm">
                         <button
-                            onClick={() => setInput("list all available ollama models")}
-                            className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
+                            onClick={() => setInput("create compression workflow with n-gram indexing")}
+                            className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
                         >
-                            → List all models
+                            → Compression workflow
                         </button>
                         <button
-                            onClick={() => setInput("pull gpt-oss:120b-cloud")}
-                            className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
+                            onClick={() => setInput("setup tensor quantization pipeline")}
+                            className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
                         >
-                            → Pull GPT-OSS cloud model
+                            → Tensor quantization
                         </button>
                         <button
-                            onClick={() => setInput("run deepseek-v3.1:671b-cloud")}
-                            className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
+                            onClick={() => setInput("generate micronaut control vectors")}
+                            className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
                         >
-                            → Run DeepSeek model
+                            → Micronaut μ-agent
                         </button>
                         <button
-                            onClick={() => setInput("check ollama version")}
-                            className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
+                            onClick={() => setInput("deploy bot with SVG-3D tensor schema")}
+                            className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
                         >
-                            → Check Ollama version
+                            → Deploy SCXQ2 bot
                         </button>
                     </div>
                 </div>
@@ -396,65 +401,65 @@ export default function ShellAssistant() {
                 <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-3">
                         <Code className="w-5 h-5 text-blue-400" />
-                        <h3 className="font-semibold text-white">Code Tasks</h3>
+                        <h3 className="font-semibold text-white">MX2LM CLI</h3>
                     </div>
                     <div className="space-y-2 text-sm">
                         <button
-                            onClick={() => setInput("generate a python script that processes CSV files")}
+                            onClick={() => setInput("generate XJSON entity schema for tensor data")}
                             className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
                         >
-                            → Generate Python script
+                            → XJSON entity schema
                         </button>
                         <button
-                            onClick={() => setInput("explain how async/await works in JavaScript")}
+                            onClick={() => setInput("create fold-based compression model")}
                             className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
                         >
-                            → Explain async/await
+                            → Fold compression
                         </button>
                         <button
-                            onClick={() => setInput("debug: TypeError: Cannot read property of undefined")}
+                            onClick={() => setInput("setup CM-1 audit trail binding")}
                             className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
                         >
-                            → Debug error
+                            → CM-1 audit binding
                         </button>
                         <button
-                            onClick={() => setInput("create a REST API endpoint in Node.js")}
+                            onClick={() => setInput("generate PS-DSL-1 legality envelope")}
                             className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
                         >
-                            → Create API endpoint
+                            → PS-DSL-1 envelope
                             </button>
                         </div>
                     </div>
 
                     <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
                         <div className="flex items-center gap-2 mb-3">
-                            <Globe className="w-5 h-5 text-cyan-400" />
-                            <h3 className="font-semibold text-white">Advanced Tools</h3>
+                            <Network className="w-5 h-5 text-indigo-400" />
+                            <h3 className="font-semibold text-white">Cluster Operations</h3>
                         </div>
                         <div className="space-y-2 text-sm">
                             <button
-                                onClick={() => setInput("search for latest AI model benchmarks")}
-                                className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
+                                onClick={() => setInput("deploy bot to distributed cluster")}
+                                className="text-left text-slate-400 hover:text-indigo-400 transition-colors w-full"
                             >
-                                → Web search with grounding
+                                → Deploy to cluster
                             </button>
                             <button
-                                onClick={() => setInput("fetch https://api.github.com/repos/ollama/ollama")}
-                                className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
+                                onClick={() => setInput("monitor tensor processing across nodes")}
+                                className="text-left text-slate-400 hover:text-indigo-400 transition-colors w-full"
                             >
-                                → Fetch web content
+                                → Monitor cluster nodes
                             </button>
                             <button
-                                onClick={() => setInput("analyze package.json dependencies")}
-                                className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
+                                onClick={() => setInput("optimize bot deployment with SCXQ2 sharding")}
+                                className="text-left text-slate-400 hover:text-indigo-400 transition-colors w-full"
                             >
-                                → Read and analyze file
+                                → Optimize deployment
                             </button>
                             <button
-                                onClick={() => setInput("setup parallel model quantization across 4 GPUs")}
-                                className="text-left text-slate-400 hover:text-cyan-400 transition-colors w-full"
+                                onClick={() => setInput("setup parallel n-gram compression")}
+                                className="text-left text-slate-400 hover:text-indigo-400 transition-colors w-full"
                             >
-                                → Cluster operations
+                                → Parallel compression
                             </button>
                         </div>
                     </div>
@@ -462,32 +467,33 @@ export default function ShellAssistant() {
                     <div className="bg-slate-900 border border-blue-800 rounded-lg p-4">
                         <div className="flex items-center gap-2 mb-3">
                             <Shield className="w-5 h-5 text-blue-400" />
-                            <h3 className="font-semibold text-white">PowerShell (XCFE)</h3>
+                            <h3 className="font-semibold text-white">XCFE PowerShell</h3>
+                            <Badge className="bg-green-600 text-xs">CM-1 Audit</Badge>
                         </div>
                         <div className="space-y-2 text-sm">
                             <button
                                 onClick={() => setInput("list running processes")}
                                 className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
                             >
-                                → List processes
+                                → Get-Process (read-only)
                             </button>
                             <button
                                 onClick={() => setInput("show windows services")}
                                 className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
                             >
-                                → Query services
+                                → Get-Service (governed)
                             </button>
                             <button
                                 onClick={() => setInput("get system information")}
                                 className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
                             >
-                                → System info
+                                → Get-ComputerInfo (safe)
                             </button>
                             <button
                                 onClick={() => setInput("check event logs")}
                                 className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
                             >
-                                → Event logs (read-only)
+                                → Get-EventLog (allowlisted)
                             </button>
                         </div>
                     </div>
