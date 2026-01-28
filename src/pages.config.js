@@ -63,11 +63,11 @@ import ModelManager from './pages/ModelManager';
 import Monitoring from './pages/Monitoring';
 import Nemesis from './pages/Nemesis';
 import Pricing from './pages/Pricing';
+import ProjectDashboard from './pages/ProjectDashboard';
 import RuntimeStudio from './pages/RuntimeStudio';
 import SWOT from './pages/SWOT';
 import ShellAssistant from './pages/ShellAssistant';
 import Success from './pages/Success';
-import ProjectDashboard from './pages/ProjectDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -88,11 +88,11 @@ export const PAGES = {
     "Monitoring": Monitoring,
     "Nemesis": Nemesis,
     "Pricing": Pricing,
+    "ProjectDashboard": ProjectDashboard,
     "RuntimeStudio": RuntimeStudio,
     "SWOT": SWOT,
     "ShellAssistant": ShellAssistant,
     "Success": Success,
-    "ProjectDashboard": ProjectDashboard,
 }
 
 export const pagesConfig = {
