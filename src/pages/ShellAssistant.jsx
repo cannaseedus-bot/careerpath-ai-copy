@@ -458,6 +458,39 @@ export default function ShellAssistant() {
                             </button>
                         </div>
                     </div>
+
+                    <div className="bg-slate-900 border border-blue-800 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Shield className="w-5 h-5 text-blue-400" />
+                            <h3 className="font-semibold text-white">PowerShell (XCFE)</h3>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                            <button
+                                onClick={() => setInput("list running processes")}
+                                className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
+                            >
+                                → List processes
+                            </button>
+                            <button
+                                onClick={() => setInput("show windows services")}
+                                className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
+                            >
+                                → Query services
+                            </button>
+                            <button
+                                onClick={() => setInput("get system information")}
+                                className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
+                            >
+                                → System info
+                            </button>
+                            <button
+                                onClick={() => setInput("check event logs")}
+                                className="text-left text-slate-400 hover:text-blue-400 transition-colors w-full"
+                            >
+                                → Event logs (read-only)
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 </TabsContent>
 
