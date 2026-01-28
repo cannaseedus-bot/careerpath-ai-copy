@@ -294,7 +294,7 @@ Provide efficient solutions for scaling and parallel execution.`;
             // XCFE-PS-ENVELOPE: Governed PowerShell execution
             const psCommand = prompt.trim();
             
-            // PS-DSL-1: Deny-by-default command registry
+            // PS-DSL-1: Deny-by-default command registry (Expanded)
             const allowedCommands = {
                 'Get-Process': { safe: true, readOnly: true, description: 'List running processes' },
                 'Get-Service': { safe: true, readOnly: true, description: 'Query Windows services' },
@@ -303,7 +303,31 @@ Provide efficient solutions for scaling and parallel execution.`;
                 'Get-WmiObject': { safe: true, readOnly: true, description: 'Query WMI objects' },
                 'Get-ItemProperty': { safe: true, readOnly: true, description: 'Read registry values' },
                 'Get-ChildItem': { safe: true, readOnly: true, description: 'List directory contents' },
-                'Get-Content': { safe: true, readOnly: true, description: 'Read file contents' }
+                'Get-Content': { safe: true, readOnly: true, description: 'Read file contents' },
+                'Get-NetAdapter': { safe: true, readOnly: true, description: 'Query network adapters' },
+                'Get-NetIPConfiguration': { safe: true, readOnly: true, description: 'Get IP configuration' },
+                'Get-DnsClientServerAddress': { safe: true, readOnly: true, description: 'Get DNS server addresses' },
+                'Get-Volume': { safe: true, readOnly: true, description: 'Query disk volumes' },
+                'Get-Disk': { safe: true, readOnly: true, description: 'Query physical disks' },
+                'Get-PSDrive': { safe: true, readOnly: true, description: 'List PowerShell drives' },
+                'Get-HotFix': { safe: true, readOnly: true, description: 'List installed updates' },
+                'Get-CimInstance': { safe: true, readOnly: true, description: 'Query CIM instances' },
+                'Get-Package': { safe: true, readOnly: true, description: 'List installed packages' },
+                'Get-WindowsFeature': { safe: true, readOnly: true, description: 'Query Windows features' },
+                'Get-ScheduledTask': { safe: true, readOnly: true, description: 'List scheduled tasks' },
+                'Get-LocalUser': { safe: true, readOnly: true, description: 'List local users' },
+                'Get-LocalGroup': { safe: true, readOnly: true, description: 'List local groups' },
+                'Get-FileHash': { safe: true, readOnly: true, description: 'Compute file hash' },
+                'Get-Date': { safe: true, readOnly: true, description: 'Get current date/time' },
+                'Get-TimeZone': { safe: true, readOnly: true, description: 'Get system timezone' },
+                'Get-Culture': { safe: true, readOnly: true, description: 'Get system culture' },
+                'Get-Command': { safe: true, readOnly: true, description: 'List available commands' },
+                'Get-Help': { safe: true, readOnly: true, description: 'Get command help' },
+                'Get-Variable': { safe: true, readOnly: true, description: 'List PowerShell variables' },
+                'Get-History': { safe: true, readOnly: true, description: 'Get command history' },
+                'Test-Path': { safe: true, readOnly: true, description: 'Test if path exists' },
+                'Test-Connection': { safe: true, readOnly: true, description: 'Ping network hosts' },
+                'Measure-Object': { safe: true, readOnly: true, description: 'Measure object properties' }
             };
             
             const deniedCommands = [
@@ -392,6 +416,15 @@ Response: Get-Service`;
                 user: user.email
             };
             
+            // Store in audit database
+            await base44.asServiceRole.entities.PowerShellAudit.create({
+                intent: psCommand,
+                lowered_command: generatedCmd,
+                legal: true,
+                cm1_metadata: cm1Envelope,
+                working_dir: workingDir || '~/'
+            });
+            
             // Format output with CM-1 provenance
             const output = `✅ XCFE-PS-ENVELOPE APPROVED
 
@@ -424,6 +457,22 @@ Execute manually in PowerShell or via powershell-utils transport layer.
                 legal: true,
                 command: generatedCmd,
                 cm1: cm1Envelope
+            });
+        } else if (action === 'suggest-cmdlet') {
+            // Handle cmdlet suggestion for allowlist
+            const suggestion = {
+                cmdlet: prompt.trim(),
+                user: user.email,
+                timestamp: new Date().toISOString(),
+                status: 'pending_review'
+            };
+            
+            // Store suggestion in database
+            await base44.asServiceRole.entities.PowerShellSuggestion.create(suggestion);
+            
+            return Response.json({
+                result: `✅ Cmdlet suggestion submitted for review\n\nCmdlet: ${suggestion.cmdlet}\nStatus: Pending Security Review\n\nYour suggestion will be evaluated for:\n- Read-only verification\n- Security implications\n- Usefulness for system inspection\n\nThank you for helping improve the XCFE-PS-ENVELOPE allowlist!`,
+                action: 'suggest-cmdlet'
             });
         }
 

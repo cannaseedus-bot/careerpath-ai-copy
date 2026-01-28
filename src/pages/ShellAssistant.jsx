@@ -26,6 +26,7 @@ import {
 import { toast } from "sonner";
 import ProjectScaffold from "@/components/shell/ProjectScaffold";
 import ScaffoldResult from "@/components/shell/ScaffoldResult";
+import CM1AuditPanel from "@/components/shell/CM1AuditPanel";
 
 export default function ShellAssistant() {
     const [input, setInput] = useState("");
@@ -191,6 +192,10 @@ export default function ShellAssistant() {
                     <TabsTrigger value="terminal">
                         <Terminal className="w-4 h-4 mr-2" />
                         Terminal
+                    </TabsTrigger>
+                    <TabsTrigger value="audit">
+                        <Shield className="w-4 h-4 mr-2" />
+                        CM-1 Audit
                     </TabsTrigger>
                     <TabsTrigger value="scaffold">
                         <Rocket className="w-4 h-4 mr-2" />
@@ -571,6 +576,10 @@ export default function ShellAssistant() {
                         </div>
                     </div>
                 </div>
+                </TabsContent>
+
+                <TabsContent value="audit">
+                    <CM1AuditPanel />
                 </TabsContent>
 
                 <TabsContent value="scaffold">
