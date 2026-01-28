@@ -334,8 +334,7 @@ export default function CodeGenerationAssistant({ onCodeGenerated, currentCode =
                   </Card>
                 </TabsContent>
               )}
-
-
+            </Tabs>
           </div>
         )}
 
