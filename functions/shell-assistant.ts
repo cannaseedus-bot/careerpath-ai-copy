@@ -10,7 +10,11 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { prompt, context, action, history, projectFiles, url, filePath, shellCommand } = await req.json();
+        const { prompt, context, action, history, projectFiles, url, filePath, shellCommand, workingDir, contextFiles } = await req.json();
+        
+        // Initialize Claude API if available
+        const anthropicKey = Deno.env.get("ANTHROPIC_API_KEY");
+        const anthropic = anthropicKey ? new Anthropic({ apiKey: anthropicKey }) : null;
 
         let systemPrompt = '';
         let userPrompt = '';
@@ -24,6 +28,13 @@ Deno.serve(async (req) => {
         const projectContext = projectFiles && projectFiles.length > 0
             ? `\n\nProject files:\n${projectFiles.map(f => `- ${f.name}: ${f.type || 'file'}`).join('\n')}`
             : '';
+            
+        // Build file context
+        const fileContext = contextFiles && contextFiles.length > 0
+            ? `\n\nContext files:\n${contextFiles.join('\n')}`
+            : '';
+            
+        const dirContext = workingDir ? `\n\nWorking directory: ${workingDir}` : '';
 
         if (action === 'command') {
             systemPrompt = `You are SCXQ2 Shell Assistant - a Claude-powered μ-agent for MX2LM runtime.
@@ -416,10 +427,28 @@ Execute manually in PowerShell or via powershell-utils transport layer.
             });
         }
 
-        const response = await base44.integrations.Core.InvokeLLM({
-            prompt: `${systemPrompt}\n\nUser request: ${userPrompt}${context ? `\n\nAdditional context: ${context}` : ''}`,
-            add_context_from_internet: false
-        });
+        // Use Claude API if available, otherwise fallback to base44 LLM
+        let response;
+        
+        if (anthropic) {
+            const fullPrompt = `${systemPrompt}\n\nUser request: ${userPrompt}${context ? `\n\nAdditional context: ${context}` : ''}${dirContext}${fileContext}`;
+            
+            const message = await anthropic.messages.create({
+                model: "claude-3-5-sonnet-20241022",
+                max_tokens: 4096,
+                messages: [{
+                    role: "user",
+                    content: fullPrompt
+                }]
+            });
+            
+            response = message.content[0].text;
+        } else {
+            response = await base44.integrations.Core.InvokeLLM({
+                prompt: `${systemPrompt}\n\nUser request: ${userPrompt}${context ? `\n\nAdditional context: ${context}` : ''}${dirContext}${fileContext}`,
+                add_context_from_internet: false
+            });
+        }
 
         return Response.json({ 
             result: response,

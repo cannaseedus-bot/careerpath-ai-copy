@@ -36,6 +36,8 @@ export default function ShellAssistant() {
     const [showScaffold, setShowScaffold] = useState(false);
     const [scaffoldResult, setScaffoldResult] = useState(null);
     const [activeTab, setActiveTab] = useState("terminal");
+    const [workingDir, setWorkingDir] = useState("~/");
+    const [contextFiles, setContextFiles] = useState([]);
     const terminalRef = useRef(null);
     const inputRef = useRef(null);
 
@@ -67,6 +69,36 @@ export default function ShellAssistant() {
     const processCommand = async (action) => {
         if (!input.trim()) return;
 
+        // Handle local commands
+        if (input.startsWith('cd ')) {
+            const newPath = input.substring(3).trim();
+            setWorkingDir(newPath);
+            const message = { type: 'assistant', content: `Changed directory to: ${newPath}`, timestamp: new Date() };
+            setHistory(prev => [...prev, { type: 'user', content: input, timestamp: new Date() }, message]);
+            setInput("");
+            toast.success(`Working directory: ${newPath}`);
+            return;
+        }
+
+        if (input.startsWith('add-context ')) {
+            const filePath = input.substring(12).trim();
+            setContextFiles(prev => [...prev, filePath]);
+            const message = { type: 'assistant', content: `Added to context: ${filePath}`, timestamp: new Date() };
+            setHistory(prev => [...prev, { type: 'user', content: input, timestamp: new Date() }, message]);
+            setInput("");
+            toast.success(`Added: ${filePath}`);
+            return;
+        }
+
+        if (input === 'clear-context') {
+            setContextFiles([]);
+            const message = { type: 'assistant', content: 'Context cleared', timestamp: new Date() };
+            setHistory(prev => [...prev, { type: 'user', content: input, timestamp: new Date() }, message]);
+            setInput("");
+            toast.success('Context cleared');
+            return;
+        }
+
         const userMessage = { type: 'user', content: input, timestamp: new Date() };
         setHistory(prev => [...prev, userMessage]);
         setLoading(true);
@@ -75,7 +107,9 @@ export default function ShellAssistant() {
             const response = await base44.functions.invoke('shell-assistant', {
                 prompt: input,
                 action: action,
-                history: history.slice(-10) // Send last 10 messages for context
+                workingDir: workingDir,
+                contextFiles: contextFiles,
+                history: history.slice(-10)
             });
 
             const assistantMessage = {
@@ -195,9 +229,12 @@ export default function ShellAssistant() {
                     <div className="text-slate-500 space-y-2">
                         <p>$ SCXQ2 Shell Assistant v1.0 - MX2LM μ-Agent Runtime</p>
                         <p className="text-xs text-cyan-400">
-                          Powered by @anthropic-ai/claude-agent-sdk
+                          Powered by Claude 3.5 Sonnet via @anthropic-ai/sdk
                         </p>
                         <p className="text-xs mt-2">
+                          Commands: "cd /path" | "add-context file.py" | "clear-context"
+                        </p>
+                        <p className="text-xs">
                           Try: "list running processes" | "generate compression workflow" | "scaffold SCXQ2 project"
                         </p>
                     </div>
@@ -246,6 +283,42 @@ export default function ShellAssistant() {
                         )}
                     </div>
 
+                    {/* Context Bar */}
+                    {(workingDir !== '~/' || contextFiles.length > 0) && (
+                        <div className="bg-slate-900 border border-slate-800 rounded-lg p-3 flex items-start gap-3">
+                            <div className="flex-1 space-y-1">
+                                <div className="flex items-center gap-2 text-xs">
+                                    <span className="text-slate-500">Working Dir:</span>
+                                    <code className="text-cyan-400">{workingDir}</code>
+                                </div>
+                                {contextFiles.length > 0 && (
+                                    <div className="flex items-start gap-2 text-xs">
+                                        <span className="text-slate-500">Context:</span>
+                                        <div className="flex flex-wrap gap-1">
+                                            {contextFiles.map((file, idx) => (
+                                                <Badge key={idx} variant="outline" className="text-xs">
+                                                    {file}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                    setWorkingDir('~/');
+                                    setContextFiles([]);
+                                    toast.success('Reset context');
+                                }}
+                                className="text-xs"
+                            >
+                                Reset
+                            </Button>
+                        </div>
+                    )}
+
                     {/* Input Area */}
                     <div className="space-y-3">
                 <div className="flex gap-2">
@@ -261,7 +334,7 @@ export default function ShellAssistant() {
                                     processCommand('command');
                                 }
                             }}
-                            placeholder="Type your request in natural language..."
+                            placeholder="Natural language or: cd /path, add-context file.py, clear-context"
                             className="pl-10 bg-slate-900 border-slate-700 text-white font-mono"
                             disabled={loading}
                         />
