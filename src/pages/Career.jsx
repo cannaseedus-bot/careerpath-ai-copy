@@ -66,14 +66,14 @@ export default function CareerPage() {
               <span className="font-bold text-lg">CAREER TERMINAL</span>
               <Badge className="bg-black text-cyan-400">v1.0</Badge>
             </div>
-            <span className="text-xs">[ alaksa.khan@career ~ ]</span>
+            <span className="text-xs">[ michael.pickett@career ~ ]</span>
           </div>
           <div className="p-6">
             <div className="text-cyan-400 mb-2">
               <span className="text-yellow-400">$</span> ./whoami.sh
             </div>
             <div className="ml-4 space-y-2">
-              <div className="text-3xl md:text-4xl font-bold text-white">Alaksa Anjum Khan</div>
+              <div className="text-3xl md:text-4xl font-bold text-white">Michael Pickett, Jr</div>
               <div className="text-xl text-cyan-400">Visual Designer & Strategist</div>
               <div className="mt-4 flex flex-wrap gap-3 text-sm">
                 <Badge className="bg-purple-600"><Target className="w-3 h-3 mr-1" /> Luxury Brands</Badge>
@@ -336,7 +336,7 @@ export default function CareerPage() {
               </div>
               <div className="border-2 border-cyan-400 bg-gradient-to-r from-cyan-900/30 to-purple-900/30 p-6 text-center">
                 <div className="text-2xl font-bold text-white mb-2">Let's Connect</div>
-                <div className="text-cyan-400 font-mono mb-4">alaksa.khan@lasallecollege.com</div>
+                <div className="text-cyan-400 font-mono mb-4">michael.pickett@email.com</div>
                 <div className="text-slate-400">Vancouver, BC • Available for opportunities</div>
                 <Button className="mt-4 bg-white text-black hover:bg-gray-200">
                   <MessageCircle className="w-4 h-4 mr-2" /> Get in Touch
