@@ -34,7 +34,7 @@ export default function CLIEditor() {
     environment_vars: {},
     selected_models: [],
     selected_endpoints: [],
-    subscription_tier: "starter"
+    subscription_tier: "free"
   });
 
   const queryClient = useQueryClient();
@@ -94,6 +94,7 @@ export default function CLIEditor() {
   };
 
   const tierFeatures = {
+    free: { models: 2, endpoints: 1, customBranding: false },
     starter: { models: 5, endpoints: 2, customBranding: false },
     professional: { models: 20, endpoints: 10, customBranding: false },
     enterprise: { models: 999, endpoints: 999, customBranding: true }
@@ -159,7 +160,8 @@ export default function CLIEditor() {
                 <Badge className={
                   config.subscription_tier === "enterprise" ? "bg-yellow-600" :
                   config.subscription_tier === "professional" ? "bg-purple-600" :
-                  "bg-blue-600"
+                  config.subscription_tier === "starter" ? "bg-blue-600" :
+                  "bg-slate-600"
                 }>
                   {config.subscription_tier === "enterprise" && <Crown className="w-4 h-4 mr-1" />}
                   {config.subscription_tier.toUpperCase()}
@@ -209,6 +211,7 @@ export default function CLIEditor() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="free">Free (Forever)</SelectItem>
                       <SelectItem value="starter">Starter ($9.99/mo)</SelectItem>
                       <SelectItem value="professional">Professional ($29.99/mo)</SelectItem>
                       <SelectItem value="enterprise">Enterprise ($99.99/mo)</SelectItem>
