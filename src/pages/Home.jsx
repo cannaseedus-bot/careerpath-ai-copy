@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Terminal, Cpu, Link as LinkIcon, Play, Zap, Code, Layers, Settings, Download } from "lucide-react";
+import { Terminal, Cpu, Link as LinkIcon, Play, Zap, Code, Layers, Settings, Download, Search, Brain, Globe, Server, DollarSign } from "lucide-react";
 
 export default function Home() {
   return (
@@ -21,16 +21,16 @@ export default function Home() {
             </div>
             <div className="ml-4 space-y-2">
               <div>╔════════════════════════════════════════════════════════════╗</div>
-              <div>║  MX2LM Studio v3.0 - Hybrid Multi-Agent Framework         ║</div>
-              <div>║  Core: @posthog/code-agent • KUHUL π Governed             ║</div>
+              <div>║  XJSON Cluster OS 2.1 - 100% FREE AI Research System      ║</div>
+              <div>║  MX2LM v3.0 • KUHUL π Governed • Zero API Costs           ║</div>
               <div>╚════════════════════════════════════════════════════════════╝</div>
               <div className="mt-4 text-blue-400">
-                Unified CLI orchestrating Claude, Gemini, Codex, Ollama & phi-3
-                <br />with XCFE security, CM-1 audit trails, and π-governed server runtime.
+                Autonomous AI research with real PyTorch models, WebGPU visualization,
+                <br />and FREE search via Google CSE + DuckDuckGo + Brave fallbacks.
               </div>
               <div className="mt-4 text-purple-400 flex items-center gap-2">
-                <Zap className="w-4 h-4" />
-                Sub-CLIs: /claude  /gemini  /codex  /ollama  /phi3
+                <DollarSign className="w-4 h-4" />
+                <span className="text-green-400 font-bold">$0/month</span> • Real ML • WebGPU Tensors • Unlimited Research
               </div>
             </div>
           </div>
@@ -40,24 +40,24 @@ export default function Home() {
         <div className="border-2 border-cyan-400 bg-gradient-to-r from-cyan-900/30 to-purple-900/30 mt-6">
           <div className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
-              <div className="text-cyan-400 text-xl font-bold mb-1">⚡ MX2LM CLI v3.0 — Hybrid Multi-Agent</div>
-              <div className="text-slate-400 text-sm">@posthog/code-agent core with KUHUL π governance & MX2LM-SR-1 server runtime.</div>
+              <div className="text-cyan-400 text-xl font-bold mb-1">🆓 XJSON Cluster OS 2.1 — 100% FREE</div>
+              <div className="text-slate-400 text-sm">Real PyTorch + WebGPU + Free Search. No API keys. No monthly fees. Run anywhere.</div>
             </div>
             <a 
               href="https://github.com/anthropics/anthropic-cookbook/archive/refs/heads/main.zip"
               download
-              className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-6 py-3 flex items-center gap-2 transition-all"
+              className="bg-green-500 hover:bg-green-400 text-black font-bold px-6 py-3 flex items-center gap-2 transition-all"
             >
               <Download className="w-5 h-5" />
-              Download CLI v3.0
+              Download FREE
             </a>
           </div>
           <div className="border-t border-cyan-800 px-6 py-3 text-xs text-slate-500 flex flex-wrap gap-4">
-            <span>✓ /claude /gemini /codex</span>
-            <span>✓ /ollama /phi3</span>
-            <span>✓ KUHUL π Decay</span>
-            <span>✓ XCFE Legality</span>
-            <span>✓ CM-1 Audit</span>
+            <span>✓ Google CSE (100/day FREE)</span>
+            <span>✓ DuckDuckGo (unlimited)</span>
+            <span>✓ PyTorch Models</span>
+            <span>✓ WebGPU Tensors</span>
+            <span>✓ Raspberry Pi Ready</span>
           </div>
         </div>
       </div>
@@ -121,37 +121,37 @@ export default function Home() {
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <div className="border-2 border-cyan-400 bg-black">
           <div className="bg-cyan-400 text-black px-4 py-1">
-            <span className="font-bold">MX2LM-SR-1 SERVER</span>
+            <span className="font-bold">🔍 FREE SEARCH</span>
           </div>
           <div className="p-4 space-y-2 text-sm text-cyan-400">
-            <div>├─ localhost:4141 (read-only)</div>
-            <div>├─ WS status streaming</div>
-            <div>├─ π decay auto-restart</div>
-            <div>└─ CLI-launched, KUHUL-governed</div>
+            <div>├─ Google CSE (100/day FREE)</div>
+            <div>├─ DuckDuckGo (unlimited)</div>
+            <div>├─ Brave Search fallback</div>
+            <div>└─ Multi-engine parallel</div>
           </div>
         </div>
 
         <div className="border-2 border-purple-400 bg-black">
           <div className="bg-purple-400 text-black px-4 py-1">
-            <span className="font-bold">MULTI-AGENT</span>
+            <span className="font-bold">🧠 FREE ML</span>
           </div>
           <div className="p-4 space-y-2 text-sm text-purple-400">
-            <div>├─ /claude - Anthropic Claude</div>
-            <div>├─ /gemini - Google Gemini</div>
-            <div>├─ /codex - OpenAI Codex</div>
-            <div>└─ /ollama /phi3 - Local</div>
+            <div>├─ Real PyTorch inference</div>
+            <div>├─ ResNet18 vision</div>
+            <div>├─ RNN text analysis</div>
+            <div>└─ Binary tensor streaming</div>
           </div>
         </div>
 
         <div className="border-2 border-green-400 bg-black">
           <div className="bg-green-400 text-black px-4 py-1">
-            <span className="font-bold">GOVERNANCE</span>
+            <span className="font-bold">🎮 WEBGPU</span>
           </div>
           <div className="p-4 space-y-2 text-sm text-green-400">
-            <div>├─ KUHUL π collapse thresholds</div>
-            <div>├─ XCFE legality gates</div>
-            <div>├─ CM-1 audit envelopes</div>
-            <div>└─ PS-DSL-1 PowerShell</div>
+            <div>├─ Three.js visualization</div>
+            <div>├─ Real-time tensors</div>
+            <div>├─ Point cloud rendering</div>
+            <div>└─ Interactive 3D</div>
           </div>
         </div>
       </div>
@@ -163,23 +163,22 @@ export default function Home() {
             <span className="font-bold">QUICK START</span>
           </div>
           <div className="p-4 space-y-2 text-pink-400 text-sm">
-            <div><span className="text-yellow-400">$</span> pip install mx2lm</div>
-            <div><span className="text-yellow-400">$</span> mx2lm init</div>
-            <div><span className="text-yellow-400">$</span> mx2lm server start</div>
-            <div><span className="text-yellow-400">$</span> /claude "analyze this repo"</div>
-            <div className="text-gray-500 text-xs mt-2"># Hybrid multi-agent CLI</div>
+            <div><span className="text-yellow-400">$</span> pip install torch numpy beautifulsoup4</div>
+            <div><span className="text-yellow-400">$</span> python cluster-free.py --port 8081</div>
+            <div><span className="text-yellow-400">$</span> curl localhost:8081/api/search</div>
+            <div className="text-gray-500 text-xs mt-2"># 100% FREE - No API keys needed</div>
           </div>
         </div>
 
         <div className="border-2 border-orange-400 bg-black">
           <div className="bg-orange-400 text-black px-4 py-1">
-            <span className="font-bold">BOT EXAMPLES</span>
+            <span className="font-bold">API ENDPOINTS (FREE)</span>
           </div>
           <div className="p-4 space-y-2 text-orange-400 text-sm">
-            <div>├─ Scrape HuggingFace code datasets</div>
-            <div>├─ Build n-gram tensors from corpora</div>
-            <div>├─ Process SVG-3D geometric weights</div>
-            <div>└─ Orchestrate cluster workers</div>
+            <div>├─ POST /api/search - Web search</div>
+            <div>├─ POST /api/research - Deep research</div>
+            <div>├─ POST /api/inference - ML inference</div>
+            <div>└─ POST /api/tensor - Tensor gen</div>
           </div>
         </div>
       </div>
@@ -187,37 +186,37 @@ export default function Home() {
       {/* System Status */}
       <div className="max-w-5xl mx-auto border-2 border-green-400 bg-black mb-8">
         <div className="bg-green-400 text-black px-4 py-1 flex justify-between items-center">
-          <span className="font-bold">RUNTIME STATUS</span>
-          <span className="text-xs">MX2LM-SR-1.0.0</span>
+          <span className="font-bold">CLUSTER STATUS</span>
+          <span className="text-xs">XJSON Cluster OS 2.1 FREE</span>
         </div>
         <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-green-400 text-sm">
           <div>
-            <div className="text-gray-500 text-xs">Server</div>
-            <div className="font-bold">localhost:4141</div>
+            <div className="text-gray-500 text-xs">Monthly Cost</div>
+            <div className="font-bold text-green-400">$0.00</div>
           </div>
           <div>
-            <div className="text-gray-500 text-xs">π Support</div>
-            <div className="font-bold">1.00</div>
+            <div className="text-gray-500 text-xs">Search Engines</div>
+            <div className="font-bold">3 FREE</div>
           </div>
           <div>
-            <div className="text-gray-500 text-xs">Agents</div>
-            <div className="font-bold">5 loaded</div>
+            <div className="text-gray-500 text-xs">ML Models</div>
+            <div className="font-bold">PyTorch</div>
           </div>
           <div>
-            <div className="text-gray-500 text-xs">Governance</div>
-            <div className="font-bold">KUHUL π</div>
+            <div className="text-gray-500 text-xs">Visualization</div>
+            <div className="font-bold">WebGPU</div>
           </div>
         </div>
         <div className="px-6 pb-6 text-xs text-gray-600">
-          <div>Collapse thresholds: &lt;0.3 deny | 0.3-0.6 advertise | &gt;0.6 launch | &gt;0.9 heal</div>
-          <div className="mt-1">Last sync: {new Date().toISOString()}</div>
+          <div>Search: Google CSE (100/day) → DuckDuckGo → Brave (unlimited fallback)</div>
+          <div className="mt-1">KUHUL π governance: &lt;0.3 deny | 0.3-0.6 advertise | &gt;0.6 launch | &gt;0.9 heal</div>
         </div>
       </div>
 
       {/* Footer */}
       <div className="max-w-5xl mx-auto text-center border-t-2 border-green-400 pt-6">
         <div className="text-green-400 font-mono text-sm space-y-1">
-          <div>MX2LM Studio v3.0 | CLI.MX2LM.COM | MX2LM-SR-1</div>
+          <div>XJSON Cluster OS 2.1 FREE | MX2LM v3.0 | $0/month Forever</div>
           <div className="text-gray-600">
             <Link to={createPageUrl("Pricing")} className="text-cyan-400 hover:underline">
               View Pricing
