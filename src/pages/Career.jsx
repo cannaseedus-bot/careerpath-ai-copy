@@ -337,7 +337,7 @@ export default function CareerPage() {
               </div>
               <div className="border-2 border-cyan-400 bg-gradient-to-r from-cyan-900/30 to-purple-900/30 p-6 text-center">
                 <div className="text-2xl font-bold text-white mb-2">Let's Connect</div>
-                <div className="text-cyan-400 font-mono mb-4">michael.pickett@email.com</div>
+                <div className="text-cyan-400 font-mono mb-4">canna.seed.usa@gmail.com</div>
                 <div className="text-slate-400">Bullhead City, AZ • Available for opportunities</div>
                 <Button className="mt-4 bg-white text-black hover:bg-gray-200">
                   <MessageCircle className="w-4 h-4 mr-2" /> Get in Touch
