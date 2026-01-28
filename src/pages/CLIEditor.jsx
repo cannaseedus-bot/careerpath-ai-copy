@@ -508,6 +508,179 @@ def ps_get_disks():
     return ps_execute_dsl({'@dsl': 'ps-dsl.v1', 'action': 'disk.list', 'params': {}})
 
 # ═══════════════════════════════════════════════════════════════
+# MX2LM SERVER RUNTIME (MX2LM-SR-1)
+# ═══════════════════════════════════════════════════════════════
+
+class ServerRuntime:
+    """
+    MX2LM Server Runtime - KUHUL π governed, XCFE legal, CM-1 auditable
+    Localhost-only, read-only, CLI-launched loop
+    """
+    
+    DEFAULT_PORT = 4141
+    
+    def __init__(self, port=None):
+        self.port = port or self.DEFAULT_PORT
+        self.host = "127.0.0.1"
+        self.state = {
+            'uptime': 0,
+            'requests': 0,
+            'healthy': True,
+            'last_tick': None
+        }
+        self.ws_clients = []
+    
+    def start(self):
+        """Start the server runtime (called by CLI, not KUHUL)"""
+        import http.server
+        import socketserver
+        import threading
+        import time
+        
+        class Handler(http.server.SimpleHTTPRequestHandler):
+            runtime = self
+            
+            def do_GET(self):
+                self.runtime.state['requests'] += 1
+                
+                if self.path == '/':
+                    self._json_response({
+                        'service': 'MX2LM Server Runtime',
+                        'version': '1.1.0',
+                        'ws': '/ws/status',
+                        'status': 'ok'
+                    })
+                elif self.path == '/status':
+                    self._json_response(self.runtime.state)
+                elif self.path == '/health':
+                    self._json_response({'healthy': self.runtime.state['healthy']})
+                else:
+                    self.send_error(404)
+            
+            def _json_response(self, data):
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(data).encode())
+        
+        def tick_loop():
+            while True:
+                self.state['uptime'] += 1
+                self.state['last_tick'] = time.time()
+                time.sleep(1)
+        
+        threading.Thread(target=tick_loop, daemon=True).start()
+        
+        with socketserver.TCPServer((self.host, self.port), Handler) as httpd:
+            print(f"[MX2LM-SR] Server running at http://{self.host}:{self.port}")
+            httpd.serve_forever()
+
+
+# π Decay Engine (CLI-owned, not KUHUL-owned)
+class PiDecayEngine:
+    """
+    π-driven restart stabilization
+    CLI owns authority; π governs existence
+    """
+    
+    def __init__(self):
+        self.pi_support = 1.0
+        self.crash_count = 0
+        self.decay_factor = 0.6
+    
+    def on_crash(self):
+        """Record crash and decay π support"""
+        self.crash_count += 1
+        self.pi_support *= self.decay_factor
+        return self.pi_support
+    
+    def allow_restart(self):
+        """Determine restart mode based on π support"""
+        if self.pi_support < 0.4:
+            return "SUPPRESS"
+        if self.pi_support < 0.7:
+            return "ONCE"
+        if self.pi_support < 0.9:
+            return "BACKOFF"
+        return "IMMEDIATE"
+    
+    def reset(self):
+        """Reset π support (manual intervention)"""
+        self.pi_support = 1.0
+        self.crash_count = 0
+
+
+# Server Lifecycle Controller
+class ServerLifecycle:
+    """
+    CLI lifecycle control for MX2LM Server
+    All restarts are π-governed
+    """
+    
+    def __init__(self):
+        self.proc = None
+        self.decay = PiDecayEngine()
+    
+    def start(self):
+        """Spawn server in new terminal"""
+        if self.proc:
+            return False
+        
+        if sys.platform == 'win32':
+            self.proc = subprocess.Popen(
+                ['cmd', '/c', 'start', 'MX2LM Server', 'python', '-c', 
+                 'from mx2lm import ServerRuntime; ServerRuntime().start()'],
+                creationflags=subprocess.CREATE_NEW_CONSOLE
+            )
+        else:
+            self.proc = subprocess.Popen(
+                ['python', '-c', 'from mx2lm import ServerRuntime; ServerRuntime().start()'],
+                start_new_session=True
+            )
+        return True
+    
+    def stop(self):
+        """Stop server"""
+        if not self.proc:
+            return False
+        try:
+            self.proc.terminate()
+            self.proc = None
+            return True
+        except:
+            return False
+    
+    def crashed(self):
+        """Handle crash with π-governed restart"""
+        pi = self.decay.on_crash()
+        mode = self.decay.allow_restart()
+        
+        print(f"[MX2LM-SR] Crash detected. π={pi:.2f}, mode={mode}")
+        
+        if mode == "SUPPRESS":
+            print("[MX2LM-SR] Restart suppressed (π too low)")
+            return False
+        if mode == "ONCE":
+            return self.start()
+        if mode == "BACKOFF":
+            import time
+            time.sleep(3)
+            return self.start()
+        if mode == "IMMEDIATE":
+            return self.start()
+        return False
+    
+    def status(self):
+        """Get server status"""
+        import requests
+        try:
+            r = requests.get(f"http://127.0.0.1:{ServerRuntime.DEFAULT_PORT}/status", timeout=2)
+            return r.json()
+        except:
+            return {'healthy': False, 'error': 'Server not responding'}
+
+
+# ═══════════════════════════════════════════════════════════════
 # MAIN CLI ENTRY POINT
 # ═══════════════════════════════════════════════════════════════
 
@@ -547,6 +720,9 @@ def main():
                 print("  /phi3 [msg]    - Run Phi-3 locally")
                 print("  /posthog       - Launch PostHog Code Agent")
                 print("  ps:[action]    - Run PowerShell (ps:process.list)")
+                print("  server start   - Start MX2LM Server Runtime")
+                print("  server stop    - Stop server")
+                print("  server status  - Check server health")
                 print("  exit           - Quit MX2LM CLI")
                 print("")
                 continue
@@ -570,6 +746,32 @@ def main():
                     print(result['output'])
                 else:
                     print(f"[PS-DSL] Error: {result['error']}")
+                continue
+            
+            # Check for server commands
+            if user_input.startswith('server '):
+                server_cmd = user_input[7:].strip()
+                lifecycle = ServerLifecycle()
+                
+                if server_cmd == 'start':
+                    if lifecycle.start():
+                        print("[MX2LM-SR] Server started")
+                    else:
+                        print("[MX2LM-SR] Server already running")
+                elif server_cmd == 'stop':
+                    if lifecycle.stop():
+                        print("[MX2LM-SR] Server stopped")
+                    else:
+                        print("[MX2LM-SR] Server not running")
+                elif server_cmd == 'status':
+                    status = lifecycle.status()
+                    print(f"[MX2LM-SR] {json.dumps(status, indent=2)}")
+                elif server_cmd == 'restart':
+                    lifecycle.stop()
+                    lifecycle.start()
+                    print("[MX2LM-SR] Server restarted")
+                else:
+                    print("[MX2LM-SR] Unknown server command")
                 continue
             
             # Default: run through PostHog agent with auto-routing
