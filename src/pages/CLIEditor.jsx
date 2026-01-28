@@ -200,7 +200,7 @@ PS_COMMAND_REGISTRY = {
 }
 
 # Illegal characters (injection prevention)
-PS_ILLEGAL_CHARS = r'[|;`$(){}[\]\\]'
+PS_ILLEGAL_CHARS = r'[|;\`\\$(){}[\\]\\\\]'
 
 def ps_dsl_verify(intent):
     """
