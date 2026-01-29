@@ -500,6 +500,11 @@ export default function CareerPage() {
                   <div className="text-white font-bold">Career</div>
                   <div className="text-slate-400 text-sm">Portfolio (You are here)</div>
                 </Link>
+                <Link to={createPageUrl("VersionControl")} className="bg-slate-900 border border-slate-700 p-4 rounded hover:border-purple-600 transition-all block">
+                  <GitMerge className="w-6 h-6 text-purple-400 mb-2" />
+                  <div className="text-white font-bold">Version Control</div>
+                  <div className="text-slate-400 text-sm">Tape Registry / Git-like</div>
+                </Link>
               </div>
             </div>
           </TabsContent>

@@ -11,7 +11,11 @@ import {
   Diff, Archive, Tag, Check, Loader2, ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { tapeManager } from '@/functions/tapeManager';
+
+// Wrapper for backend function
+const tapeManager = async (payload) => {
+  return await base44.functions.invoke('tapeManager', payload);
+};
 
 export default function TapeManager({ entityType, entityId, entityName }) {
   const [commitMessage, setCommitMessage] = useState('');
