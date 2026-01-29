@@ -25,7 +25,7 @@ export default function BrainManager({ entityType, entityId, tapes = [], current
   const [selectedBrainId, setSelectedBrainId] = useState('');
   const [pullMessage, setPullMessage] = useState('');
   const [mergeSelection, setMergeSelection] = useState([]);
-  const [mergeForm, setMergeForm] = useState({ name: '', description: '', strategy: 'latest' });
+  const [mergeForm, setMergeForm] = useState({ name: '', description: '', strategy: 'latest', targetBrainId: '' });
   const queryClient = useQueryClient();
 
   // List brains
@@ -99,6 +99,7 @@ export default function BrainManager({ entityType, entityId, tapes = [], current
         action: 'mergeBrains',
         sourceBrainIds: mergeSelection,
         targetName: mergeForm.name,
+        targetBrainId: mergeForm.targetBrainId || undefined,
         description: mergeForm.description,
         strategy: mergeForm.strategy
       });
@@ -107,7 +108,7 @@ export default function BrainManager({ entityType, entityId, tapes = [], current
     onSuccess: (data) => {
       toast.success(data.message);
       setMergeSelection([]);
-      setMergeForm({ name: '', description: '', strategy: 'latest' });
+      setMergeForm({ name: '', description: '', strategy: 'latest', targetBrainId: '' });
       queryClient.invalidateQueries({ queryKey: ['brains'] });
     },
     onError: (err) => toast.error(err.message)
@@ -345,34 +346,69 @@ export default function BrainManager({ entityType, entityId, tapes = [], current
               
               {mergeSelection.length >= 2 && (
                 <div className="space-y-3 pt-3 border-t border-slate-700">
-                  <Input
-                    value={mergeForm.name}
-                    onChange={(e) => setMergeForm(f => ({ ...f, name: e.target.value }))}
-                    placeholder="Merged brain name"
-                    className="bg-slate-800 border-slate-600 text-white"
-                  />
+                  {/* Merge target: new or existing */}
+                  <div className="space-y-2">
+                    <label className="text-xs text-slate-400">Merge into:</label>
+                    <Select 
+                      value={mergeForm.targetBrainId || 'new'} 
+                      onValueChange={(v) => setMergeForm(f => ({ ...f, targetBrainId: v === 'new' ? '' : v }))}
+                    >
+                      <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="new">Create New Brain</SelectItem>
+                        {brainsData?.brains?.filter(b => !mergeSelection.includes(b.id)).map(brain => (
+                          <SelectItem key={brain.id} value={brain.id}>
+                            {brain.name} (v{brain.version}) - Existing
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {!mergeForm.targetBrainId && (
+                    <Input
+                      value={mergeForm.name}
+                      onChange={(e) => setMergeForm(f => ({ ...f, name: e.target.value }))}
+                      placeholder="New brain name"
+                      className="bg-slate-800 border-slate-600 text-white"
+                    />
+                  )}
+                  
                   <Textarea
                     value={mergeForm.description}
                     onChange={(e) => setMergeForm(f => ({ ...f, description: e.target.value }))}
                     placeholder="Description (optional)"
                     className="bg-slate-800 border-slate-600 text-white"
                   />
-                  <Select value={mergeForm.strategy} onValueChange={(v) => setMergeForm(f => ({ ...f, strategy: v }))}>
-                    <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="latest">Latest Wins (override)</SelectItem>
-                      <SelectItem value="combine">Combine (merge arrays/objects)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  
+                  <div className="space-y-2">
+                    <label className="text-xs text-slate-400">Merge Strategy:</label>
+                    <Select value={mergeForm.strategy} onValueChange={(v) => setMergeForm(f => ({ ...f, strategy: v }))}>
+                      <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="latest">Latest Wins (override)</SelectItem>
+                        <SelectItem value="combine">Combine (merge arrays/objects)</SelectItem>
+                        <SelectItem value="smart">Smart Merge (semantic conflict resolution)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-slate-500">
+                      {mergeForm.strategy === 'latest' && 'Later brains override earlier values'}
+                      {mergeForm.strategy === 'combine' && 'Arrays concatenate, objects deep merge'}
+                      {mergeForm.strategy === 'smart' && 'Dedupes arrays, takes max for levels/counts, merges intelligently'}
+                    </p>
+                  </div>
+                  
                   <Button
                     onClick={() => mergeMutation.mutate()}
-                    disabled={mergeMutation.isPending || !mergeForm.name}
+                    disabled={mergeMutation.isPending || (!mergeForm.name && !mergeForm.targetBrainId)}
                     className="w-full bg-orange-600 hover:bg-orange-700"
                   >
                     {mergeMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <GitMerge className="w-4 h-4 mr-1" />}
-                    Merge {mergeSelection.length} Brains
+                    {mergeForm.targetBrainId ? `Merge into Existing (bump version)` : `Create Merged Brain`}
                   </Button>
                 </div>
               )}
