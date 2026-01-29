@@ -11,8 +11,9 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Brain, GitFork, Upload, Download, Share2, Loader2, 
-  Globe, Lock, Package, Cpu, HardDrive, Users, Tag, GitMerge, Check
+  Globe, Lock, Package, Cpu, HardDrive, Users, Tag, GitMerge, Check, Workflow
 } from 'lucide-react';
+import PipelineBuilder from './PipelineBuilder';
 import { toast } from 'sonner';
 
 const tapeManager = async (payload) => base44.functions.invoke('tapeManager', payload);
@@ -156,6 +157,7 @@ export default function BrainManager({ entityType, entityId, tapes = [], current
           <TabsTrigger value="browse"><Brain className="w-4 h-4 mr-1" />Browse</TabsTrigger>
           <TabsTrigger value="create"><Package className="w-4 h-4 mr-1" />Create</TabsTrigger>
           <TabsTrigger value="merge"><GitMerge className="w-4 h-4 mr-1" />Merge</TabsTrigger>
+          <TabsTrigger value="pipelines"><Workflow className="w-4 h-4 mr-1" />Pipelines</TabsTrigger>
           <TabsTrigger value="sync"><Upload className="w-4 h-4 mr-1" />Push/Pull</TabsTrigger>
         </TabsList>
 
@@ -376,6 +378,11 @@ export default function BrainManager({ entityType, entityId, tapes = [], current
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Pipelines */}
+        <TabsContent value="pipelines">
+          <PipelineBuilder />
         </TabsContent>
 
         {/* Push/Pull */}

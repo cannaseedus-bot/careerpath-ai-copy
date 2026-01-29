@@ -817,6 +817,160 @@ Deno.serve(async (req) => {
                 });
             }
             
+            // CREATE PIPELINE
+            case 'createPipeline': {
+                const { name, description, nodes = [], connections = [], triggers = [] } = params;
+                
+                // Generate API routes for each node
+                const apiRoutes = nodes.map(node => ({
+                    path: `/pipeline/${name.toLowerCase().replace(/\s+/g, '-')}/${node.id}`,
+                    node_id: node.id,
+                    method: 'POST'
+                }));
+                
+                const pipeline = await base44.entities.BrainPipeline.create({
+                    name,
+                    description,
+                    nodes,
+                    connections,
+                    api_routes: apiRoutes,
+                    triggers,
+                    status: 'draft'
+                });
+                
+                return Response.json({
+                    success: true,
+                    pipeline,
+                    message: `Created pipeline '${name}'`
+                });
+            }
+            
+            // EXECUTE PIPELINE
+            case 'executePipeline': {
+                const { pipelineId, inputData = {} } = params;
+                
+                const pipeline = await base44.entities.BrainPipeline.get(pipelineId);
+                if (!pipeline) {
+                    return Response.json({ error: 'Pipeline not found' }, { status: 404 });
+                }
+                
+                const results = {};
+                const executionLog = [];
+                
+                // Build execution order from connections (topological sort simplified)
+                const nodeMap = new Map(pipeline.nodes.map(n => [n.id, n]));
+                const executed = new Set();
+                
+                // Execute nodes in connection order
+                for (const node of pipeline.nodes) {
+                    if (executed.has(node.id)) continue;
+                    
+                    try {
+                        let nodeData = inputData;
+                        
+                        // Get input from connected nodes
+                        const incomingConnections = pipeline.connections.filter(c => c.to_node === node.id);
+                        for (const conn of incomingConnections) {
+                            if (results[conn.from_node]) {
+                                nodeData = { ...nodeData, [conn.data_key || 'input']: results[conn.from_node] };
+                            }
+                        }
+                        
+                        // Execute based on node type
+                        let output = null;
+                        
+                        if (node.type === 'brain') {
+                            const brain = await base44.entities.Brain.get(node.source_id);
+                            if (brain) {
+                                const snapshot = brain.model_files?.snapshot || {};
+                                output = snapshot._scxq2 ? scxq2Decompress(snapshot) : snapshot;
+                                output = { ...output, _input: nodeData };
+                            }
+                        } else if (node.type === 'tape') {
+                            const tape = await base44.entities.Tape.get(node.source_id);
+                            if (tape) {
+                                output = scxq2Decompress(tape.snapshot_data);
+                                output = { ...output, _input: nodeData };
+                            }
+                        } else if (node.type === 'router') {
+                            // Router passes data through with transformation
+                            output = { routed: true, data: nodeData, config: node.config };
+                        }
+                        
+                        results[node.id] = output;
+                        executed.add(node.id);
+                        executionLog.push({ node: node.id, status: 'success', timestamp: new Date().toISOString() });
+                        
+                    } catch (err) {
+                        executionLog.push({ node: node.id, status: 'error', error: err.message, timestamp: new Date().toISOString() });
+                    }
+                }
+                
+                // Update pipeline stats
+                await base44.entities.BrainPipeline.update(pipelineId, {
+                    last_run: new Date().toISOString(),
+                    run_count: (pipeline.run_count || 0) + 1,
+                    status: 'active'
+                });
+                
+                return Response.json({
+                    success: true,
+                    results,
+                    executionLog,
+                    message: `Executed pipeline '${pipeline.name}'`
+                });
+            }
+            
+            // LIST PIPELINES
+            case 'listPipelines': {
+                const pipelines = await base44.entities.BrainPipeline.filter({}, '-created_date', 50);
+                
+                return Response.json({
+                    success: true,
+                    pipelines: pipelines.map(p => ({
+                        id: p.id,
+                        name: p.name,
+                        description: p.description,
+                        status: p.status,
+                        nodes_count: p.nodes?.length || 0,
+                        connections_count: p.connections?.length || 0,
+                        run_count: p.run_count,
+                        last_run: p.last_run,
+                        api_routes: p.api_routes
+                    }))
+                });
+            }
+            
+            // PING NODE (API route communication)
+            case 'pingNode': {
+                const { pipelineId, nodeId, data = {} } = params;
+                
+                const pipeline = await base44.entities.BrainPipeline.get(pipelineId);
+                if (!pipeline) {
+                    return Response.json({ error: 'Pipeline not found' }, { status: 404 });
+                }
+                
+                const node = pipeline.nodes.find(n => n.id === nodeId);
+                if (!node) {
+                    return Response.json({ error: 'Node not found' }, { status: 404 });
+                }
+                
+                // Get node data
+                let response = { node_id: nodeId, type: node.type, timestamp: new Date().toISOString() };
+                
+                if (node.type === 'brain') {
+                    const brain = await base44.entities.Brain.get(node.source_id);
+                    response.data = brain ? scxq2Decompress(brain.model_files?.snapshot || {}) : null;
+                } else if (node.type === 'tape') {
+                    const tape = await base44.entities.Tape.get(node.source_id);
+                    response.data = tape ? scxq2Decompress(tape.snapshot_data) : null;
+                }
+                
+                response.input = data;
+                
+                return Response.json({ success: true, response });
+            }
+            
             default:
                 return Response.json({ error: 'Unknown action' }, { status: 400 });
         }
