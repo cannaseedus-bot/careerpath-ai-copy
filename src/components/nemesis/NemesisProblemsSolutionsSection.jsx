@@ -1,19 +1,18 @@
-
 import React from 'react';
-import { Layers, BookOpen, Compass, CreditCard, Book, Pin, ShoppingCart } from 'lucide-react';
+import { Layers, Cpu, Gauge, Monitor, Box, Zap, Globe, Sparkles } from 'lucide-react';
 
 const ProblemCard = ({ icon: Icon, title, description, index }) => (
-    <div className="p-6 bg-red-900/20 rounded-xl h-full">
+    <div className="p-6 bg-red-900/20 rounded-xl h-full border border-red-500/20">
         <div className="flex items-center gap-3 mb-3">
             <Icon className="w-5 h-5 text-red-400" />
-            <h4 className="text-base font-medium text-white">Problem #{index}: {title}</h4>
+            <h4 className="text-base font-medium text-white">Challenge #{index}: {title}</h4>
         </div>
         <p className="text-sm text-white/70 font-light">{description}</p>
     </div>
 );
 
 const SolutionCard = ({ icon: Icon, title, description }) => (
-    <div className="p-6 bg-green-900/20 rounded-xl h-full">
+    <div className="p-6 bg-green-900/20 rounded-xl h-full border border-green-500/20">
         <div className="flex items-center gap-3 mb-3">
             <Icon className="w-5 h-5 text-green-400" />
             <h4 className="text-base font-medium text-white">Solution: {title}</h4>
@@ -25,20 +24,20 @@ const SolutionCard = ({ icon: Icon, title, description }) => (
 export default function NemesisProblemsSolutionsSection() {
     const items = [
         { 
-            pIcon: Layers, pTitle: "Inconsistent Tone", pDesc: "Website, social, and in-store voice feel disjointed, creating brand friction for new visitors.",
-            sIcon: Book, sTitle: "Brand Guidelines & Grid", sDesc: "Create a compact brand playbook and social templates for a consistent tone and faster content creation."
+            pIcon: Layers, pTitle: "Resolution Scaling", pDesc: "Traditional engines struggle with crisp visuals across 1080p to 8K displays, requiring multiple texture resolutions.",
+            sIcon: Box, sTitle: "Vector Resolution Independence", sDesc: "SVG-3D renders mathematically — infinite sharpness at any resolution without additional assets."
         },
         { 
-            pIcon: BookOpen, pTitle: "Underleveraged Storytelling", pDesc: "Origin/producer stories are not integrated at key touchpoints like menus or packaging, missing a chance to add value.",
-            sIcon: Book, sTitle: "Provenance Integration", sDesc: "Add origin modules (farm blurbs, QR codes) to packaging, menus, and web pages to link product to story."
+            pIcon: Cpu, pTitle: "Large Asset Sizes", pDesc: "AAA games ship with 100GB+ of textures and models, causing long downloads and storage issues.",
+            sIcon: Zap, sTitle: "Procedural Generation", sDesc: "KUHUL generates geometry from equations — entire game worlds in megabytes, not gigabytes."
         },
         { 
-            pIcon: Compass, pTitle: "Generic Environmental Signage", pDesc: "The iconic pavilion's interior signage and wayfinding lack a consistent, branded vocabulary.",
-            sIcon: Pin, sTitle: "Environmental Graphics System", sDesc: "Develop a kit (vinyl, menus, aprons) that echoes the pavilion's architecture and brand identity."
+            pIcon: Gauge, pTitle: "Performance Bottlenecks", pDesc: "Complex scenes with millions of polygons cause frame drops and require expensive hardware.",
+            sIcon: Sparkles, sTitle: "GPU-Accelerated Vectors", sDesc: "Compute shaders process vector math directly on GPU, achieving 60+ FPS on mid-range hardware."
         },
         { 
-            pIcon: CreditCard, pTitle: "Conversion & UX Gaps", pDesc: "Digital shop and event pages have friction points that hinder online purchases and bookings.",
-            sIcon: ShoppingCart, sTitle: "E-commerce & Events UX Overhaul", sDesc: "Redesign product/event pages with clearer info, single-click actions, and better booking flows."
+            pIcon: Monitor, pTitle: "Platform Fragmentation", pDesc: "Building for PC, console, mobile, and web requires separate optimizations and builds.",
+            sIcon: Globe, sTitle: "Universal Export", sDesc: "Single codebase exports to WebGL, native desktop, mobile, and console with automatic optimization."
         }
     ];
 
@@ -46,10 +45,10 @@ export default function NemesisProblemsSolutionsSection() {
         <section id="nemesis-problems-solutions" className="fade-in">
             <div className="text-center mb-16">
                 <h2 className="text-sm font-light text-white text-opacity-70 mb-3 uppercase tracking-widest">Section 2</h2>
-                <p className="text-4xl md:text-5xl font-extralight text-white tracking-tight">Problems & Strategic Solutions</p>
-                <div className="mt-6 max-w-3xl mx-auto glass-card p-4 rounded-xl border-l-4 border-r-4 border-[#D7263D]/80">
-                    <p className="text-white/80 font-light italic">Theme: “Anchor the story — unify the system.”</p>
-                    <p className="mt-2 text-white/90 font-medium">Center every touchpoint on three pillars: Hospitality, Provenance, & Design.</p>
+                <p className="text-4xl md:text-5xl font-extralight text-white tracking-tight">Challenges & Solutions</p>
+                <div className="mt-6 max-w-3xl mx-auto glass-card p-4 rounded-xl border-l-4 border-r-4 border-purple-500/80">
+                    <p className="text-white/80 font-light italic">Philosophy: "Mathematics is the ultimate compression."</p>
+                    <p className="mt-2 text-white/90 font-medium">Every visual is a formula — infinitely scalable, instantly modifiable.</p>
                 </div>
             </div>
 
