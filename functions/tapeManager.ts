@@ -661,7 +661,7 @@ Deno.serve(async (req) => {
             
             // MERGE BRAINS
             case 'mergeBrains': {
-                const { sourceBrainIds, targetName, description, strategy = 'latest', isPublic = false } = params;
+                const { sourceBrainIds, targetName, targetBrainId, description, strategy = 'latest', isPublic = false } = params;
                 
                 if (!sourceBrainIds || sourceBrainIds.length < 2) {
                     return Response.json({ error: 'Need at least 2 brains to merge' }, { status: 400 });
@@ -676,25 +676,64 @@ Deno.serve(async (req) => {
                     return Response.json({ error: 'One or more brains not found' }, { status: 404 });
                 }
                 
-                // Merge strategy
+                // If merging into existing brain, fetch it
+                let existingBrain = null;
+                if (targetBrainId) {
+                    existingBrain = await base44.entities.Brain.get(targetBrainId);
+                    if (!existingBrain) {
+                        return Response.json({ error: 'Target brain not found' }, { status: 404 });
+                    }
+                }
+                
+                // Smart merge helper - semantic conflict resolution
+                const smartMerge = (obj1, obj2, key) => {
+                    if (Array.isArray(obj1) && Array.isArray(obj2)) {
+                        const combined = [...obj1, ...obj2];
+                        const seen = new Set();
+                        return combined.filter(item => {
+                            const k = typeof item === 'object' ? JSON.stringify(item) : item;
+                            if (seen.has(k)) return false;
+                            seen.add(k);
+                            return true;
+                        });
+                    }
+                    if (typeof obj1 === 'object' && typeof obj2 === 'object' && obj1 && obj2) {
+                        const result = { ...obj1 };
+                        for (const [k, v] of Object.entries(obj2)) {
+                            result[k] = k in result ? smartMerge(result[k], v, k) : v;
+                        }
+                        return result;
+                    }
+                    if (obj2 === null || obj2 === undefined || obj2 === '') return obj1;
+                    if (obj1 === null || obj1 === undefined || obj1 === '') return obj2;
+                    if (typeof obj1 === 'number' && typeof obj2 === 'number') {
+                        if (key?.includes('level') || key?.includes('count') || key?.includes('size')) {
+                            return Math.max(obj1, obj2);
+                        }
+                    }
+                    return obj2;
+                };
+                
+                // Start with existing brain data if merging into existing
                 let mergedSnapshot = {};
                 let mergedTags = new Set();
                 let mergedCapabilities = new Set();
                 
-                if (strategy === 'latest') {
-                    // Later brains override earlier ones
-                    for (const brain of brains) {
-                        const snapshot = brain.model_files?.snapshot || {};
-                        const decompressed = snapshot._scxq2 ? scxq2Decompress(snapshot) : snapshot;
+                if (existingBrain) {
+                    const existingSnapshot = existingBrain.model_files?.snapshot || {};
+                    mergedSnapshot = existingSnapshot._scxq2 ? scxq2Decompress(existingSnapshot) : existingSnapshot;
+                    existingBrain.tags?.forEach(t => mergedTags.add(t));
+                    existingBrain.capabilities?.forEach(c => mergedCapabilities.add(c));
+                }
+                
+                // Merge based on strategy
+                for (const brain of brains) {
+                    const snapshot = brain.model_files?.snapshot || {};
+                    const decompressed = snapshot._scxq2 ? scxq2Decompress(snapshot) : snapshot;
+                    
+                    if (strategy === 'latest') {
                         mergedSnapshot = { ...mergedSnapshot, ...decompressed };
-                        brain.tags?.forEach(t => mergedTags.add(t));
-                        brain.capabilities?.forEach(c => mergedCapabilities.add(c));
-                    }
-                } else if (strategy === 'combine') {
-                    // Combine arrays, merge objects deeply
-                    for (const brain of brains) {
-                        const snapshot = brain.model_files?.snapshot || {};
-                        const decompressed = snapshot._scxq2 ? scxq2Decompress(snapshot) : snapshot;
+                    } else if (strategy === 'combine') {
                         for (const [key, value] of Object.entries(decompressed)) {
                             if (Array.isArray(value) && Array.isArray(mergedSnapshot[key])) {
                                 mergedSnapshot[key] = [...mergedSnapshot[key], ...value];
@@ -704,17 +743,24 @@ Deno.serve(async (req) => {
                                 mergedSnapshot[key] = value;
                             }
                         }
-                        brain.tags?.forEach(t => mergedTags.add(t));
-                        brain.capabilities?.forEach(c => mergedCapabilities.add(c));
+                    } else if (strategy === 'smart') {
+                        for (const [key, value] of Object.entries(decompressed)) {
+                            mergedSnapshot[key] = key in mergedSnapshot 
+                                ? smartMerge(mergedSnapshot[key], value, key) 
+                                : value;
+                        }
                     }
+                    brain.tags?.forEach(t => mergedTags.add(t));
+                    brain.capabilities?.forEach(c => mergedCapabilities.add(c));
                 }
                 
                 // Compress merged data
                 const { compressed, originalSize, compressedSize, ratio } = scxq2Compress(mergedSnapshot);
                 const checksum = await generateChecksum(mergedSnapshot);
                 
-                // Determine version (take highest + bump)
+                // Determine version
                 const versions = brains.map(b => b.version || '1.0.0');
+                if (existingBrain) versions.push(existingBrain.version || '1.0.0');
                 const highestVersion = versions.sort((a, b) => {
                     const [aMaj, aMin, aPat] = a.split('.').map(Number);
                     const [bMaj, bMin, bPat] = b.split('.').map(Number);
@@ -722,33 +768,60 @@ Deno.serve(async (req) => {
                 })[0];
                 const newVersion = incrementVersion(highestVersion, 'minor');
                 
-                // Create merged brain
-                const mergedBrain = await base44.entities.Brain.create({
-                    name: targetName || `Merged Brain (${brains.length} sources)`,
-                    description: description || `Merged from: ${brains.map(b => b.name).join(', ')}`,
-                    brain_type: 'full_package',
-                    version: newVersion,
-                    model_files: {
-                        snapshot: compressed,
-                        merge_sources: sourceBrainIds,
-                        merge_strategy: strategy
-                    },
-                    scxq2_compressed: true,
-                    compression_ratio: ratio,
-                    size_bytes: compressedSize,
-                    original_size_bytes: originalSize,
-                    checksum,
-                    is_public: isPublic,
-                    tags: [...mergedTags, 'merged'],
-                    capabilities: [...mergedCapabilities],
-                    status: 'active',
-                    last_synced: new Date().toISOString()
-                });
+                let resultBrain;
+                
+                if (existingBrain) {
+                    // Merge into existing brain - update with version bump
+                    await base44.entities.Brain.update(targetBrainId, {
+                        model_files: {
+                            snapshot: compressed,
+                            merge_sources: sourceBrainIds,
+                            merge_strategy: strategy,
+                            previous_version: existingBrain.version
+                        },
+                        version: newVersion,
+                        size_bytes: compressedSize,
+                        original_size_bytes: originalSize,
+                        compression_ratio: ratio,
+                        checksum,
+                        tags: [...mergedTags, 'merged'],
+                        capabilities: [...mergedCapabilities],
+                        last_synced: new Date().toISOString(),
+                        description: description || existingBrain.description
+                    });
+                    resultBrain = { ...existingBrain, version: newVersion };
+                } else {
+                    // Create new merged brain
+                    resultBrain = await base44.entities.Brain.create({
+                        name: targetName || `Merged Brain (${brains.length} sources)`,
+                        description: description || `Merged from: ${brains.map(b => b.name).join(', ')}`,
+                        brain_type: 'full_package',
+                        version: newVersion,
+                        model_files: {
+                            snapshot: compressed,
+                            merge_sources: sourceBrainIds,
+                            merge_strategy: strategy
+                        },
+                        scxq2_compressed: true,
+                        compression_ratio: ratio,
+                        size_bytes: compressedSize,
+                        original_size_bytes: originalSize,
+                        checksum,
+                        is_public: isPublic,
+                        tags: [...mergedTags, 'merged'],
+                        capabilities: [...mergedCapabilities],
+                        status: 'active',
+                        last_synced: new Date().toISOString()
+                    });
+                }
                 
                 return Response.json({
                     success: true,
-                    brain: mergedBrain,
-                    message: `Merged ${brains.length} brains into '${mergedBrain.name}'`,
+                    brain: resultBrain,
+                    merged_into_existing: !!existingBrain,
+                    message: existingBrain 
+                        ? `Merged ${brains.length} brains into '${existingBrain.name}' (v${newVersion})`
+                        : `Merged ${brains.length} brains into '${resultBrain.name}'`,
                     stats: {
                         sourcesCount: brains.length,
                         strategy,
