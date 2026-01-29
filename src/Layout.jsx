@@ -21,6 +21,7 @@ const navigationItems = {
     ModelManager: [],
     APIManager: [],
     CLIPlayground: [],
+    Marketplace: [],
     Career: [
         { title: "Mission", id: "hero", icon: User },
         { title: "Studios", id: "studios", icon: Briefcase },

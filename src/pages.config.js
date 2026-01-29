@@ -69,6 +69,7 @@ import SWOT from './pages/SWOT';
 import ShellAssistant from './pages/ShellAssistant';
 import Success from './pages/Success';
 import VersionControl from './pages/VersionControl';
+import Marketplace from './pages/Marketplace';
 import __Layout from './Layout.jsx';
 
 
@@ -95,6 +96,7 @@ export const PAGES = {
     "ShellAssistant": ShellAssistant,
     "Success": Success,
     "VersionControl": VersionControl,
+    "Marketplace": Marketplace,
 }
 
 export const pagesConfig = {
