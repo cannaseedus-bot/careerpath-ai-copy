@@ -68,6 +68,7 @@ import RuntimeStudio from './pages/RuntimeStudio';
 import SWOT from './pages/SWOT';
 import ShellAssistant from './pages/ShellAssistant';
 import Success from './pages/Success';
+import VersionControl from './pages/VersionControl';
 import __Layout from './Layout.jsx';
 
 
@@ -93,6 +94,7 @@ export const PAGES = {
     "SWOT": SWOT,
     "ShellAssistant": ShellAssistant,
     "Success": Success,
+    "VersionControl": VersionControl,
 }
 
 export const pagesConfig = {

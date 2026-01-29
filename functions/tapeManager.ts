@@ -1,0 +1,340 @@
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+
+// SCXQ2 Compression Simulation (simplified for demo)
+function scxq2Compress(data) {
+    const jsonStr = JSON.stringify(data);
+    const originalSize = new TextEncoder().encode(jsonStr).length;
+    
+    // Simulate compression by storing as base64 with metadata
+    const compressed = {
+        _scxq2: true,
+        _version: "2.0",
+        _original_size: originalSize,
+        _data: btoa(unescape(encodeURIComponent(jsonStr)))
+    };
+    
+    const compressedSize = new TextEncoder().encode(JSON.stringify(compressed)).length;
+    const ratio = originalSize / compressedSize;
+    
+    return {
+        compressed,
+        originalSize,
+        compressedSize,
+        ratio: Math.max(ratio, 0.8) // Simulated ratio
+    };
+}
+
+function scxq2Decompress(compressed) {
+    if (!compressed._scxq2) return compressed;
+    const jsonStr = decodeURIComponent(escape(atob(compressed._data)));
+    return JSON.parse(jsonStr);
+}
+
+// Generate checksum
+async function generateChecksum(data) {
+    const encoder = new TextEncoder();
+    const dataBuffer = encoder.encode(JSON.stringify(data));
+    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Compute diff between two objects
+function computeDiff(oldObj, newObj) {
+    const diff = { added: {}, removed: {}, changed: {} };
+    
+    const allKeys = new Set([...Object.keys(oldObj || {}), ...Object.keys(newObj || {})]);
+    
+    for (const key of allKeys) {
+        if (!(key in (oldObj || {}))) {
+            diff.added[key] = newObj[key];
+        } else if (!(key in (newObj || {}))) {
+            diff.removed[key] = oldObj[key];
+        } else if (JSON.stringify(oldObj[key]) !== JSON.stringify(newObj[key])) {
+            diff.changed[key] = { from: oldObj[key], to: newObj[key] };
+        }
+    }
+    
+    return diff;
+}
+
+// Increment version
+function incrementVersion(version, type = 'patch') {
+    const [major, minor, patch] = (version || '0.0.0').split('.').map(Number);
+    switch (type) {
+        case 'major': return `${major + 1}.0.0`;
+        case 'minor': return `${major}.${minor + 1}.0`;
+        default: return `${major}.${minor}.${patch + 1}`;
+    }
+}
+
+Deno.serve(async (req) => {
+    try {
+        const base44 = createClientFromRequest(req);
+        const user = await base44.auth.me();
+        
+        if (!user) {
+            return Response.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        
+        const { action, ...params } = await req.json();
+        
+        switch (action) {
+            // CREATE TAPE (commit)
+            case 'commit': {
+                const { entityType, entityId, message, branch = 'main', versionType = 'patch', tags = [] } = params;
+                
+                // Get entity data
+                const entityData = await base44.entities[entityType].get(entityId);
+                if (!entityData) {
+                    return Response.json({ error: 'Entity not found' }, { status: 404 });
+                }
+                
+                // Get or create registry
+                let registries = await base44.entities.TapeRegistry.filter({ 
+                    entity_type: entityType, 
+                    entity_id: entityId 
+                });
+                
+                let registry = registries[0];
+                let parentTape = null;
+                let newVersion = '1.0.0';
+                
+                if (registry) {
+                    // Get parent tape
+                    const branchInfo = registry.branches?.find(b => b.name === branch);
+                    if (branchInfo?.head_tape_id) {
+                        parentTape = await base44.entities.Tape.get(branchInfo.head_tape_id);
+                        newVersion = incrementVersion(parentTape.version, versionType);
+                    }
+                } else {
+                    // Create new registry
+                    registry = await base44.entities.TapeRegistry.create({
+                        name: `${entityType}/${entityId}`,
+                        entity_type: entityType,
+                        entity_id: entityId,
+                        head_branch: 'main',
+                        branches: [{ name: 'main', head_tape_id: null, created_date: new Date().toISOString() }],
+                        total_tapes: 0,
+                        total_size_bytes: 0
+                    });
+                }
+                
+                // Compress data
+                const { compressed, originalSize, compressedSize, ratio } = scxq2Compress(entityData);
+                const checksum = await generateChecksum(entityData);
+                
+                // Compute diff from parent
+                let diffFromParent = null;
+                if (parentTape) {
+                    const parentData = scxq2Decompress(parentTape.snapshot_data);
+                    diffFromParent = computeDiff(parentData, entityData);
+                }
+                
+                // Create tape
+                const tape = await base44.entities.Tape.create({
+                    name: message || `${entityType} v${newVersion}`,
+                    description: message,
+                    tape_type: entityType === 'UserProfile' ? 'profile' : 'project',
+                    version: newVersion,
+                    parent_tape_id: parentTape?.id || null,
+                    branch,
+                    entity_type: entityType,
+                    entity_id: entityId,
+                    snapshot_data: compressed,
+                    checksum,
+                    compression_ratio: ratio,
+                    size_bytes: compressedSize,
+                    original_size_bytes: originalSize,
+                    tags,
+                    status: 'active',
+                    diff_from_parent: diffFromParent
+                });
+                
+                // Update registry
+                const updatedBranches = registry.branches.map(b => 
+                    b.name === branch ? { ...b, head_tape_id: tape.id } : b
+                );
+                
+                await base44.entities.TapeRegistry.update(registry.id, {
+                    current_version: newVersion,
+                    current_tape_id: tape.id,
+                    branches: updatedBranches,
+                    total_tapes: (registry.total_tapes || 0) + 1,
+                    total_size_bytes: (registry.total_size_bytes || 0) + compressedSize
+                });
+                
+                return Response.json({ 
+                    success: true, 
+                    tape,
+                    message: `Committed ${entityType} as tape v${newVersion}`
+                });
+            }
+            
+            // CHECKOUT (revert to tape)
+            case 'checkout': {
+                const { tapeId } = params;
+                
+                const tape = await base44.entities.Tape.get(tapeId);
+                if (!tape) {
+                    return Response.json({ error: 'Tape not found' }, { status: 404 });
+                }
+                
+                // Decompress snapshot
+                const restoredData = scxq2Decompress(tape.snapshot_data);
+                
+                // Remove system fields
+                const { id, created_date, updated_date, created_by, ...cleanData } = restoredData;
+                
+                // Update entity
+                await base44.entities[tape.entity_type].update(tape.entity_id, cleanData);
+                
+                // Update registry
+                const registries = await base44.entities.TapeRegistry.filter({
+                    entity_type: tape.entity_type,
+                    entity_id: tape.entity_id
+                });
+                
+                if (registries[0]) {
+                    await base44.entities.TapeRegistry.update(registries[0].id, {
+                        current_version: tape.version,
+                        current_tape_id: tapeId
+                    });
+                }
+                
+                return Response.json({ 
+                    success: true, 
+                    message: `Checked out ${tape.entity_type} to v${tape.version}`,
+                    data: restoredData
+                });
+            }
+            
+            // LIST TAPES (log)
+            case 'log': {
+                const { entityType, entityId, branch, limit = 20 } = params;
+                
+                let query = { entity_type: entityType, entity_id: entityId, status: 'active' };
+                if (branch) query.branch = branch;
+                
+                const tapes = await base44.entities.Tape.filter(query, '-created_date', limit);
+                
+                return Response.json({ 
+                    success: true, 
+                    tapes: tapes.map(t => ({
+                        id: t.id,
+                        version: t.version,
+                        name: t.name,
+                        description: t.description,
+                        branch: t.branch,
+                        checksum: t.checksum?.substring(0, 8),
+                        size_bytes: t.size_bytes,
+                        compression_ratio: t.compression_ratio,
+                        tags: t.tags,
+                        created_date: t.created_date,
+                        created_by: t.created_by
+                    }))
+                });
+            }
+            
+            // DIFF between two tapes
+            case 'diff': {
+                const { tapeId1, tapeId2 } = params;
+                
+                const tape1 = await base44.entities.Tape.get(tapeId1);
+                const tape2 = await base44.entities.Tape.get(tapeId2);
+                
+                if (!tape1 || !tape2) {
+                    return Response.json({ error: 'Tape(s) not found' }, { status: 404 });
+                }
+                
+                const data1 = scxq2Decompress(tape1.snapshot_data);
+                const data2 = scxq2Decompress(tape2.snapshot_data);
+                
+                const diff = computeDiff(data1, data2);
+                
+                return Response.json({ 
+                    success: true, 
+                    diff,
+                    from: { version: tape1.version, checksum: tape1.checksum?.substring(0, 8) },
+                    to: { version: tape2.version, checksum: tape2.checksum?.substring(0, 8) }
+                });
+            }
+            
+            // CREATE BRANCH
+            case 'branch': {
+                const { entityType, entityId, branchName, fromTapeId } = params;
+                
+                const registries = await base44.entities.TapeRegistry.filter({
+                    entity_type: entityType,
+                    entity_id: entityId
+                });
+                
+                if (!registries[0]) {
+                    return Response.json({ error: 'Registry not found' }, { status: 404 });
+                }
+                
+                const registry = registries[0];
+                const existingBranch = registry.branches?.find(b => b.name === branchName);
+                
+                if (existingBranch) {
+                    return Response.json({ error: 'Branch already exists' }, { status: 400 });
+                }
+                
+                const newBranches = [
+                    ...(registry.branches || []),
+                    { 
+                        name: branchName, 
+                        head_tape_id: fromTapeId || registry.current_tape_id,
+                        created_date: new Date().toISOString()
+                    }
+                ];
+                
+                await base44.entities.TapeRegistry.update(registry.id, { branches: newBranches });
+                
+                return Response.json({ 
+                    success: true, 
+                    message: `Created branch '${branchName}'`
+                });
+            }
+            
+            // GET REGISTRY STATUS
+            case 'status': {
+                const { entityType, entityId } = params;
+                
+                const registries = await base44.entities.TapeRegistry.filter({
+                    entity_type: entityType,
+                    entity_id: entityId
+                });
+                
+                if (!registries[0]) {
+                    return Response.json({ 
+                        success: true, 
+                        initialized: false,
+                        message: 'No version history. Run commit to initialize.'
+                    });
+                }
+                
+                const registry = registries[0];
+                
+                return Response.json({
+                    success: true,
+                    initialized: true,
+                    registry: {
+                        name: registry.name,
+                        current_version: registry.current_version,
+                        head_branch: registry.head_branch,
+                        branches: registry.branches,
+                        total_tapes: registry.total_tapes,
+                        total_size_bytes: registry.total_size_bytes
+                    }
+                });
+            }
+            
+            default:
+                return Response.json({ error: 'Unknown action' }, { status: 400 });
+        }
+    } catch (error) {
+        console.error('TapeManager error:', error);
+        return Response.json({ error: error.message }, { status: 500 });
+    }
+});
