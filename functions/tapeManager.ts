@@ -659,6 +659,106 @@ Deno.serve(async (req) => {
                 });
             }
             
+            // MERGE BRAINS
+            case 'mergeBrains': {
+                const { sourceBrainIds, targetName, description, strategy = 'latest', isPublic = false } = params;
+                
+                if (!sourceBrainIds || sourceBrainIds.length < 2) {
+                    return Response.json({ error: 'Need at least 2 brains to merge' }, { status: 400 });
+                }
+                
+                // Fetch all source brains
+                const brains = await Promise.all(
+                    sourceBrainIds.map(id => base44.entities.Brain.get(id))
+                );
+                
+                if (brains.some(b => !b)) {
+                    return Response.json({ error: 'One or more brains not found' }, { status: 404 });
+                }
+                
+                // Merge strategy
+                let mergedSnapshot = {};
+                let mergedTags = new Set();
+                let mergedCapabilities = new Set();
+                
+                if (strategy === 'latest') {
+                    // Later brains override earlier ones
+                    for (const brain of brains) {
+                        const snapshot = brain.model_files?.snapshot || {};
+                        const decompressed = snapshot._scxq2 ? scxq2Decompress(snapshot) : snapshot;
+                        mergedSnapshot = { ...mergedSnapshot, ...decompressed };
+                        brain.tags?.forEach(t => mergedTags.add(t));
+                        brain.capabilities?.forEach(c => mergedCapabilities.add(c));
+                    }
+                } else if (strategy === 'combine') {
+                    // Combine arrays, merge objects deeply
+                    for (const brain of brains) {
+                        const snapshot = brain.model_files?.snapshot || {};
+                        const decompressed = snapshot._scxq2 ? scxq2Decompress(snapshot) : snapshot;
+                        for (const [key, value] of Object.entries(decompressed)) {
+                            if (Array.isArray(value) && Array.isArray(mergedSnapshot[key])) {
+                                mergedSnapshot[key] = [...mergedSnapshot[key], ...value];
+                            } else if (typeof value === 'object' && typeof mergedSnapshot[key] === 'object') {
+                                mergedSnapshot[key] = { ...mergedSnapshot[key], ...value };
+                            } else {
+                                mergedSnapshot[key] = value;
+                            }
+                        }
+                        brain.tags?.forEach(t => mergedTags.add(t));
+                        brain.capabilities?.forEach(c => mergedCapabilities.add(c));
+                    }
+                }
+                
+                // Compress merged data
+                const { compressed, originalSize, compressedSize, ratio } = scxq2Compress(mergedSnapshot);
+                const checksum = await generateChecksum(mergedSnapshot);
+                
+                // Determine version (take highest + bump)
+                const versions = brains.map(b => b.version || '1.0.0');
+                const highestVersion = versions.sort((a, b) => {
+                    const [aMaj, aMin, aPat] = a.split('.').map(Number);
+                    const [bMaj, bMin, bPat] = b.split('.').map(Number);
+                    return bMaj - aMaj || bMin - aMin || bPat - aPat;
+                })[0];
+                const newVersion = incrementVersion(highestVersion, 'minor');
+                
+                // Create merged brain
+                const mergedBrain = await base44.entities.Brain.create({
+                    name: targetName || `Merged Brain (${brains.length} sources)`,
+                    description: description || `Merged from: ${brains.map(b => b.name).join(', ')}`,
+                    brain_type: 'full_package',
+                    version: newVersion,
+                    model_files: {
+                        snapshot: compressed,
+                        merge_sources: sourceBrainIds,
+                        merge_strategy: strategy
+                    },
+                    scxq2_compressed: true,
+                    compression_ratio: ratio,
+                    size_bytes: compressedSize,
+                    original_size_bytes: originalSize,
+                    checksum,
+                    is_public: isPublic,
+                    tags: [...mergedTags, 'merged'],
+                    capabilities: [...mergedCapabilities],
+                    status: 'active',
+                    last_synced: new Date().toISOString()
+                });
+                
+                return Response.json({
+                    success: true,
+                    brain: mergedBrain,
+                    message: `Merged ${brains.length} brains into '${mergedBrain.name}'`,
+                    stats: {
+                        sourcesCount: brains.length,
+                        strategy,
+                        originalSize,
+                        compressedSize,
+                        compressionRatio: ratio
+                    }
+                });
+            }
+            
             // LIST BRAINS
             case 'listBrains': {
                 const { publicOnly = false, tags = [] } = params;
