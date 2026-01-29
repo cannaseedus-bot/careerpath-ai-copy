@@ -469,6 +469,232 @@ Deno.serve(async (req) => {
                 });
             }
             
+            // CREATE BRAIN from tape
+            case 'createBrain': {
+                const { tapeId, name, description, isPublic = false, tags = [], modelArchitecture, quantization, capabilities = [] } = params;
+                
+                const tape = await base44.entities.Tape.get(tapeId);
+                if (!tape) {
+                    return Response.json({ error: 'Tape not found' }, { status: 404 });
+                }
+                
+                // Brain contains model-like structure from tape snapshot
+                const snapshotData = tape.snapshot_data;
+                const checksum = await generateChecksum(snapshotData);
+                
+                const brain = await base44.entities.Brain.create({
+                    name: name || `${tape.name} Brain`,
+                    description: description || `Brain created from tape v${tape.version}`,
+                    brain_type: 'full_package',
+                    version: tape.version,
+                    model_files: {
+                        snapshot: snapshotData,
+                        source_version: tape.version,
+                        source_branch: tape.branch
+                    },
+                    scxq2_compressed: true,
+                    compression_ratio: tape.compression_ratio,
+                    size_bytes: tape.size_bytes,
+                    original_size_bytes: tape.original_size_bytes,
+                    checksum,
+                    source_tape_id: tapeId,
+                    is_public: isPublic,
+                    tags,
+                    model_architecture: modelArchitecture,
+                    quantization,
+                    capabilities,
+                    status: 'active',
+                    last_synced: new Date().toISOString()
+                });
+                
+                return Response.json({
+                    success: true,
+                    brain,
+                    message: `Created brain '${brain.name}' from tape v${tape.version}`
+                });
+            }
+            
+            // FORK brain into new tape
+            case 'forkBrain': {
+                const { brainId, entityType, entityId, branch = 'main' } = params;
+                
+                const brain = await base44.entities.Brain.get(brainId);
+                if (!brain) {
+                    return Response.json({ error: 'Brain not found' }, { status: 404 });
+                }
+                
+                // Create tape from brain
+                const snapshotData = brain.model_files?.snapshot || {};
+                const checksum = await generateChecksum(snapshotData);
+                
+                const tape = await base44.entities.Tape.create({
+                    name: `Fork of ${brain.name}`,
+                    description: `Forked from brain ${brain.name} v${brain.version}`,
+                    tape_type: entityType === 'UserProfile' ? 'profile' : 'project',
+                    version: brain.version,
+                    branch,
+                    entity_type: entityType,
+                    entity_id: entityId,
+                    snapshot_data: snapshotData,
+                    checksum,
+                    compression_ratio: brain.compression_ratio,
+                    size_bytes: brain.size_bytes,
+                    original_size_bytes: brain.original_size_bytes,
+                    tags: ['forked', `brain:${brainId}`],
+                    status: 'active'
+                });
+                
+                // Update brain fork count
+                await base44.entities.Brain.update(brainId, {
+                    fork_count: (brain.fork_count || 0) + 1
+                });
+                
+                return Response.json({
+                    success: true,
+                    tape,
+                    message: `Forked brain '${brain.name}' into tape v${tape.version}`
+                });
+            }
+            
+            // PUSH tape changes to brain
+            case 'push': {
+                const { tapeId, brainId } = params;
+                
+                const tape = await base44.entities.Tape.get(tapeId);
+                const brain = await base44.entities.Brain.get(brainId);
+                
+                if (!tape || !brain) {
+                    return Response.json({ error: 'Tape or Brain not found' }, { status: 404 });
+                }
+                
+                const checksum = await generateChecksum(tape.snapshot_data);
+                
+                await base44.entities.Brain.update(brainId, {
+                    model_files: {
+                        ...brain.model_files,
+                        snapshot: tape.snapshot_data,
+                        source_version: tape.version,
+                        source_branch: tape.branch
+                    },
+                    version: tape.version,
+                    checksum,
+                    compression_ratio: tape.compression_ratio,
+                    size_bytes: tape.size_bytes,
+                    original_size_bytes: tape.original_size_bytes,
+                    status: 'active',
+                    last_synced: new Date().toISOString()
+                });
+                
+                return Response.json({
+                    success: true,
+                    message: `Pushed tape v${tape.version} to brain '${brain.name}'`
+                });
+            }
+            
+            // PULL brain into tape
+            case 'pull': {
+                const { brainId, entityType, entityId, branch = 'main', message } = params;
+                
+                const brain = await base44.entities.Brain.get(brainId);
+                if (!brain) {
+                    return Response.json({ error: 'Brain not found' }, { status: 404 });
+                }
+                
+                // Get registry for version
+                const registries = await base44.entities.TapeRegistry.filter({
+                    entity_type: entityType,
+                    entity_id: entityId
+                });
+                
+                const registry = registries[0];
+                let newVersion = brain.version;
+                
+                if (registry?.current_version) {
+                    newVersion = incrementVersion(registry.current_version, 'minor');
+                }
+                
+                const snapshotData = brain.model_files?.snapshot || {};
+                const checksum = await generateChecksum(snapshotData);
+                
+                const tape = await base44.entities.Tape.create({
+                    name: message || `Pull from ${brain.name}`,
+                    description: `Pulled from brain ${brain.name} v${brain.version}`,
+                    tape_type: entityType === 'UserProfile' ? 'profile' : 'project',
+                    version: newVersion,
+                    branch,
+                    entity_type: entityType,
+                    entity_id: entityId,
+                    snapshot_data: snapshotData,
+                    checksum,
+                    compression_ratio: brain.compression_ratio,
+                    size_bytes: brain.size_bytes,
+                    original_size_bytes: brain.original_size_bytes,
+                    tags: ['pulled', `brain:${brainId}`],
+                    status: 'active'
+                });
+                
+                // Update brain pull count
+                await base44.entities.Brain.update(brainId, {
+                    pull_count: (brain.pull_count || 0) + 1
+                });
+                
+                // Update registry
+                if (registry) {
+                    const updatedBranches = registry.branches.map(b =>
+                        b.name === branch ? { ...b, head_tape_id: tape.id } : b
+                    );
+                    await base44.entities.TapeRegistry.update(registry.id, {
+                        current_version: newVersion,
+                        current_tape_id: tape.id,
+                        branches: updatedBranches,
+                        total_tapes: (registry.total_tapes || 0) + 1,
+                        total_size_bytes: (registry.total_size_bytes || 0) + tape.size_bytes
+                    });
+                }
+                
+                return Response.json({
+                    success: true,
+                    tape,
+                    message: `Pulled brain '${brain.name}' into tape v${newVersion}`
+                });
+            }
+            
+            // LIST BRAINS
+            case 'listBrains': {
+                const { publicOnly = false, tags = [] } = params;
+                
+                let query = { status: 'active' };
+                if (publicOnly) query.is_public = true;
+                
+                let brains = await base44.entities.Brain.filter(query, '-created_date', 50);
+                
+                if (tags.length > 0) {
+                    brains = brains.filter(b => tags.some(t => b.tags?.includes(t)));
+                }
+                
+                return Response.json({
+                    success: true,
+                    brains: brains.map(b => ({
+                        id: b.id,
+                        name: b.name,
+                        description: b.description,
+                        version: b.version,
+                        brain_type: b.brain_type,
+                        model_architecture: b.model_architecture,
+                        quantization: b.quantization,
+                        capabilities: b.capabilities,
+                        is_public: b.is_public,
+                        fork_count: b.fork_count,
+                        pull_count: b.pull_count,
+                        size_bytes: b.size_bytes,
+                        compression_ratio: b.compression_ratio,
+                        tags: b.tags,
+                        created_by: b.created_by,
+                        created_date: b.created_date
+                    }))
+                });
+            }
+            
             // TAG existing tape
             case 'tag': {
                 const { tapeId, tag } = params;

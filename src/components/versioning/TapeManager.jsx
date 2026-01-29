@@ -13,6 +13,7 @@ import {
 import { toast } from 'sonner';
 import ReleaseManager from './ReleaseManager';
 import BranchCompare from './BranchCompare';
+import BrainManager from './BrainManager';
 
 // Wrapper for backend function
 const tapeManager = async (payload) => {
@@ -180,6 +181,7 @@ export default function TapeManager({ entityType, entityId, entityName }) {
           <TabsTrigger value="releases"><Rocket className="w-4 h-4 mr-1" />Releases</TabsTrigger>
           <TabsTrigger value="branches"><GitBranch className="w-4 h-4 mr-1" />Branches</TabsTrigger>
           <TabsTrigger value="compare"><GitCompare className="w-4 h-4 mr-1" />Compare</TabsTrigger>
+          <TabsTrigger value="brains" className="text-pink-400"><svg className="w-4 h-4 mr-1 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2a4 4 0 0 0-4 4c0 1.5.8 2.8 2 3.5V12h4V9.5c1.2-.7 2-2 2-3.5a4 4 0 0 0-4-4z"/><path d="M8 12v2a4 4 0 0 0 8 0v-2"/><path d="M12 18v4"/></svg>Brains</TabsTrigger>
         </TabsList>
 
         {/* Commit Tab */}
@@ -407,6 +409,16 @@ export default function TapeManager({ entityType, entityId, entityName }) {
             entityType={entityType} 
             entityId={entityId} 
             branches={status?.registry?.branches || []}
+          />
+        </TabsContent>
+
+        {/* Brains Tab */}
+        <TabsContent value="brains">
+          <BrainManager 
+            entityType={entityType}
+            entityId={entityId}
+            tapes={logData?.tapes || []}
+            currentTapeId={status?.registry?.current_tape_id}
           />
         </TabsContent>
       </Tabs>
