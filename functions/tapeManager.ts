@@ -941,6 +941,211 @@ Deno.serve(async (req) => {
                 });
             }
             
+            // CHECK TRIGGERS - evaluate if event should trigger pipelines
+            case 'checkTriggers': {
+                const { eventType, eventData = {} } = params;
+                
+                const pipelines = await base44.entities.BrainPipeline.filter({ status: 'active' });
+                const triggeredPipelines = [];
+                
+                for (const pipeline of pipelines) {
+                    if (!pipeline.triggers?.length) continue;
+                    
+                    for (const trigger of pipeline.triggers) {
+                        if (!trigger.enabled || trigger.event !== eventType) continue;
+                        
+                        // Evaluate conditions
+                        const conditions = trigger.conditions || {};
+                        let shouldTrigger = true;
+                        
+                        if (conditions.entity_type && eventData.entity_type !== conditions.entity_type) {
+                            shouldTrigger = false;
+                        }
+                        
+                        if (conditions.branch_pattern && eventData.branch) {
+                            const regex = new RegExp(conditions.branch_pattern);
+                            if (!regex.test(eventData.branch)) shouldTrigger = false;
+                        }
+                        
+                        if (conditions.tag_pattern && eventData.release_tag) {
+                            const regex = new RegExp(conditions.tag_pattern);
+                            if (!regex.test(eventData.release_tag)) shouldTrigger = false;
+                        }
+                        
+                        if (conditions.release_type && conditions.release_type !== 'any' && eventData.release_type !== conditions.release_type) {
+                            shouldTrigger = false;
+                        }
+                        
+                        if (conditions.brain_name_pattern && eventData.brain_name) {
+                            const regex = new RegExp(conditions.brain_name_pattern);
+                            if (!regex.test(eventData.brain_name)) shouldTrigger = false;
+                        }
+                        
+                        if (shouldTrigger) {
+                            triggeredPipelines.push({
+                                pipeline_id: pipeline.id,
+                                pipeline_name: pipeline.name,
+                                trigger_id: trigger.id,
+                                event: eventType
+                            });
+                        }
+                    }
+                }
+                
+                return Response.json({
+                    success: true,
+                    event: eventType,
+                    triggered: triggeredPipelines.length,
+                    pipelines: triggeredPipelines
+                });
+            }
+            
+            // AUTO TRIGGER - check and execute matching pipelines
+            case 'autoTrigger': {
+                const { eventType, eventData = {}, execute = false } = params;
+                
+                // First check which pipelines match
+                const pipelines = await base44.entities.BrainPipeline.filter({ status: 'active' });
+                const results = [];
+                
+                for (const pipeline of pipelines) {
+                    if (!pipeline.triggers?.length) continue;
+                    
+                    for (const trigger of pipeline.triggers) {
+                        if (!trigger.enabled || trigger.event !== eventType) continue;
+                        
+                        const conditions = trigger.conditions || {};
+                        let match = true;
+                        
+                        if (conditions.entity_type && eventData.entity_type !== conditions.entity_type) match = false;
+                        if (conditions.branch_pattern && eventData.branch && !new RegExp(conditions.branch_pattern).test(eventData.branch)) match = false;
+                        if (conditions.tag_pattern && eventData.release_tag && !new RegExp(conditions.tag_pattern).test(eventData.release_tag)) match = false;
+                        if (conditions.release_type && conditions.release_type !== 'any' && eventData.release_type !== conditions.release_type) match = false;
+                        if (conditions.brain_name_pattern && eventData.brain_name && !new RegExp(conditions.brain_name_pattern).test(eventData.brain_name)) match = false;
+                        
+                        if (match) {
+                            let executionResult = null;
+                            
+                            if (execute) {
+                                // Actually execute the pipeline
+                                const execResults = {};
+                                const execLog = [];
+                                
+                                for (const node of (pipeline.nodes || [])) {
+                                    try {
+                                        let output = null;
+                                        const nodeInput = { ...eventData };
+                                        
+                                        if (node.type === 'brain' && node.source_id) {
+                                            const brain = await base44.entities.Brain.get(node.source_id);
+                                            output = brain?.model_files?.snapshot || {};
+                                        } else if (node.type === 'tape' && node.source_id) {
+                                            const tape = await base44.entities.Tape.get(node.source_id);
+                                            output = tape?.snapshot_data || {};
+                                        } else if (node.type === 'router') {
+                                            output = { routed: true, input: nodeInput };
+                                        }
+                                        
+                                        execResults[node.id] = output;
+                                        execLog.push({ node: node.id, status: 'success' });
+                                    } catch (err) {
+                                        execLog.push({ node: node.id, status: 'error', error: err.message });
+                                    }
+                                }
+                                
+                                await base44.entities.BrainPipeline.update(pipeline.id, {
+                                    last_run: new Date().toISOString(),
+                                    run_count: (pipeline.run_count || 0) + 1
+                                });
+                                
+                                executionResult = { results: execResults, log: execLog };
+                            }
+                            
+                            results.push({
+                                pipeline_id: pipeline.id,
+                                pipeline_name: pipeline.name,
+                                trigger: trigger.event,
+                                executed: execute,
+                                execution: executionResult
+                            });
+                        }
+                    }
+                }
+                
+                return Response.json({
+                    success: true,
+                    event: eventType,
+                    matched: results.length,
+                    results
+                });
+            }
+            
+            // ADD TRIGGER to pipeline
+            case 'addTrigger': {
+                const { pipelineId, event, conditions = {}, schedule = null, enabled = true } = params;
+                
+                const pipeline = await base44.entities.BrainPipeline.get(pipelineId);
+                if (!pipeline) {
+                    return Response.json({ error: 'Pipeline not found' }, { status: 404 });
+                }
+                
+                const newTrigger = {
+                    id: `trigger_${Date.now()}`,
+                    event,
+                    enabled,
+                    conditions,
+                    schedule
+                };
+                
+                const triggers = [...(pipeline.triggers || []), newTrigger];
+                
+                await base44.entities.BrainPipeline.update(pipelineId, { triggers });
+                
+                return Response.json({
+                    success: true,
+                    trigger: newTrigger,
+                    message: `Added ${event} trigger to pipeline`
+                });
+            }
+            
+            // REMOVE TRIGGER
+            case 'removeTrigger': {
+                const { pipelineId, triggerId } = params;
+                
+                const pipeline = await base44.entities.BrainPipeline.get(pipelineId);
+                if (!pipeline) {
+                    return Response.json({ error: 'Pipeline not found' }, { status: 404 });
+                }
+                
+                const triggers = (pipeline.triggers || []).filter(t => t.id !== triggerId);
+                await base44.entities.BrainPipeline.update(pipelineId, { triggers });
+                
+                return Response.json({ success: true, message: 'Trigger removed' });
+            }
+            
+            // TOGGLE TRIGGER
+            case 'toggleTrigger': {
+                const { pipelineId, triggerId } = params;
+                
+                const pipeline = await base44.entities.BrainPipeline.get(pipelineId);
+                if (!pipeline) {
+                    return Response.json({ error: 'Pipeline not found' }, { status: 404 });
+                }
+                
+                const triggers = (pipeline.triggers || []).map(t => 
+                    t.id === triggerId ? { ...t, enabled: !t.enabled } : t
+                );
+                await base44.entities.BrainPipeline.update(pipelineId, { triggers });
+                
+                const trigger = triggers.find(t => t.id === triggerId);
+                
+                return Response.json({ 
+                    success: true, 
+                    enabled: trigger?.enabled,
+                    message: `Trigger ${trigger?.enabled ? 'enabled' : 'disabled'}` 
+                });
+            }
+            
             // PING NODE (API route communication)
             case 'pingNode': {
                 const { pipelineId, nodeId, data = {} } = params;
