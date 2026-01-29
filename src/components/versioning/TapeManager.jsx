@@ -352,8 +352,8 @@ export default function TapeManager({ entityType, entityId, entityName }) {
         {/* Releases Tab */}
         <TabsContent value="releases">
           <ReleaseManager 
-            entityType={selectedType} 
-            entityId={selectedEntityId} 
+            entityType={entityType} 
+            entityId={entityId} 
             tapes={logData?.tapes || []}
           />
         </TabsContent>
