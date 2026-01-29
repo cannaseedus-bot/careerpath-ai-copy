@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMeshNetwork } from '@/components/mesh/MeshServiceWorker';
+import MergeProposalManager from '@/components/mesh/MergeProposalManager';
+import VersionHistoryPanel from '@/components/mesh/VersionHistoryPanel';
 
 const tapeManager = async (payload) => base44.functions.invoke('tapeManager', payload);
 
@@ -227,10 +229,40 @@ export default function MeshDashboard() {
         <Tabs defaultValue="nodes" className="space-y-4">
           <TabsList className="bg-slate-800">
             <TabsTrigger value="nodes"><Users className="w-4 h-4 mr-1" /> Network Nodes</TabsTrigger>
+            <TabsTrigger value="merges"><GitBranch className="w-4 h-4 mr-1" /> Merge Proposals</TabsTrigger>
+            <TabsTrigger value="versions"><Clock className="w-4 h-4 mr-1" /> Version History</TabsTrigger>
             <TabsTrigger value="brains"><Brain className="w-4 h-4 mr-1" /> Brains</TabsTrigger>
             <TabsTrigger value="tapes"><Database className="w-4 h-4 mr-1" /> Tapes</TabsTrigger>
             <TabsTrigger value="marketplace"><Globe className="w-4 h-4 mr-1" /> Marketplace</TabsTrigger>
           </TabsList>
+
+          {/* Merge Proposals Tab */}
+          <TabsContent value="merges">
+            <Card className="bg-slate-900 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <GitBranch className="w-5 h-5 text-purple-400" /> Network Merge Proposals
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MergeProposalManager nodeId={localNodeId} sharedBrains={sharedBrains} sharedTapes={sharedTapes} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Version History Tab */}
+          <TabsContent value="versions">
+            <Card className="bg-slate-900 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-yellow-400" /> Mesh Version History
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <VersionHistoryPanel nodeId={localNodeId} />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Nodes Tab */}
           <TabsContent value="nodes">
