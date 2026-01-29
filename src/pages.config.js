@@ -70,6 +70,7 @@ import ShellAssistant from './pages/ShellAssistant';
 import Success from './pages/Success';
 import VersionControl from './pages/VersionControl';
 import Marketplace from './pages/Marketplace';
+import MeshDashboard from './pages/MeshDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -97,6 +98,7 @@ export const PAGES = {
     "Success": Success,
     "VersionControl": VersionControl,
     "Marketplace": Marketplace,
+    "MeshDashboard": MeshDashboard,
 }
 
 export const pagesConfig = {

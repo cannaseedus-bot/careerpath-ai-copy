@@ -22,6 +22,7 @@ const navigationItems = {
     APIManager: [],
     CLIPlayground: [],
     Marketplace: [],
+    MeshDashboard: [],
     Career: [
         { title: "Mission", id: "hero", icon: User },
         { title: "Studios", id: "studios", icon: Briefcase },
