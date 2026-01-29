@@ -8,9 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   GitBranch, GitCommit, History, RotateCcw, Plus, 
-  Diff, Archive, Tag, Check, Loader2, ChevronRight
+  Diff, Archive, Tag, Check, Loader2, ChevronRight, Rocket, GitCompare
 } from 'lucide-react';
 import { toast } from 'sonner';
+import ReleaseManager from './ReleaseManager';
+import BranchCompare from './BranchCompare';
 
 // Wrapper for backend function
 const tapeManager = async (payload) => {
@@ -172,10 +174,12 @@ export default function TapeManager({ entityType, entityId, entityName }) {
       </Card>
 
       <Tabs defaultValue="commit" className="space-y-4">
-        <TabsList className="bg-slate-800 border-slate-700">
+        <TabsList className="bg-slate-800 border-slate-700 flex-wrap">
           <TabsTrigger value="commit"><GitCommit className="w-4 h-4 mr-1" />Commit</TabsTrigger>
           <TabsTrigger value="history"><History className="w-4 h-4 mr-1" />History</TabsTrigger>
+          <TabsTrigger value="releases"><Rocket className="w-4 h-4 mr-1" />Releases</TabsTrigger>
           <TabsTrigger value="branches"><GitBranch className="w-4 h-4 mr-1" />Branches</TabsTrigger>
+          <TabsTrigger value="compare"><GitCompare className="w-4 h-4 mr-1" />Compare</TabsTrigger>
         </TabsList>
 
         {/* Commit Tab */}
@@ -345,6 +349,15 @@ export default function TapeManager({ entityType, entityId, entityName }) {
           )}
         </TabsContent>
 
+        {/* Releases Tab */}
+        <TabsContent value="releases">
+          <ReleaseManager 
+            entityType={selectedType} 
+            entityId={selectedEntityId} 
+            tapes={logData?.tapes || []}
+          />
+        </TabsContent>
+
         {/* Branches Tab */}
         <TabsContent value="branches">
           <Card className="bg-slate-900 border-slate-700">
@@ -386,6 +399,15 @@ export default function TapeManager({ entityType, entityId, entityName }) {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Compare Tab */}
+        <TabsContent value="compare">
+          <BranchCompare 
+            entityType={entityType} 
+            entityId={entityId} 
+            branches={status?.registry?.branches || []}
+          />
         </TabsContent>
       </Tabs>
     </div>

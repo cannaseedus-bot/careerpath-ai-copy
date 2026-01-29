@@ -330,6 +330,167 @@ Deno.serve(async (req) => {
                 });
             }
             
+            // CREATE RELEASE from tape
+            case 'release': {
+                const { tapeId, releaseTag, releaseType = 'stable', releaseNotes = '' } = params;
+                
+                const tape = await base44.entities.Tape.get(tapeId);
+                if (!tape) {
+                    return Response.json({ error: 'Tape not found' }, { status: 404 });
+                }
+                
+                // Check if release tag already exists
+                const existingRelease = await base44.entities.Tape.filter({
+                    entity_type: tape.entity_type,
+                    entity_id: tape.entity_id,
+                    release_tag: releaseTag
+                });
+                
+                if (existingRelease.length > 0) {
+                    return Response.json({ error: `Release tag '${releaseTag}' already exists` }, { status: 400 });
+                }
+                
+                // Update tape with release info
+                await base44.entities.Tape.update(tapeId, {
+                    release_tag: releaseTag,
+                    is_release: true,
+                    release_type: releaseType,
+                    release_notes: releaseNotes,
+                    tags: [...(tape.tags || []), 'release', releaseType]
+                });
+                
+                return Response.json({
+                    success: true,
+                    message: `Created release ${releaseTag}`,
+                    releaseTag,
+                    releaseType
+                });
+            }
+            
+            // LIST RELEASES
+            case 'releases': {
+                const { entityType, entityId } = params;
+                
+                const releases = await base44.entities.Tape.filter({
+                    entity_type: entityType,
+                    entity_id: entityId,
+                    is_release: true
+                }, '-created_date', 50);
+                
+                return Response.json({
+                    success: true,
+                    releases: releases.map(r => ({
+                        id: r.id,
+                        release_tag: r.release_tag,
+                        release_type: r.release_type,
+                        release_notes: r.release_notes,
+                        version: r.version,
+                        branch: r.branch,
+                        checksum: r.checksum?.substring(0, 8),
+                        created_date: r.created_date
+                    }))
+                });
+            }
+            
+            // COMPARE BRANCHES
+            case 'compareBranches': {
+                const { entityType, entityId, branch1, branch2 } = params;
+                
+                // Get tapes from both branches
+                const tapes1 = await base44.entities.Tape.filter({
+                    entity_type: entityType,
+                    entity_id: entityId,
+                    branch: branch1,
+                    status: 'active'
+                }, '-created_date', 50);
+                
+                const tapes2 = await base44.entities.Tape.filter({
+                    entity_type: entityType,
+                    entity_id: entityId,
+                    branch: branch2,
+                    status: 'active'
+                }, '-created_date', 50);
+                
+                // Find common ancestor (simplified - find matching checksums)
+                const checksums1 = new Set(tapes1.map(t => t.checksum));
+                const checksums2 = new Set(tapes2.map(t => t.checksum));
+                
+                const commonChecksums = [...checksums1].filter(c => checksums2.has(c));
+                const commonAncestor = commonChecksums.length > 0 
+                    ? tapes1.find(t => t.checksum === commonChecksums[0]) 
+                    : null;
+                
+                // Tapes unique to each branch
+                const uniqueTo1 = tapes1.filter(t => !checksums2.has(t.checksum));
+                const uniqueTo2 = tapes2.filter(t => !checksums1.has(t.checksum));
+                
+                // Get latest from each branch for diff
+                let contentDiff = null;
+                if (tapes1[0] && tapes2[0]) {
+                    const data1 = scxq2Decompress(tapes1[0].snapshot_data);
+                    const data2 = scxq2Decompress(tapes2[0].snapshot_data);
+                    contentDiff = computeDiff(data1, data2);
+                }
+                
+                return Response.json({
+                    success: true,
+                    branch1: {
+                        name: branch1,
+                        totalTapes: tapes1.length,
+                        latestVersion: tapes1[0]?.version,
+                        uniqueTapes: uniqueTo1.map(t => ({
+                            id: t.id,
+                            version: t.version,
+                            name: t.name,
+                            checksum: t.checksum?.substring(0, 8),
+                            created_date: t.created_date
+                        }))
+                    },
+                    branch2: {
+                        name: branch2,
+                        totalTapes: tapes2.length,
+                        latestVersion: tapes2[0]?.version,
+                        uniqueTapes: uniqueTo2.map(t => ({
+                            id: t.id,
+                            version: t.version,
+                            name: t.name,
+                            checksum: t.checksum?.substring(0, 8),
+                            created_date: t.created_date
+                        }))
+                    },
+                    commonAncestor: commonAncestor ? {
+                        id: commonAncestor.id,
+                        version: commonAncestor.version,
+                        checksum: commonAncestor.checksum?.substring(0, 8)
+                    } : null,
+                    contentDiff,
+                    ahead: uniqueTo1.length,
+                    behind: uniqueTo2.length
+                });
+            }
+            
+            // TAG existing tape
+            case 'tag': {
+                const { tapeId, tag } = params;
+                
+                const tape = await base44.entities.Tape.get(tapeId);
+                if (!tape) {
+                    return Response.json({ error: 'Tape not found' }, { status: 404 });
+                }
+                
+                const existingTags = tape.tags || [];
+                if (!existingTags.includes(tag)) {
+                    await base44.entities.Tape.update(tapeId, {
+                        tags: [...existingTags, tag]
+                    });
+                }
+                
+                return Response.json({
+                    success: true,
+                    message: `Added tag '${tag}' to tape v${tape.version}`
+                });
+            }
+            
             default:
                 return Response.json({ error: 'Unknown action' }, { status: 400 });
         }
